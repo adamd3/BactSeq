@@ -42,9 +42,9 @@ if (params.sample_file) {
     ch_samples = file(params.sample_file, checkIfExists: true)
 } else { exit 1, 'Sample file not specified!' }
 
-// if (params.multifasta_file) {
-//     ch_multifasta_file = file(params.multifasta_file, checkIfExists: true)
-// } else { exit 1, 'Multi-fasta file not specified!' }
+if (params.ref_genome) {
+    ch_fasta_file = file(params.ref_genome, checkIfExists: true)
+} else { exit 1, 'Reference genome FASTA file not specified!' }
 
 // if (params.faidx_file) {
 //     ch_faidx_file = file(params.faidx_file, checkIfExists: true)
@@ -64,6 +64,7 @@ if (params.sample_file) {
 */
 include {MAKE_META_FILE} from './modules/metadata'
 include {TRIMGALORE} from './modules/trim_reads'
+include {MAKE_BWA_INDEX} from './modules/bwa_align'
 // include {MAKE_KALLISTO_INDEX; KALLISTO_QUANT; MERGE_COUNTS; MERGE_LENS} from './modules/kallisto'
 // include {SUBSET_GENES; LENGTH_SCALE_COUNTS; TMM_NORMALISE_COUNTS} from './modules/normalisation'
 
@@ -91,7 +92,7 @@ workflow {
      */
     ch_metadata
         .splitCsv(header:true, sep:'\t')
-        .map { row -> [ row.sample_id, [ file(row.path_to_file, checkIfExists: true) ] ] }
+        .map { row -> [ row.sample, [ file(row.path_to_file, checkIfExists: true) ] ] }
         .set { ch_raw_reads_trimgalore }
 
 
@@ -112,13 +113,24 @@ workflow {
     }
 
 
+    /*
+     *  Create a bwa index for the genome
+     */
+    MAKE_BWA_INDEX (
+        ch_fasta_file
+    )
+    ch_bwa_idx = MAKE_BWA_INDEX.out.bwa_idx
+
     // /*
-    //  *  Create a Kallisto index for each strain
+    //  *  Align reads to the genome
     //  */
-    // MAKE_KALLISTO_INDEX (
-    //     ch_clone_fasta
-    // )
-    // ch_kallisto_idx = MAKE_KALLISTO_INDEX.out.kallisto_idx
+    BWA_ALIGN (
+        ch_trimmed_reads,
+        ch_bwa_idx
+    )
+    ch_bwa_out = BWA_ALIGN.out.bwa_out
+
+
     //
     //
     // /*
@@ -202,6 +214,7 @@ def helpMessage() {
     Mandatory arguments:
       --data_dir [file]               Path to directory containing FastQ files.
       --sample_file [file]            Path to file containing sample information.
+      --ref_genome [file]             Path to FASTA file containing reference genome sequence.
       -profile [str]                  Configuration profile to use. Can use multiple (comma separated).
                                       Available: conda, docker
 

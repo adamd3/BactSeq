@@ -213,7 +213,6 @@ def helpMessage() {
       --data_dir [file]               Path to directory containing FastQ files.
       --sample_file [file]            Path to file containing sample information.
       --ref_genome [file]             Path to FASTA file containing reference genome sequence.
-      --ref_name [str]                Name of the reference strain (must match FASTA file name).
       -profile [str]                  Configuration profile to use. Can use multiple (comma separated).
                                       Available: conda, docker
 

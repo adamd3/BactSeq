@@ -29,7 +29,7 @@ process BWA_ALIGN {
 
     script:
     """
-    bwa mem -t ${task.cpus} ${idx} ${reads} | samtools sort -@ ${task.cpus - 1} -O bam - > ${name}.bam
+    bwa mem -t ${task.cpus} ${params.ref_name} ${reads} | samtools sort -@ ${task.cpus - 1} -O bam - > ${name}.bam
     samtools index -@ ${task.cpus} ${name}.bam
     """
 }

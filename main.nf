@@ -35,8 +35,6 @@ if (!(workflow.runName ==~ /[a-z]+_[a-z]+/)) {
 ================================================================================
 */
 
-// ## to get the sample sheet from an ENA file list (for fetchngs):
-// awk -F '\t' 'BEGIN{print "sample\tfilename\tgroup\trepeat"} FNR > 1 {printf "%s\t%s\t%s\t%s\n", $3,$3"_T1.fastq.gz",$10,"1"}' ENA_file_list.tsv > sample_info.tsv
 
 if (params.sample_file) {
     ch_samples = file(params.sample_file, checkIfExists: true)

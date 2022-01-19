@@ -117,7 +117,7 @@ workflow {
     MAKE_BWA_INDEX (
         ch_fasta_file
     )
-    ch_bwa_idx = MAKE_BWA_INDEX.out.bwa_idx
+    ch_bwa_idx = MAKE_BWA_INDEX.out.bwa_idx.first()
 
     // /*
     //  *  Align reads to the genome

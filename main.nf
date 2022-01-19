@@ -62,7 +62,7 @@ if (params.ref_genome) {
 */
 include {MAKE_META_FILE} from './modules/metadata'
 include {TRIMGALORE} from './modules/trim_reads'
-include {MAKE_BWA_INDEX} from './modules/bwa_align'
+include {MAKE_BWA_INDEX; BWA_ALIGN} from './modules/bwa_align'
 // include {MAKE_KALLISTO_INDEX; KALLISTO_QUANT; MERGE_COUNTS; MERGE_LENS} from './modules/kallisto'
 // include {SUBSET_GENES; LENGTH_SCALE_COUNTS; TMM_NORMALISE_COUNTS} from './modules/normalisation'
 

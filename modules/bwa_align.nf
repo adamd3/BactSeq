@@ -25,7 +25,7 @@ process BWA_ALIGN {
     path idx
 
     output:
-    tuple name, path('*.bam'), path('*.bai'), emit: bwa_out
+    tuple val(name), path('*.bam'), path('*.bai'), emit: bwa_out
 
     script:
     """

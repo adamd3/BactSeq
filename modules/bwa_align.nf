@@ -1,5 +1,5 @@
 process MAKE_BWA_INDEX {
-    tag "$name"
+    tag "$ref_genome"
     label 'process_high'
     publishDir "${params.outdir}/bwa_idx", mode: 'copy'
 

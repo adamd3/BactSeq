@@ -129,15 +129,6 @@ workflow {
         ch_trimmed_reads,
         ch_bwa_idx
     )
-    ch_bwa_out = BWA_ALIGN.out.bwa_out
-
-    /*
-     *  Align reads to the genome + count total mapped reads
-     */
-    BWA_ALIGN (
-        ch_trimmed_reads,
-        ch_bwa_idx
-    )
     ch_kallisto_out_bam = BWA_ALIGN.out.bam_files.collect()
     ch_kallisto_out_bai = BWA_ALIGN.out.bai_files.collect()
     ch_kallisto_out_count = BWA_ALIGN.out.count_files.collect()

@@ -44,6 +44,7 @@ if (params.ref_genome) {
     ch_fasta_file = file(params.ref_genome, checkIfExists: true)
 } else { exit 1, 'Reference genome FASTA file not specified!' }
 
+
 // if (params.faidx_file) {
 //     ch_faidx_file = file(params.faidx_file, checkIfExists: true)
 // } else { exit 1, 'Index for multi-fasta file not specified!' }
@@ -63,6 +64,7 @@ if (params.ref_genome) {
 include {MAKE_META_FILE} from './modules/metadata'
 include {TRIMGALORE} from './modules/trim_reads'
 include {MAKE_BWA_INDEX; BWA_ALIGN} from './modules/bwa_align'
+include {COUNT_READS} from './modules/count_reads'
 // include {MAKE_KALLISTO_INDEX; KALLISTO_QUANT; MERGE_COUNTS; MERGE_LENS} from './modules/kallisto'
 // include {SUBSET_GENES; LENGTH_SCALE_COUNTS; TMM_NORMALISE_COUNTS} from './modules/normalisation'
 
@@ -76,9 +78,9 @@ include {MAKE_BWA_INDEX; BWA_ALIGN} from './modules/bwa_align'
 */
 workflow {
 
-    // /*
-    //  * Make metadata file linking samples with FastQ files
-    //  */
+    /*
+     * Make metadata file linking samples with FastQ files
+     */
     MAKE_META_FILE (
         ch_samples
     )
@@ -112,22 +114,44 @@ workflow {
 
 
     /*
-     *  Create a bwa index for the genome
+     *  Create a bwa index for the reference genome
      */
     MAKE_BWA_INDEX (
         ch_fasta_file
     )
     ch_bwa_idx = MAKE_BWA_INDEX.out.bwa_idx
 
-    // /*
-    //  *  Align reads to the genome
-    //  */
+
+    /*
+     *  Align reads to the genome + count total mapped reads
+     */
     BWA_ALIGN (
         ch_trimmed_reads,
         ch_bwa_idx
     )
     ch_bwa_out = BWA_ALIGN.out.bwa_out
 
+    /*
+     *  Align reads to the genome + count total mapped reads
+     */
+    BWA_ALIGN (
+        ch_trimmed_reads,
+        ch_bwa_idx
+    )
+    ch_kallisto_out_bam = BWA_ALIGN.out.bam_files.collect()
+    ch_kallisto_out_bai = BWA_ALIGN.out.bai_files.collect()
+    ch_kallisto_out_count = BWA_ALIGN.out.count_files.collect()
+
+    /*
+     *  Count reads mapped per gene; summarise library composition
+     */
+    COUNT_READS (
+        ch_kallisto_out_bam,
+        ch_kallisto_out_bai,
+        ch_kallisto_out_count,
+        ch_metadata
+    )
+    ch_readcounts_out = COUNT_READS.out.counts_out
 
     //
     //
@@ -213,6 +237,7 @@ def helpMessage() {
       --data_dir [file]               Path to directory containing FastQ files.
       --sample_file [file]            Path to file containing sample information.
       --ref_genome [file]             Path to FASTA file containing reference genome sequence.
+      --ref_ann [file]                Path to GFF file containing reference genome annotation.
       -profile [str]                  Configuration profile to use. Can use multiple (comma separated).
                                       Available: conda, docker
 

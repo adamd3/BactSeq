@@ -93,9 +93,14 @@ workflow {
     /*
      *  Create channels for input files
      */
+    // ch_metadata
+    //     .splitCsv(header:true, sep:'\t')
+    //     .map { row -> [ row.sample, [ file(row.path_to_file, checkIfExists: true) ] ] }
+    //     .set { ch_raw_reads_trimgalore }
+
     ch_metadata
         .splitCsv(header:true, sep:'\t')
-        .map { row -> [ row.sample, [ file(row.path_to_file, checkIfExists: true) ] ] }
+        .map { row -> [ file(row.path_to_file, checkIfExists: true) ] }
         .set { ch_raw_reads_trimgalore }
 
     ch_metadata

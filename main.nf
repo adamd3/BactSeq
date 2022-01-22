@@ -133,6 +133,7 @@ workflow {
     ch_bwa_out_bai = BWA_ALIGN.out.bai_files.collect()
     ch_bwa_out_count = BWA_ALIGN.out.count_files.collect()
 
+
     /*
      *  Count reads mapped per gene; summarise library composition
      */

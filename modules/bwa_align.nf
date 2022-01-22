@@ -16,7 +16,7 @@ process MAKE_BWA_INDEX {
 }
 
 process BWA_ALIGN {
-    tag "$trimmed_reads"
+    tag "$name"
     label 'process_high'
     publishDir "${params.outdir}/bwa_aln", mode: 'copy'
 

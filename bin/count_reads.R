@@ -120,9 +120,9 @@ ggCols <- c(brewer_pallette1[1],brewer_pallette1[3])
 
 ## summarise counts per sample
 counts_summary <- data.frame(
-    sample = meta_tab$sample,
-    group = meta_tab$group,
-    rep = meta_tab$repeat,
+    sample = meta_tab$"sample",
+    group = meta_tab$"group",
+    rep = meta_tab$"repeat",
     # protein_coding = colSums(
     #     gene_counts$counts[ref_gene_df$biotype=="protein_coding",]),
     # tRNA = colSums(

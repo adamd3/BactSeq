@@ -93,14 +93,9 @@ workflow {
     /*
      *  Create channels for input files
      */
-    // ch_metadata
-    //     .splitCsv(header:true, sep:'\t')
-    //     .map { row -> [ row.sample, [ file(row.path_to_file, checkIfExists: true) ] ] }
-    //     .set { ch_raw_reads_trimgalore }
-
     ch_metadata
         .splitCsv(header:true, sep:'\t')
-        .map { row -> [ file(row.path_to_file, checkIfExists: true) ] }
+        .map { row -> [ row.sample, [ file(row.path_to_file, checkIfExists: true) ] ] }
         .set { ch_raw_reads_trimgalore }
 
     ch_metadata
@@ -117,7 +112,7 @@ workflow {
         ch_trimgalore_fastqc_reports_mqc = Channel.empty()
     } else {
         TRIMGALORE (
-            ch_raw_reads_trimgalore.collect()
+            ch_raw_reads_trimgalore
         )
         ch_trimmed_reads = TRIMGALORE.out.trimmed_reads.collect()
         ch_trimgalore_results_mqc = TRIMGALORE.out.trimgalore_results_mqc

@@ -1,5 +1,5 @@
 process TRIMGALORE {
-    tag "$reads_collected"
+    tag "$name"
     label 'process_high'
     publishDir "${params.outdir}/trim_galore", mode: 'copy',
         saveAs: { filename ->
@@ -10,7 +10,7 @@ process TRIMGALORE {
                 }
 
     input:
-    path reads_collected
+    tuple val(name), path(reads)
 
     output:
     path '*.fq.gz', emit: trimmed_reads
@@ -29,7 +29,9 @@ process TRIMGALORE {
         if (cores > 4) cores = 4
     }
 
+    // Add symlinks to original fastqs for consistent naming in MultiQC
     """
-    trim_galore --cores $cores --fastqc --gzip *.fastq.gz
+    [ ! -f  ${name}.fastq.gz ] && ln -s $reads ${name}.fastq.gz
+    trim_galore --cores $cores --fastqc --gzip ${name}.fastq.gz
     """
 }

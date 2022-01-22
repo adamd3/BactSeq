@@ -21,7 +21,7 @@ process BWA_ALIGN {
     publishDir "${params.outdir}/bwa_aln", mode: 'copy'
 
     input:
-    tuple val(name), path(reads)
+    path trimmed_reads
     path idx
 
     output:
@@ -31,7 +31,7 @@ process BWA_ALIGN {
 
     script:
     """
-    bwa mem -t ${task.cpus} ref_idx ${reads} | samtools sort -@ ${task.cpus - 1} -O bam - > ${name}.bam
+    bwa mem -t ${task.cpus} ref_idx ${name}_trimmed.fq.gz | samtools sort -@ ${task.cpus - 1} -O bam - > ${name}.bam
     samtools index -@ ${task.cpus} ${name}.bam
     samtools idxstats ${name}.bam | head -n 1 > ${name}.counts
     """

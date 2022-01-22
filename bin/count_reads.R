@@ -86,7 +86,7 @@ ref_gene_df$gene_name <- gsub("gene=","",ref_gene_df$gene_name)
 ##------------------------------------------------------------------------------
 ## Count reads mapping to genes
 ##------------------------------------------------------------------------------
-bamfilesCount <- file.path(meta_tab$sample, ".bam")
+bamfilesCount <- paste0(meta_tab$sample, ".bam")
 
 gene_counts <- Rsubread::featureCounts(
     bamfilesCount, annot.ext = gff_f,

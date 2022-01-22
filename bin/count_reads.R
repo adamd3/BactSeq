@@ -45,7 +45,7 @@ meta_tab <- read.table(meta_f, header = TRUE, sep = "\t")
 ## cat the counts files
 # system("cat *.counts > merged_counts.txt")
 total_counts_list <- lapply(meta_tab$sample, function(x){
-    total_counts <- read.table(file.path(x,".counts"), header = FALSE, sep = "\t")
+    total_counts <- read.table(paste0(x,".counts"), header = FALSE, sep = "\t")
     total_counts$sample <- x
     colnames(total_counts) <- c("chr","chr_size","mapped","blank","sample")
 })

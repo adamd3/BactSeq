@@ -15,6 +15,6 @@ process COUNT_READS {
 
     script:
     """
-    Rscript count_reads.R -m $meta -g ${params.ref_ann}
+    count_reads.R -m $meta -g ${params.ref_ann}
     """
 }

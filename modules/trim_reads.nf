@@ -1,5 +1,5 @@
 process TRIMGALORE {
-    tag "$name"
+    tag "$reads_collected"
     label 'process_high'
     publishDir "${params.outdir}/trim_galore", mode: 'copy',
         saveAs: { filename ->

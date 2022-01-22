@@ -15,6 +15,12 @@ if (!require("ape")){
 if (!require("stringr")){
     install.packages("stringr")
 }
+if (!require("ggplot2")){
+    install.packages("ggplot2")
+}
+if (!require("scales")){
+    install.packages("scales")
+}
 if (!require("RColorBrewer")){
     install.packages("RColorBrewer")
 }
@@ -48,6 +54,7 @@ total_counts_list <- lapply(meta_tab$sample, function(x){
     total_counts <- read.table(paste0(x,".counts"), header = FALSE, sep = "\t")
     total_counts$sample <- x
     colnames(total_counts) <- c("chr","chr_size","mapped","blank","sample")
+    total_counts
 })
 merged_total_counts <- as.data.frame(do.call(rbind, total_counts_list))
 
@@ -122,7 +129,7 @@ ggCols <- c(brewer_pallette1[1],brewer_pallette1[3])
 counts_summary <- data.frame(
     sample = meta_tab$"sample",
     group = meta_tab$"group",
-    rep = meta_tab$"repeat",
+    rep = meta_tab$"rep",
     # protein_coding = colSums(
     #     gene_counts$counts[ref_gene_df$biotype=="protein_coding",]),
     # tRNA = colSums(
@@ -140,21 +147,21 @@ counts_summary <- data.frame(
 
 ## add total mapped counts
 counts_summary <- merge(counts_summary,merged_total_counts, by = "sample")
-counts_summary$non_rRNA <- counts_summary$mapped-counts_summary$rRNA
+counts_summary$non_rRNA <- counts_summary$mapped-counts_summary$rRNA_genes
 
 counts_summary <- counts_summary[rev(order(counts_summary$sample)),]
 
 counts_melt <- reshape2::melt(
     counts_summary, id.vars = c("sample"),
-    measure.vars = c("non_rRNA", "rRNA")
+    measure.vars = c("non_rRNA", "rRNA_genes")
 )
 counts_melt$sample <- factor(
     counts_melt$sample, levels = rev(unique(sort(counts_melt$sample)))
 )
-counts_melt$variable <- factor(counts_melt$variable, levels=c("rRNA", "non_rRNA"))
+counts_melt$variable <- factor(counts_melt$variable, levels=c("rRNA_genes", "non_rRNA"))
 # minUsable <- min(mergedDf$q15_dedup_reads)
 
-
+cc1 <- 12
 p1 <- ggplot(counts_melt,
         aes(x = sample, colour = variable, fill = variable, y = value)
     ) + geom_bar(position = "stack", stat = "identity", width = 0.7) +

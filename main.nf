@@ -44,6 +44,9 @@ if (params.ref_genome) {
     ch_fasta_file = file(params.ref_genome, checkIfExists: true)
 } else { exit 1, 'Reference genome FASTA file not specified!' }
 
+if (params.ref_ann) {
+    ch_gff_file = file(params.ref_ann, checkIfExists: true)
+} else { exit 1, 'Reference genome GFF file not specified!' }
 
 // if (params.faidx_file) {
 //     ch_faidx_file = file(params.faidx_file, checkIfExists: true)
@@ -95,6 +98,10 @@ workflow {
         .map { row -> [ row.sample, [ file(row.path_to_file, checkIfExists: true) ] ] }
         .set { ch_raw_reads_trimgalore }
 
+    ch_metadata
+        .splitCsv(header: true, sep:'\t')
+        .map { row -> row.sample }
+        .set { ch_sample_ids }
 
     /*
      *  Trim reads
@@ -127,7 +134,8 @@ workflow {
      */
     BWA_ALIGN (
         ch_trimmed_reads,
-        ch_bwa_idx
+        ch_bwa_idx,
+        ch_sample_ids
     )
     ch_bwa_out_bam = BWA_ALIGN.out.bam_files.collect()
     ch_bwa_out_bai = BWA_ALIGN.out.bai_files.collect()
@@ -141,7 +149,8 @@ workflow {
         ch_bwa_out_bam,
         ch_bwa_out_bai,
         ch_bwa_out_count,
-        ch_metadata
+        ch_metadata,
+        ch_gff_file
     )
     ch_readcounts_out = COUNT_READS.out.counts_out
 

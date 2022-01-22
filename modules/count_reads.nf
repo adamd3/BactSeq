@@ -9,12 +9,13 @@ process COUNT_READS {
     path bai
     path counts
     path meta
+    path gff
 
     output:
     path "gene_counts.tsv", emit: counts_out
 
     script:
     """
-    count_reads.R -m $meta -g ${params.ref_ann}
+    count_reads.R -m $meta -g $gff
     """
 }

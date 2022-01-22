@@ -23,6 +23,7 @@ process BWA_ALIGN {
     input:
     path trimmed_reads
     path idx
+    val name
 
     output:
     path '*.bam', emit: bam_files

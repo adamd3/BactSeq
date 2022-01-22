@@ -1,6 +1,6 @@
 
 process COUNT_READS {
-    tag "$name"
+    tag "$bam"
     label 'process_high'
     publishDir "${params.outdir}/bwa_aln", mode: 'copy'
 

@@ -2,7 +2,7 @@
 process COUNT_READS {
     tag "$bam"
     label 'process_high'
-    publishDir "${params.outdir}/bwa_aln", mode: 'copy'
+    publishDir "${params.outdir}/read_counts", mode: 'copy'
 
     input:
     path bam
@@ -12,7 +12,7 @@ process COUNT_READS {
     path gff
 
     output:
-    path "gene_counts.tsv", emit: counts_out
+    path '*.{tsv,png}', emit: counts_out
 
     script:
     """

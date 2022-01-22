@@ -129,17 +129,17 @@ workflow {
         ch_trimmed_reads,
         ch_bwa_idx
     )
-    ch_kallisto_out_bam = BWA_ALIGN.out.bam_files.collect()
-    ch_kallisto_out_bai = BWA_ALIGN.out.bai_files.collect()
-    ch_kallisto_out_count = BWA_ALIGN.out.count_files.collect()
+    ch_bwa_out_bam = BWA_ALIGN.out.bam_files.collect()
+    ch_bwa_out_bai = BWA_ALIGN.out.bai_files.collect()
+    ch_bwa_out_count = BWA_ALIGN.out.count_files.collect()
 
     /*
      *  Count reads mapped per gene; summarise library composition
      */
     COUNT_READS (
-        ch_kallisto_out_bam,
-        ch_kallisto_out_bai,
-        ch_kallisto_out_count,
+        ch_bwa_out_bam,
+        ch_bwa_out_bai,
+        ch_bwa_out_count,
         ch_metadata
     )
     ch_readcounts_out = COUNT_READS.out.counts_out
@@ -151,39 +151,39 @@ workflow {
     //  */
     // KALLISTO_QUANT (
     //     ch_trimmed_reads,
-    //     ch_kallisto_idx
+    //     ch_bwa_idx
     // )
     // // NOTE: the output is a _directory_ containing the kallisto results
-    // ch_kallisto_out = KALLISTO_QUANT.out.kallisto_out
+    // ch_bwa_out = KALLISTO_QUANT.out.bwa_out
     //
     // /*
     //  *  Merge counts
     //  */
     // MERGE_COUNTS (
     //     ch_gpa_file,
-    //     ch_kallisto_out,
+    //     ch_bwa_out,
     //     ch_metadata,
     //     params.st_file
     // )
-    // ch_kallisto_counts = MERGE_COUNTS.out.kallisto_merged_counts
+    // ch_bwa_counts = MERGE_COUNTS.out.bwa_merged_counts
     //
     // /*
     //  *  Merge effective gene lengths
     //  */
     // MERGE_LENS (
     //     ch_gpa_file,
-    //     ch_kallisto_out,
+    //     ch_bwa_out,
     //     ch_metadata,
     //     params.st_file
     // )
-    // ch_kallisto_lens = MERGE_LENS.out.kallisto_merged_lens
+    // ch_bwa_lens = MERGE_LENS.out.bwa_merged_lens
     //
     // /*
     //  *  Scale counts to median gene length across strains
     //  */
     // LENGTH_SCALE_COUNTS (
-    //     ch_kallisto_counts,
-    //     ch_kallisto_lens,
+    //     ch_bwa_counts,
+    //     ch_bwa_lens,
     //     ch_gene_subset
     // )
     // ch_scaled_counts = LENGTH_SCALE_COUNTS.out.scaled_counts
@@ -192,8 +192,8 @@ workflow {
     //  *  Get size-factor-scaled, TMM-normalised counts
     //  */
     // TMM_NORMALISE_COUNTS (
-    //     ch_kallisto_counts,
-    //     ch_kallisto_lens,
+    //     ch_bwa_counts,
+    //     ch_bwa_lens,
     //     ch_gene_subset
     // )
     // ch_tmm_counts = TMM_NORMALISE_COUNTS.out.tmm_counts

@@ -100,14 +100,14 @@ workflow {
      *  Trim reads
      */
     if (params.skip_trimming) {
-        ch_trimmed_reads = ch_raw_reads_trimgalore
+        ch_trimmed_reads = ch_raw_reads_trimgalore.collect()
         ch_trimgalore_results_mqc = Channel.empty()
         ch_trimgalore_fastqc_reports_mqc = Channel.empty()
     } else {
         TRIMGALORE (
             ch_raw_reads_trimgalore
         )
-        ch_trimmed_reads = TRIMGALORE.out.trimmed_reads
+        ch_trimmed_reads = TRIMGALORE.out.trimmed_reads.collect()
         ch_trimgalore_results_mqc = TRIMGALORE.out.trimgalore_results_mqc
         ch_trimgalore_fastqc_reports_mqc = TRIMGALORE.out.trimgalore_fastqc_reports_mqc
     }

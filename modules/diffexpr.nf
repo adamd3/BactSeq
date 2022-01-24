@@ -12,6 +12,6 @@ process DIFF_EXPRESSION {
 
     script:
     """
-    diffexpr.R -t TRUE -o ./
+    diffexpr.R -o ./
     """
 }

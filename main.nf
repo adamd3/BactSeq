@@ -69,7 +69,7 @@ include {TRIMGALORE} from './modules/trim_reads'
 include {MAKE_BWA_INDEX; BWA_ALIGN} from './modules/bwa_align'
 include {COUNT_READS} from './modules/count_reads'
 include {TMM_NORMALISE_COUNTS} from './modules/normalisation'
-include {PCA_SAMPLES} from './modules/pca'
+include {PCA_SAMPLES} from './modules/plots'
 
 
 

@@ -21,7 +21,7 @@ opt_parser <- OptionParser(option_list=option_list)
 opt <- parse_args(opt_parser)
 
 log <- if(opt$log_transform == "TRUE") TRUE else FALSE
-outf <- opt$outf
+outdir <- opt$outdir
 
 ## Read data
 counts_tab <- read.csv(

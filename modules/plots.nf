@@ -8,7 +8,7 @@ process PCA_SAMPLES {
     path meta_merged
 
     output:
-    path '*.{rds,png}', emit: PCA_out
+    path '*.{rds,png}', emit: pca_out
 
     script:
     """

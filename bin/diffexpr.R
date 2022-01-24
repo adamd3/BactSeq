@@ -81,8 +81,8 @@ dds <- DESeq(dds)
 
 ## perform pairwise contrasts of groups
 contrast_list <- lapply(comb_list, function(x){
-    gp_1 <- (comb_list[[x]])[1]
-    gp_2 <- (comb_list[[x]])[2]
+    gp_1 <- x[1]
+    gp_2 <- x[2]
     res <- lfcShrink(dds, contrast = c("group", gp_1, gp_2), type = "normal")
     res
 })

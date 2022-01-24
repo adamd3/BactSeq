@@ -1,5 +1,5 @@
 process TMM_NORMALISE_COUNTS {
-    tag "$merged_counts"
+    tag "$gene_counts"
     label 'process_medium'
     publishDir "${params.outdir}/read_counts", mode: 'copy'
 

@@ -5,12 +5,14 @@ process TMM_NORMALISE_COUNTS {
 
     input:
     path gene_counts
+    path ref_gene_df
 
     output:
-    path 'norm_counts.tsv', emit: tmm_counts
+    path 'cpm_counts.tsv', emit: cpm_counts
+    path 'rpkm_counts.tsv', emit: rpkm_counts
 
     script:
     """
-    TMM_normalise_counts.R -t TRUE -o norm_counts.tsv
+    TMM_normalise_counts.R -t TRUE -o ./
     """
 }

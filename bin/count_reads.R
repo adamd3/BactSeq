@@ -88,6 +88,10 @@ ref_gene_df$locus_tag <- gsub("locus_tag=","",ref_gene_df$locus_tag)
 ref_gene_df$biotype <- gsub("gene_biotype=","",ref_gene_df$biotype)
 ref_gene_df$gene_name <- gsub("gene=","",ref_gene_df$gene_name)
 
+write.table(
+    ref_gene_df, "ref_gene_df.tsv", col.names = TRUE, row.names = FALSE,
+    sep = "\t", quote = FALSE
+)
 
 
 ##------------------------------------------------------------------------------

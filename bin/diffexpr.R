@@ -40,47 +40,57 @@ colpal_large[c(5:8)] <- colpal_large[c(70:73)] ## replace to avoid colour clashe
 ##------------------------------------------------------------------------------
 ## Read and process data
 ##------------------------------------------------------------------------------
-norm_counts <- read.table(counts_f)
+counts_tab <- read.csv(
+    "gene_counts.tsv", header = TRUE, na.strings=c("","NA"), sep = "\t",
+    stringsAsFactors = FALSE
+)
 meta_tab <- read.table(
     meta_f, header = TRUE, sep = "\t", stringsAsFactors = FALSE
 )
 
-## factorise group
+## factorise group column
 meta_tab$group <- as.factor(as.character(meta_tab$group))
 
 ## order rows to match counts columns
-meta_tab <- meta_tab[match(colnames(norm_counts),meta_tab$sample),]
+meta_tab <- meta_tab[match(colnames(counts_tab),meta_tab$sample),]
 
 
 
 ##------------------------------------------------------------------------------
-## PCA
+## Differential gene expression
 ##------------------------------------------------------------------------------
-pca_counts <- prcomp(t(norm_counts), center = TRUE, scale = FALSE)
+## get all possible combinations of group column:
+comb_list <- combn(levels(meta_tab$group), 2, simplify = FALSE)
 
-## save pca object
-saveRDS(pca_counts, file.path(outdir,'pca.rds'))
+comb_names <- sapply(comb_list, function(x){
+    contrast_name <- paste0(x[1],"_",x[2])
+    contrast_name
+})
+names(comb_list) <- comb_names
 
-
-p1 <- ggbiplot(
-        pca_counts, groups = meta_tab$group,
-        var.axes = FALSE, alpha = 0, scale = 0#, ellipse = TRUE
-    ) +
-    geom_point(size = 4, shape = 21, colour = "black",
-        aes(fill = meta_tab$group)
-    ) +
-    theme_bw(base_size = 12) +
-    scale_colour_manual(values = colpal_large, guide = "none") +
-    scale_fill_manual("Group", values = colpal_large) +
-    guides(fill = guide_legend(override.aes=list(shape=21))) +
-    theme(
-        legend.position = "right",
-        axis.text.x = element_text(colour = "black", size=12),
-        axis.text.y = element_text(colour = "black", size=12)
-    )
-
-ggsave(
-    p1, file = file.path(outdir,'pca_grouped.png'),
-    device = "png", units = "in",
-    width = 9, height = 7, dpi = 300
+## make DESeq2 object
+dds <- DESeqDataSetFromMatrix(
+    countData = counts_tab, colData = meta_tab,
+    design = ~ group
 )
+dds <- DESeq(dds)
+
+## perform pairwise contrasts of groups
+contrast_list <- lapply(comb_list, function(x){
+    gp_1 <- (comb_list[[x]])[1]
+    gp_2 <- (comb_list[[x]])[2]
+    res <- lfcShrink(dds, contrast = c("group", gp_1, gp_2), type = "normal")
+    res
+})
+
+
+## export tables of genes with log2FC and p-values:
+lapply(seq_along(contrast_list), function(x){
+    contrast_name <- names(contrast_list)[x]
+    write.table(
+        contrast_list[x],
+        file = file.path(outdir, paste0("DGE_", contrast_name, ".tsv")),
+        quote = FALSE, sep = "\t",
+        row.names = TRUE, col.names = TRUE
+    )
+})

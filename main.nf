@@ -70,6 +70,7 @@ include {MAKE_BWA_INDEX; BWA_ALIGN} from './modules/bwa_align'
 include {COUNT_READS} from './modules/count_reads'
 include {TMM_NORMALISE_COUNTS} from './modules/normalisation'
 include {PCA_SAMPLES} from './modules/plots'
+include {DIFF_EXPRESSION} from './modules/diffexpr'
 
 
 
@@ -101,6 +102,7 @@ workflow {
         .splitCsv(header: true, sep:'\t')
         .map { row -> row.sample }
         .set { ch_sample_ids }
+
 
     /*
      *  Trim reads
@@ -151,25 +153,40 @@ workflow {
         ch_metadata,
         ch_gff_file
     )
-    ch_readcounts_out = COUNT_READS.out.counts_out
+    ch_readcounts_df = COUNT_READS.out.counts_df
+    ch_refgene_df = COUNT_READS.out.ref_gene_df
+
 
     /*
-     *  Get normalised counts
+     *  Get normalised read counts per gene
      */
     TMM_NORMALISE_COUNTS (
-        ch_readcounts_out
+        ch_readcounts_df,
+        ch_refgene_df
     )
-    ch_tmm_counts = TMM_NORMALISE_COUNTS.out.tmm_counts
+    ch_cpm_counts = TMM_NORMALISE_COUNTS.out.cpm_counts
+    ch_rpkm_counts = TMM_NORMALISE_COUNTS.out.rpkm_counts
     // NB the resulting counts are log-transformed by default
 
+
     /*
-     *  UMAP of samples
+     *  Principal component analysis (PCA) of samples
      */
     PCA_SAMPLES (
-        ch_tmm_counts,
+        ch_cpm_counts,
         ch_metadata
     )
     ch_pca_out = PCA_SAMPLES.out.pca_out
+
+
+    /*
+     *  Differential gene expression (DESeq2)
+     */
+    DIFF_EXPRESSION (
+        ch_readcounts_df,
+        ch_metadata
+    )
+    ch_deseq_out = PCA_SAMPLES.out.deseq_out
 
 }
 

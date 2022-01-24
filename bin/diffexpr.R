@@ -10,11 +10,15 @@ if (!require("ggplot2")){
 if (!require("RColorBrewer")){
     install.packages("RColorBrewer")
 }
-if (!require("devtools")){
-    install.packages("devtools")
+if (!require("DESeq2")){
+    if (!requireNamespace("BiocManager", quietly = TRUE))
+        install.packages("BiocManager")
+    BiocManager::install("DESeq2")
 }
-if (!require("ggbiplot")){
-    devtools::install_github("vqv/ggbiplot")
+if (!require("EnhancedVolcano")){
+    if (!requireNamespace("BiocManager", quietly = TRUE))
+        install.packages("BiocManager")
+    BiocManager::install("EnhancedVolcano")
 }
 
 

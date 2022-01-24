@@ -147,18 +147,18 @@ counts_summary <- data.frame(
 
 ## add total mapped counts
 counts_summary <- merge(counts_summary,merged_total_counts, by = "sample")
-counts_summary$non_rRNA <- counts_summary$mapped-counts_summary$rRNA_genes
+counts_summary$non_rRNA_genes <- counts_summary$mapped-counts_summary$rRNA_genes
 
 counts_summary <- counts_summary[rev(order(counts_summary$sample)),]
 
 counts_melt <- reshape2::melt(
     counts_summary, id.vars = c("sample"),
-    measure.vars = c("non_rRNA", "rRNA_genes")
+    measure.vars = c("non_rRNA_genes", "rRNA_genes")
 )
 counts_melt$sample <- factor(
     counts_melt$sample, levels = rev(unique(sort(counts_melt$sample)))
 )
-counts_melt$variable <- factor(counts_melt$variable, levels=c("rRNA_genes", "non_rRNA"))
+counts_melt$variable <- factor(counts_melt$variable, levels=c("rRNA_genes", "non_rRNA_genes"))
 # minUsable <- min(mergedDf$q15_dedup_reads)
 
 cc1 <- 12

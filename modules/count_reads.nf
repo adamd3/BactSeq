@@ -1,4 +1,3 @@
-
 process COUNT_READS {
     tag "$bam"
     label 'process_high'

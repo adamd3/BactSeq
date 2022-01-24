@@ -68,9 +68,8 @@ include {MAKE_META_FILE} from './modules/metadata'
 include {TRIMGALORE} from './modules/trim_reads'
 include {MAKE_BWA_INDEX; BWA_ALIGN} from './modules/bwa_align'
 include {COUNT_READS} from './modules/count_reads'
-// include {MAKE_KALLISTO_INDEX; KALLISTO_QUANT; MERGE_COUNTS; MERGE_LENS} from './modules/kallisto'
-// include {SUBSET_GENES; LENGTH_SCALE_COUNTS; TMM_NORMALISE_COUNTS} from './modules/normalisation'
-
+include {TMM_NORMALISE_COUNTS} from './modules/normalisation'
+include {PCA_SAMPLES} from './modules/pca'
 
 
 
@@ -154,60 +153,23 @@ workflow {
     )
     ch_readcounts_out = COUNT_READS.out.counts_out
 
-    //
-    //
-    // /*
-    //  *  Quantify gene expression using Kallisto
-    //  */
-    // KALLISTO_QUANT (
-    //     ch_trimmed_reads,
-    //     ch_bwa_idx
-    // )
-    // // NOTE: the output is a _directory_ containing the kallisto results
-    // ch_bwa_out = KALLISTO_QUANT.out.bwa_out
-    //
-    // /*
-    //  *  Merge counts
-    //  */
-    // MERGE_COUNTS (
-    //     ch_gpa_file,
-    //     ch_bwa_out,
-    //     ch_metadata,
-    //     params.st_file
-    // )
-    // ch_bwa_counts = MERGE_COUNTS.out.bwa_merged_counts
-    //
-    // /*
-    //  *  Merge effective gene lengths
-    //  */
-    // MERGE_LENS (
-    //     ch_gpa_file,
-    //     ch_bwa_out,
-    //     ch_metadata,
-    //     params.st_file
-    // )
-    // ch_bwa_lens = MERGE_LENS.out.bwa_merged_lens
-    //
-    // /*
-    //  *  Scale counts to median gene length across strains
-    //  */
-    // LENGTH_SCALE_COUNTS (
-    //     ch_bwa_counts,
-    //     ch_bwa_lens,
-    //     ch_gene_subset
-    // )
-    // ch_scaled_counts = LENGTH_SCALE_COUNTS.out.scaled_counts
-    //
-    // /*
-    //  *  Get size-factor-scaled, TMM-normalised counts
-    //  */
-    // TMM_NORMALISE_COUNTS (
-    //     ch_bwa_counts,
-    //     ch_bwa_lens,
-    //     ch_gene_subset
-    // )
-    // ch_tmm_counts = TMM_NORMALISE_COUNTS.out.tmm_counts
-    // // NB the resulting counts are log-transformed by default
+    /*
+     *  Get normalised counts
+     */
+    TMM_NORMALISE_COUNTS (
+        ch_readcounts_out
+    )
+    ch_tmm_counts = TMM_NORMALISE_COUNTS.out.tmm_counts
+    // NB the resulting counts are log-transformed by default
+
+    /*
+     *  UMAP of samples
+     */
+    PCA_SAMPLES (
+        ch_tmm_counts,
+        ch_metadata
+    )
+    ch_pca_out = PCA_SAMPLES.out.pca_out
 
 }
 

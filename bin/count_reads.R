@@ -191,9 +191,11 @@ p1 <- ggplot(counts_melt,
         axis.text.y = element_text(colour = "black")
     )
 
+nsamps <- ncol(gene_counts$counts)
+
 ggsave(
     p1, file = paste0('library_composition.png'),
     device = "png",
-    width = 8, height = 10,
+    width = 8, height = (nsamps/2),
     dpi = 300
 )

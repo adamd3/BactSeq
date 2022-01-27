@@ -21,18 +21,17 @@ if (!require("DESeq2")){
 if (!require("plyr")){
     install.packages("plyr")
 }
-if (!require("devtools")){
-    install.packages("devtools")
-}
-if (!require("EnhancedVolcano")){
-    devtools::install_github("kevinblighe/EnhancedVolcano")
-}
-
-# if (!require("EnhancedVolcano")){
-    # if (!requireNamespace("BiocManager", quietly = TRUE))
-    #     install.packages("BiocManager")
-    # BiocManager::install("EnhancedVolcano")
+# if (!require("devtools")){
+#     install.packages("devtools")
 # }
+# if (!require("EnhancedVolcano")){
+#     devtools::install_github("kevinblighe/EnhancedVolcano")
+# }
+if (!require("EnhancedVolcano")){
+    if (!requireNamespace("BiocManager", quietly = TRUE))
+        install.packages("BiocManager")
+    BiocManager::install("EnhancedVolcano")
+}
 
 library(optparse)
 library(ggplot2)
@@ -196,9 +195,9 @@ lapply(seq_along(contrast_list), function(x){#
           FCcutoff = 1,
           colCustom = keyvals,
           drawConnectors = TRUE,
-          max.overlaps = 20,
-          arrowheads = FALSE,
-          min.segment.length = 1.5,
+          # max.overlaps = 20,
+          # arrowheads = FALSE,
+          # min.segment.length = 1.5,
           title = paste0(group1," vs ",group2),
           subtitle = ""
         ) +

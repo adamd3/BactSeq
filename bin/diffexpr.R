@@ -10,6 +10,9 @@ if (!require("ggplot2")){
 if (!require("RColorBrewer")){
     install.packages("RColorBrewer")
 }
+if (!require("RSQLite")){
+    install.packages("RSQLite")
+}
 if (!require("DESeq2")){
     if (!requireNamespace("BiocManager", quietly = TRUE))
         install.packages("BiocManager")
@@ -24,6 +27,13 @@ if (!require("EnhancedVolcano")){
     BiocManager::install("EnhancedVolcano")
 }
 
+library(optparse)
+library(ggplot2)
+library(RColorBrewer)
+library(RSQLite)
+library(DESeq2)
+library(plyr)
+library(EnhancedVolcano)
 
 option_list <- list(
     make_option(c("-o", "--outdir"), type="character", default=NULL,

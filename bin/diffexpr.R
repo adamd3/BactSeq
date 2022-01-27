@@ -98,3 +98,105 @@ lapply(seq_along(contrast_list), function(x){
         row.names = TRUE, col.names = TRUE
     )
 })
+
+
+
+##------------------------------------------------------------------------------
+## Volcano plots
+##------------------------------------------------------------------------------
+## choose the limits for the x- and y-axes using the log2FoldChanges and pvalues
+lfc_list <- lapply(contrast_list, function(x){
+    subset(x, padj<0.05)$log2FoldChange
+})
+xmin <- round_any(min(unlist(lfc_list)), 0.1, floor)
+xmax <- round_any(max(unlist(lfc_list)), 0.1, ceiling)
+
+if(abs(xmax)>abs(xmin)){
+    xmin=xmax*-1
+} else if(abs(xmin)>abs(xmax)){
+    xmax=xmin*-1
+}
+
+ymin <- 0
+pval_list <- lapply(contrast_list, function(x){
+    subset(x, padj<0.05)$padj
+})
+ymax <- round_any(max(unlist(pval_list)), 0.5, ceiling)
+
+set1pal <- brewer.pal(9,"Set1")
+
+
+lapply(seq_along(contrast_list), function(x){#
+    ymin <- 0
+    ymax <- max(-log10(
+        subset(contrast_list[[x]], padj<0.05 & log2FoldChange > 1)$padj))
+    xmin <- round_any(min(unlist(subset(
+        contrast_list[[x]], padj<0.05 & log2FoldChange > 1)$log2FoldChange)),
+        0.1, floor)
+    xmax <- round_any(max(unlist(subset(
+        contrast_list[[x]], padj<0.05 & log2FoldChange > 1)$log2FoldChange)),
+        0.1, ceiling)
+    if(abs(xmax)>abs(xmin)){
+        xmin=xmax*-1
+    } else if(abs(xmin)>abs(xmax)){
+        xmax=xmin*-1
+    }
+
+    ## show gene labels where the log2FoldChange exceeds a certain threshold:
+    keepLabs <- rownames(
+        subset(contrast_list[[x]], padj<0.05 & (abs(log2FoldChange) > xmax*0.9)))
+    keepLabs <- c(keepLabs,rownames(
+        subset(contrast_list[[x]], padj<0.05 & (abs(-log10(padj)) > ymax*0.5))
+    ))
+
+    ## Custom colour scheme
+    keyvals <- ifelse(
+        contrast_list[[x]]$log2FoldChange < -1 & contrast_list[[x]]$padj<0.05,
+        set1pal[3],
+        ifelse(
+            contrast_list[[x]]$log2FoldChange > 1 & contrast_list[[x]]$padj<0.05,
+            set1pal[1], 'grey45')
+    )
+    keyvals[is.na(keyvals)] <- 'grey45'
+    names(keyvals)[keyvals == set1pal[1]] <- 'up'
+    names(keyvals)[keyvals == 'grey45'] <- 'NS'
+    names(keyvals)[keyvals == set1pal[3]] <- 'down'
+
+    group1 <- (comb_list[[x]])[1]
+    group2 <- (comb_list[[x]])[2]
+
+    volcano_plot <- EnhancedVolcano::EnhancedVolcano(
+          contrast_list[[x]],
+          lab = rownames(contrast_list[[x]]),
+          selectLab = keepLabs,
+          x = 'log2FoldChange', y = 'padj',
+          pointSize = 3.0,
+          labSize = 4.0,
+          pCutoff = 5e-2,
+          FCcutoff = 1,
+          colCustom = keyvals,
+          drawConnectors = TRUE,
+          max.overlaps = 20,
+          arrowheads = FALSE,
+          min.segment.length = 1.5,
+          title = paste0(group1," vs ",group2),
+          subtitle = ""
+        ) +
+        theme(
+          axis.text.x = element_text(size=cc1*1.5),
+          axis.title.x = element_text(size=cc1*1.5),
+          axis.text.y = element_text(size=cc1*1.5),
+          axis.title.y = element_text(size=cc1*1.5),
+          plot.subtitle = element_blank(),
+          plot.caption = element_blank(),
+          legend.position = "none",
+          plot.title = element_text(size=cc1*1.5, hjust = 0.5)
+      ) + ylab(bquote(~-Log[10]~adjusted~italic(P)))
+
+    ggsave(
+        volcano_plot,
+        file = file.path(outdir, paste0("volcano_plot_", names(contrast_list)[x], ".png")),
+        device = "png", units = "in",
+        width = 8, height = 7, dpi = 300
+    )
+})

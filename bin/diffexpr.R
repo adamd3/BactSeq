@@ -21,11 +21,18 @@ if (!require("DESeq2")){
 if (!require("plyr")){
     install.packages("plyr")
 }
-if (!require("EnhancedVolcano")){
-    if (!requireNamespace("BiocManager", quietly = TRUE))
-        install.packages("BiocManager")
-    BiocManager::install("EnhancedVolcano")
+if (!require("devtools")){
+    install.packages("devtools")
 }
+if (!require("EnhancedVolcano")){
+    devtools::install_github("kevinblighe/EnhancedVolcano")
+}
+
+# if (!require("EnhancedVolcano")){
+    # if (!requireNamespace("BiocManager", quietly = TRUE))
+    #     install.packages("BiocManager")
+    # BiocManager::install("EnhancedVolcano")
+# }
 
 library(optparse)
 library(ggplot2)

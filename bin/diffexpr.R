@@ -15,6 +15,9 @@ if (!require("DESeq2")){
         install.packages("BiocManager")
     BiocManager::install("DESeq2")
 }
+if (!require("plyr")){
+    install.packages("plyr")
+}
 if (!require("EnhancedVolcano")){
     if (!requireNamespace("BiocManager", quietly = TRUE))
         install.packages("BiocManager")

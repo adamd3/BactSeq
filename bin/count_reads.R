@@ -25,6 +25,15 @@ if (!require("RColorBrewer")){
     install.packages("RColorBrewer")
 }
 
+library(optparse)
+library(Rsubread)
+library(ape)
+library(stringr)
+library(ggplot2)
+library(scales)
+library(RColorBrewer)
+
+
 option_list <- list(
     make_option(c("-m", "--metadata"), type="character", default=NULL,
         help="sample metadata tsv file", metavar="character"),

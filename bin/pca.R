@@ -17,6 +17,12 @@ if (!require("ggbiplot")){
     devtools::install_github("vqv/ggbiplot")
 }
 
+library(optparse)
+library(ggplot2)
+library(RColorBrewer)
+library(devtools)
+library(ggbiplot)
+
 
 option_list <- list(
     make_option(c("-o", "--outdir"), type="character", default=NULL,

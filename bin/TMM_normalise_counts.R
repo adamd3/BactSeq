@@ -10,6 +10,9 @@ if (!require("edgeR")){
     BiocManager::install("edgeR")
 }
 
+library(optparse)
+library(edgeR)
+
 option_list <- list(
     make_option(c("-t", "--log_transform"), type="character", default=NULL,
         help="log transform the counts? default = FALSE", metavar="character"),

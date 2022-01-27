@@ -202,14 +202,14 @@ lapply(seq_along(contrast_list), function(x){#
           subtitle = ""
         ) +
         theme(
-          axis.text.x = element_text(size=cc1*1.5),
-          axis.title.x = element_text(size=cc1*1.5),
-          axis.text.y = element_text(size=cc1*1.5),
-          axis.title.y = element_text(size=cc1*1.5),
+          axis.text.x = element_text(size=12*1.5),
+          axis.title.x = element_text(size=12*1.5),
+          axis.text.y = element_text(size=12*1.5),
+          axis.title.y = element_text(size=12*1.5),
           plot.subtitle = element_blank(),
           plot.caption = element_blank(),
           legend.position = "none",
-          plot.title = element_text(size=cc1*1.5, hjust = 0.5)
+          plot.title = element_text(size=12*1.5, hjust = 0.5)
       ) + ylab(bquote(~-Log[10]~adjusted~italic(P)))
 
     ggsave(

@@ -8,7 +8,8 @@ process DIFF_EXPRESSION {
     path ref_gene_df
 
     output:
-    path '*.tsv', emit: deseq_out
+    path '*.tsv', emit: deseq_res
+    path '*.png', emit: deseq_volcano
 
     script:
     """

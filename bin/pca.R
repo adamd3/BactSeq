@@ -10,6 +10,9 @@ if (!require("ggplot2")){
 if (!require("RColorBrewer")){
     install.packages("RColorBrewer")
 }
+if (!require("fastmap")){
+    install.packages("fastmap")
+}
 if (!require("devtools")){
     install.packages("devtools")
 }

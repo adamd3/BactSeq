@@ -1,6 +1,26 @@
 #!/usr/bin/env Rscript
 
 ## load / install packages
+if (!require("optparse")){
+    install.packages("optparse")
+}
+if (!require("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+if (!require("DESeq2")){
+    BiocManager::install("DESeq2")
+}
+if (!require("ggplot2")){
+    install.packages("ggplot2")
+}
+if (!require("RColorBrewer")){
+    install.packages("RColorBrewer")
+}
+if (!require("RSQLite")){
+    install.packages("RSQLite")
+}
+if (!require("plyr")){
+    install.packages("plyr")
+}
 if (!require("devtools")){
     install.packages("devtools")
 }
@@ -10,10 +30,10 @@ if (!require("EnhancedVolcano")){
 
 
 library(optparse)
+library(DESeq2)
 library(ggplot2)
 library(RColorBrewer)
 library(RSQLite)
-library(DESeq2)
 library(plyr)
 library(EnhancedVolcano)
 

@@ -1,5 +1,12 @@
 #!/usr/bin/env Rscript
 
+if (!require("optparse")){
+    install.packages("optparse")
+}
+if (!require("edgeR")){
+    install.packages("edgeR")
+}
+
 library(optparse)
 library(edgeR)
 

@@ -1,6 +1,15 @@
 #!/usr/bin/env Rscript
 
 ## load / install packages
+if (!require("optparse")){
+    install.packages("optparse")
+}
+if (!require("ggplot2")){
+    install.packages("ggplot2")
+}
+if (!require("RColorBrewer")){
+    install.packages("RColorBrewer")
+}
 if (!require("devtools")){
     install.packages("devtools")
 }
@@ -11,7 +20,6 @@ if (!require("ggbiplot")){
 library(optparse)
 library(ggplot2)
 library(RColorBrewer)
-library(devtools)
 library(ggbiplot)
 
 

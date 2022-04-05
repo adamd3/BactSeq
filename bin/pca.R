@@ -1,18 +1,6 @@
 #!/usr/bin/env Rscript
 
 ## load / install packages
-if (!require("optparse")){
-    install.packages("optparse")
-}
-if (!require("ggplot2")){
-    install.packages("ggplot2")
-}
-if (!require("RColorBrewer")){
-    install.packages("RColorBrewer")
-}
-if (!require("fastmap")){
-    install.packages("fastmap")
-}
 if (!require("devtools")){
     install.packages("devtools")
 }

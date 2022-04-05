@@ -1,30 +1,5 @@
 #!/usr/bin/env Rscript
 
-## load / install packages
-if (!require("optparse")){
-    install.packages("optparse")
-}
-if (!require("Rsubread")){
-    if (!requireNamespace("BiocManager", quietly = TRUE))
-        install.packages("BiocManager")
-    BiocManager::install("Rsubread")
-}
-if (!require("ape")){
-    install.packages("ape")
-}
-if (!require("stringr")){
-    install.packages("stringr")
-}
-if (!require("ggplot2")){
-    install.packages("ggplot2")
-}
-if (!require("scales")){
-    install.packages("scales")
-}
-if (!require("RColorBrewer")){
-    install.packages("RColorBrewer")
-}
-
 library(optparse)
 library(Rsubread)
 library(ape)

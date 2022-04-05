@@ -1,15 +1,5 @@
 #!/usr/bin/env Rscript
 
-## load / install packages
-if (!require("optparse")){
-    install.packages("optparse")
-}
-if (!require("edgeR")){
-    if (!requireNamespace("BiocManager", quietly = TRUE))
-        install.packages("BiocManager")
-    BiocManager::install("edgeR")
-}
-
 library(optparse)
 library(edgeR)
 

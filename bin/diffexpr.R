@@ -1,29 +1,6 @@
 #!/usr/bin/env Rscript
 
 ## load / install packages
-if (!require("optparse")){
-    install.packages("optparse")
-}
-if (!require("ggplot2")){
-    install.packages("ggplot2")
-}
-if (!require("RColorBrewer")){
-    install.packages("RColorBrewer")
-}
-if (!require("xtable")){
-    install.packages("xtable")
-}
-if (!require("RSQLite")){
-    install.packages("RSQLite")
-}
-if (!require("DESeq2")){
-    if (!requireNamespace("BiocManager", quietly = TRUE))
-        install.packages("BiocManager")
-    BiocManager::install("DESeq2")
-}
-if (!require("plyr")){
-    install.packages("plyr")
-}
 if (!require("devtools")){
     install.packages("devtools")
 }

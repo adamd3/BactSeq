@@ -1,27 +1,27 @@
 #!/usr/bin/env Rscript
 
 if (!require("optparse")){
-    install.packages("optparse")
+    install.packages("optparse",repos = "http://cran.us.r-project.org")
 }
 if (!require("BiocManager", quietly = TRUE))
-    install.packages("BiocManager")
+    install.packages("BiocManager",repos = "http://cran.us.r-project.org")
 if (!require("Rsubread")){
     BiocManager::install("Rsubread")
 }
 if (!require("ape")){
-    install.packages("ape")
+    install.packages("ape",repos = "http://cran.us.r-project.org")
 }
 if (!require("stringr")){
-    install.packages("stringr")
+    install.packages("stringr",repos = "http://cran.us.r-project.org")
 }
 if (!require("ggplot2")){
-    install.packages("ggplot2")
+    install.packages("ggplot2",repos = "http://cran.us.r-project.org")
 }
 if (!require("scales")){
-    install.packages("scales")
+    install.packages("scales",repos = "http://cran.us.r-project.org")
 }
 if (!require("RColorBrewer")){
-    install.packages("RColorBrewer")
+    install.packages("RColorBrewer",repos = "http://cran.us.r-project.org")
 }
 
 library(optparse)

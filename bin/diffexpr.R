@@ -2,27 +2,27 @@
 
 ## load / install packages
 if (!require("optparse")){
-    install.packages("optparse")
+    install.packages("optparse",repos = "http://cran.us.r-project.org")
 }
 if (!require("BiocManager", quietly = TRUE))
-    install.packages("BiocManager")
+    install.packages("BiocManager",repos = "http://cran.us.r-project.org")
 if (!require("DESeq2")){
     BiocManager::install("DESeq2")
 }
 if (!require("ggplot2")){
-    install.packages("ggplot2")
+    install.packages("ggplot2",repos = "http://cran.us.r-project.org")
 }
 if (!require("RColorBrewer")){
-    install.packages("RColorBrewer")
+    install.packages("RColorBrewer",repos = "http://cran.us.r-project.org")
 }
 if (!require("RSQLite")){
-    install.packages("RSQLite")
+    install.packages("RSQLite",repos = "http://cran.us.r-project.org")
 }
 if (!require("plyr")){
-    install.packages("plyr")
+    install.packages("plyr",repos = "http://cran.us.r-project.org")
 }
 if (!require("devtools")){
-    install.packages("devtools")
+    install.packages("devtools",repos = "http://cran.us.r-project.org")
 }
 if (!require("EnhancedVolcano")){
     devtools::install_github("kevinblighe/EnhancedVolcano")

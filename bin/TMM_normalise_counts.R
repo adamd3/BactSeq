@@ -1,10 +1,10 @@
 #!/usr/bin/env Rscript
 
 if (!require("optparse")){
-    install.packages("optparse")
+    install.packages("optparse",repos = "http://cran.us.r-project.org")
 }
 if (!require("edgeR")){
-    install.packages("edgeR")
+    install.packages("edgeR",repos = "http://cran.us.r-project.org")
 }
 
 library(optparse)

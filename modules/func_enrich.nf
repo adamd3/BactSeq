@@ -14,10 +14,8 @@ process FUNC_ENRICHMENT {
     script:
     """
     for resf in ./DGE*tsv; do
-        bname="${resf//+(*\/|.*)}"
         functional_enrichment.R  \
-            -r $resf -a $ch_func_file  \
-            -l $bname -o ./
+            -r $resf -a $ch_func_file -o ./
     done
     """
 }

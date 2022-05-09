@@ -43,9 +43,9 @@ if (params.ref_ann) {
 } else { exit 1, 'Reference genome GFF file not specified!' }
 
 // optional functional enrichment step
-ch_ann_file = ( params.ann_file
+ch_func_file = ( params.func_file
             ? Channel.empty()
-            : file(params.ann_file, checkIfExists: true) )
+            : file(params.func_file, checkIfExists: true) )
 
 
 
@@ -184,10 +184,10 @@ workflow {
      *  Functional enrichment of DEGs (optional)
      */
     FUNC_ENRICHMENT (
-        ch_ann_file,
+        ch_func_file,
         ch_deseq_res
     )
-    ch_func_enrich = FUNC_ENRICHMENT.out.deseq_res
+    ch_func_enrich = FUNC_ENRICHMENT.out.func_res
 
 }
 
@@ -223,7 +223,7 @@ def helpMessage() {
                                       Available: conda, docker, singularity.
 
     Other options:
-      --ann_file [file]               Path to GMT file containing functional annotation.
+      --func_file [file]              Path to GMT-format file containing functional annotation.
       --skip_trimming [bool]          Do not trim adaptors from FastQ files.
       --outdir [file]                 The output directory where the results will be saved (Default: './results').
       -name [str]                     Name for the pipeline run. If not specified, Nextflow will automatically generate a random mnemonic.

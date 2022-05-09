@@ -1,10 +1,10 @@
 process FUNC_ENRICHMENT {
     tag "$gene_counts"
     label 'process_medium'
-    publishDir "${params.outdir}/diff_expr", mode: 'copy'
+    publishDir "${params.outdir}/func_enrich", mode: 'copy'
 
     input:
-    path ch_ann_file
+    path ch_func_file
     path ch_deseq_res
 
     output:
@@ -16,7 +16,7 @@ process FUNC_ENRICHMENT {
     for resf in ./DGE*tsv; do
         bname=$(basename $resf .tsv)
         functional_enrichment.R  \
-            -r $resf -a $ch_ann_file  \
+            -r $resf -a $ch_func_file  \
             -l $bname -o ./
     done
     """

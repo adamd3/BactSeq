@@ -115,6 +115,7 @@ gene_counts <- Rsubread::featureCounts(
     isPairedEnd = FALSE, strandSpecific = 2
 )
 colnames(gene_counts$counts) <- gsub(".bam", "", colnames(gene_counts$counts))
+colnames(gene_counts$counts) <- gsub("\\.","_",colnames(gene_counts$counts))
 
 write.table(
     gene_counts$counts, "gene_counts.tsv", col.names = TRUE, row.names = TRUE,

@@ -40,9 +40,6 @@ option_list <- list(
     make_option(c("-n", "--min_size"), type="double", default=10,
         help="minimum size of the functional categories to test (default = 10)",
         metavar="character"),
-    make_option(c("-l", "--label"), type="character", default=10,
-        help="prefix name for output files",
-        metavar="character"),
     make_option(c("-o", "--out_dir"), type="character", default=NULL,
         help="output dir for results", metavar="character")
 )
@@ -56,7 +53,6 @@ p_threshold <- opt$p_threshold
 log2fc_threshold <- opt$log2fc_threshold
 max_size <- opt$max_size
 min_size <- opt$min_size
-label <- opt$label
 out_dir <- opt$out_dir
 
 
@@ -66,7 +62,6 @@ out_dir <- opt$out_dir
 # log2fc_threshold <- 1
 # max_size <- 200
 # min_size <- 10
-# label <- "CRISPR_MAB_4099c"
 # out_dir <- "/home/adam/BactSeq/GO_annotations"
 
 
@@ -84,6 +79,8 @@ out_dir <- opt$out_dir
 res_tab <- read.table(res_f)
 annot_tab <- read_tsv(annot_f, col_names=FALSE, show_col_types=FALSE)[c(1,2)]
 annot_list <- gmtPathways(file.path(annot_f))
+
+label <- sub(pattern = "(.*)\\..*$", replacement = "\\1", basename(file.path(res_f)))
 
 if(!length(annot_list)==nrow(annot_tab)){
     stop("annotation data was not successfully parsed. please check files.")

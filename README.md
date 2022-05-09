@@ -28,10 +28,11 @@ You will need to install [`Nextflow`](https://www.nextflow.io/) (version 21.10.3
 
 You can run the pipeline as follows:
 
-    nextflow run /path/to/StrainSeq \
-        --meta_file /path/to/metadata.txt \
-        --gpa_file /path/to/gene_presence_absence.csv \
-        --perc 99 --norm_method DESeq --group majority_ST -profile conda -resume
+    nextflow run /home/adam/BactSeq \
+        --data_dir [/path/to/data_dir] \
+        --sample_file [sample_file.tsv] \
+        --ref_genome [genome.fasta] --ref_ann [genome_annot.gff3] \
+        -profile docker -resume
 
 You can run with [`Docker`](https://www.docker.com/) or [`Singularity`](https://sylabs.io/guides/3.5/user-guide/introduction.html) by specifying ` -profile docker` or ` -profile singularity`, respectively.
 

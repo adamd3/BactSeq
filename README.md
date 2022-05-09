@@ -52,8 +52,8 @@ Other available parameters:
 
 ## Required input
 
-- __Genome sequence__: FASTA file containing the genome sequence. Can be retrieved from `https://ftp.ncbi.nlm.nih.gov/genomes/genbank/bacteria/`.
-- __Gene annotation file__: GFF file containing the genome annotation. Can be retrieved from `https://ftp.ncbi.nlm.nih.gov/genomes/genbank/bacteria/`.
+- __Genome sequence__: FASTA file containing the genome sequence. Can be retrieved from NCBI.
+- __Gene annotation file__: GFF file containing the genome annotation. Can be retrieved from NCBI.
 - __Sample file__: TSV file containing sample information. Must contain the following columns:
   - `sample`: sample ID
   - `file_name`: name of the FASTQ file.

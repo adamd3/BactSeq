@@ -9,12 +9,6 @@ nextflow.enable.dsl=2
     Github : [github.com/adamd3/BactSeq]
 */
 
-// /home/adam/nextflow run /home/adam/strain_seq \
-//     --data_dir /projects/pseudomonas_transcriptomics/storage/fastq_files \
-//     --sample_file /projects/pseudomonas_transcriptomics/storage/hzi_meta.txt \
-//     -profile docker -resume
-
-
 // Show help message
 if (params.help) {
     helpMessage()
@@ -48,13 +42,6 @@ if (params.ref_ann) {
     ch_gff_file = file(params.ref_ann, checkIfExists: true)
 } else { exit 1, 'Reference genome GFF file not specified!' }
 
-// if (params.faidx_file) {
-//     ch_faidx_file = file(params.faidx_file, checkIfExists: true)
-// } else { exit 1, 'Index for multi-fasta file not specified!' }
-
-// if (params.gpa_file) {
-//     ch_gpa_file = file(params.gpa_file, checkIfExists: true)
-// } else { exit 1, 'Gene presence/absence file not specified!' }
 
 
 
@@ -211,15 +198,15 @@ def helpMessage() {
     log.info"""
     Usage:
     The typical command for running the pipeline is as follows:
-      nextflow run strain_seq --data_dir [dir] --sample_file [file] --gpa_file [gene_presence_absence.csv] -profile docker
+      nextflow run BactSeq --data_dir [dir] --sample_file [file] --ref_genome [file] --ref_ann [file] -profile docker
 
     Mandatory arguments:
       --data_dir [file]               Path to directory containing FastQ files.
       --sample_file [file]            Path to file containing sample information.
       --ref_genome [file]             Path to FASTA file containing reference genome sequence.
       --ref_ann [file]                Path to GFF file containing reference genome annotation.
-      -profile [str]                  Configuration profile to use. Can use multiple (comma separated).
-                                      Available: conda, docker
+      -profile [str]                  Configuration profile to use.
+                                      Available: conda, docker, singularity
 
     Other options:
       --outdir [file]                 The output directory where the results will be saved (Default: './results').

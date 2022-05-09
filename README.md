@@ -17,9 +17,9 @@ The pipeline will perform the following steps:
 2. Read QC ([`FastQC`](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/))
 3. Align reads to reference genome ([`BWA-MEM`](https://github.com/lh3/bwa/))
 4. Size-factor scaling and gene length (RPKM) scaling of counts (TMM from [`edgeR`](http://bioconductor.org/packages/release/bioc/html/edgeR.html))
-5. Principal component analysis (PCA) of normalised expression values.
-6. Differential gene expression ([`DESeq2`](https://bioconductor.org/packages/release/bioc/html/DESeq2.html)).
-6. Functional enrichment of differentially expressed genes ([`fgsea`](https://bioconductor.org/packages/release/bioc/html/fgsea.html)) (optional).
+5. Principal component analysis (PCA) of normalised expression values
+6. Differential gene expression ([`DESeq2`](https://bioconductor.org/packages/release/bioc/html/DESeq2.html))
+6. Functional enrichment of differentially expressed genes ([`fgsea`](https://bioconductor.org/packages/release/bioc/html/fgsea.html)) (optional)
 
 
 ## Installation

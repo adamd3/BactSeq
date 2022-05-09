@@ -65,15 +65,21 @@ Other available parameters:
 
     ```console
     sample	file_name	group	rep_no
-    ZG301975	SRX5123742_T1.fastq.gz	ST_313	1
-    ZG205864	SRX5123741_T1.fastq.gz	ST_111	1
-    ZG302367	SRX5123744_T1.fastq.gz	ST_274	1
-    ZG302359	SRX5123743_T1.fastq.gz	ST_244	1
-    PSAE1647	SRX5123713_T1.fastq.gz	ST_313	1
-    PSAE1649	SRX5123714_T1.fastq.gz	ST_313	1
-    MHH17441	SRX5123695_T1.fastq.gz	ST_235	1
-    PSAE1975	SRX5123726_T1.fastq.gz	ST_395	1
-    PSAE1745	SRX5123719_T1.fastq.gz	ST_111	1
+    AS_1	SRX1607051_T1.fastq.gz	Artificial_Sputum	1
+    AS_2	SRX1607052_T1.fastq.gz	Artificial_Sputum	2
+    AS_3	SRX1607053_T1.fastq.gz	Artificial_Sputum	3
+    MB_1	SRX1607054_T1.fastq.gz	Middlebrook	1
+    MB_2	SRX1607055_T1.fastq.gz	Middlebrook	2
+    MB_3	SRX1607056_T1.fastq.gz	Middlebrook	3
+    ER_1	SRX1607060_T1.fastq.gz	Erythromycin	1
+    ER_2	SRX1607061_T1.fastq.gz	Erythromycin	2
+    ER_3	SRX1607062_T1.fastq.gz	Erythromycin	3
+    HP_1	SRX1607063_T1.fastq.gz	Hypoxia	1
+    HP_2	SRX1607064_T1.fastq.gz	Hypoxia	2
+    HP_3	SRX1607065_T1.fastq.gz	Hypoxia	3
+    KN_1	SRX1607066_T1.fastq.gz	Kanamycin	1
+    KN_2	SRX1607067_T1.fastq.gz	Kanamycin	2
+    KN_3	SRX1607068_T1.fastq.gz	Kanamycin	3
     ```
 
 ## Output

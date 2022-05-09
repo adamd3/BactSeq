@@ -42,7 +42,10 @@ if (params.ref_ann) {
     ch_gff_file = file(params.ref_ann, checkIfExists: true)
 } else { exit 1, 'Reference genome GFF file not specified!' }
 
-
+// optional functional enrichment step
+ch_ann_file = ( params.ann_file
+            ? Channel.empty()
+            : file(params.ann_file, checkIfExists: true) )
 
 
 
@@ -58,6 +61,7 @@ include {COUNT_READS} from './modules/count_reads'
 include {TMM_NORMALISE_COUNTS} from './modules/normalisation'
 include {PCA_SAMPLES} from './modules/plots'
 include {DIFF_EXPRESSION} from './modules/diffexpr'
+include {FUNC_ENRICHMENT} from './modules/func_enrich'
 
 
 
@@ -175,6 +179,16 @@ workflow {
     )
     ch_deseq_res = DIFF_EXPRESSION.out.deseq_res
 
+
+    /*
+     *  Functional enrichment of DEGs (optional)
+     */
+    FUNC_ENRICHMENT (
+        ch_ann_file,
+        ch_deseq_res
+    )
+    ch_func_enrich = FUNC_ENRICHMENT.out.deseq_res
+
 }
 
 /*
@@ -206,9 +220,11 @@ def helpMessage() {
       --ref_genome [file]             Path to FASTA file containing reference genome sequence.
       --ref_ann [file]                Path to GFF file containing reference genome annotation.
       -profile [str]                  Configuration profile to use.
-                                      Available: conda, docker, singularity
+                                      Available: conda, docker, singularity.
 
     Other options:
+      --ann_file [file]               Path to GMT file containing functional annotation.
+      --skip_trimming [bool]          Do not trim adaptors from FastQ files.
       --outdir [file]                 The output directory where the results will be saved (Default: './results').
       -name [str]                     Name for the pipeline run. If not specified, Nextflow will automatically generate a random mnemonic.
 

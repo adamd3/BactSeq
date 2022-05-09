@@ -32,6 +32,7 @@ You can run the pipeline as follows:
         --data_dir [/path/to/data_dir] \
         --sample_file [sample_file.tsv] \
         --ref_genome [genome.fasta] --ref_ann [genome_annot.gff3] \
+        --func_file [func_file.gmt] \
         -profile docker -resume
 
 You can run with [`Docker`](https://www.docker.com/) or [`Singularity`](https://sylabs.io/guides/3.5/user-guide/introduction.html) by specifying ` -profile docker` or ` -profile singularity`, respectively.

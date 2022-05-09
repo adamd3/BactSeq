@@ -14,7 +14,7 @@ process FUNC_ENRICHMENT {
     script:
     """
     for resf in ./DGE*tsv; do
-        bname=$(basename $resf .tsv)
+        bname="$(basename $resf .tsv)"
         functional_enrichment.R  \
             -r $resf -a $ch_func_file  \
             -l $bname -o ./

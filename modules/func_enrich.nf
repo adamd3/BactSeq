@@ -1,6 +1,6 @@
 process FUNC_ENRICHMENT {
     tag "$ch_func_file"
-    label 'process_medium'
+    label 'process_high'
     publishDir "${params.outdir}/func_enrich", mode: 'copy'
 
     input:

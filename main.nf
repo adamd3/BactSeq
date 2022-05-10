@@ -42,14 +42,10 @@ if (params.ref_ann) {
     ch_gff_file = file(params.ref_ann, checkIfExists: true)
 } else { exit 1, 'Reference genome GFF file not specified!' }
 
-if (params.func_file) {
-    ch_func_file = file(params.func_file, checkIfExists: true)
-}
-
 // optional functional enrichment step
-//ch_func_file = ( params.func_file
-//            ? Channel.empty()
-//            : file(params.func_file, checkIfExists: true) )
+ch_func_file = ( params.func_file
+            ? Channel.empty()
+            : file(params.func_file, checkIfExists: true) )
 
 
 
@@ -181,19 +177,17 @@ workflow {
         ch_readcounts_df,
         ch_metadata
     )
-    ch_deseq_res = DIFF_EXPRESSION.out.deseq_res.collect()
+    ch_deseq_res = DIFF_EXPRESSION.out.deseq_res
 
 
     /*
      *  Functional enrichment of DEGs (optional)
      */
-    if (params.func_file) {
-        FUNC_ENRICHMENT (
-            ch_func_file,
-            ch_deseq_res
-        )
-        ch_func_enrich = FUNC_ENRICHMENT.out.func_res
-    }
+    FUNC_ENRICHMENT (
+        ch_func_file,
+        ch_deseq_res
+    )
+    ch_func_enrich = FUNC_ENRICHMENT.out.func_res
 
 }
 

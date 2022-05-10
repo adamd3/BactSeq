@@ -23,6 +23,10 @@ if (!require("scales")){
 if (!require("RColorBrewer")){
     install.packages("RColorBrewer",repos = "http://cran.us.r-project.org")
 }
+if (!require("reshape2")){
+    install.packages("reshape2",repos = "http://cran.us.r-project.org")
+}
+
 
 library(optparse)
 library(Rsubread)
@@ -31,6 +35,8 @@ library(stringr)
 library(ggplot2)
 library(scales)
 library(RColorBrewer)
+library(reshape2)
+
 
 
 option_list <- list(

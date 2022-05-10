@@ -1,5 +1,5 @@
 process FUNC_ENRICHMENT {
-    tag "$gene_counts"
+    tag "$ch_func_file"
     label 'process_medium'
     publishDir "${params.outdir}/func_enrich", mode: 'copy'
 

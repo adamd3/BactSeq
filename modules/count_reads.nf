@@ -1,5 +1,5 @@
 process COUNT_READS {
-    tag "$bam"
+    tag "$gff"
     label 'process_high'
     publishDir "${params.outdir}/read_counts", mode: 'copy'
 

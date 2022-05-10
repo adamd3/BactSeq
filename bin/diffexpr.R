@@ -45,7 +45,7 @@ option_list <- list(
 opt_parser <- OptionParser(option_list=option_list)
 opt <- parse_args(opt_parser)
 
-counts_f <- "cpm_counts.tsv"
+counts_f <- "gene_counts.tsv"
 meta_f <- "sample_metadata.tsv"
 outdir <- opt$outdir
 
@@ -56,7 +56,7 @@ outdir <- opt$outdir
 ## Read and process data
 ##------------------------------------------------------------------------------
 counts_tab <- read.csv(
-    "gene_counts.tsv", header = TRUE, na.strings=c("","NA"), sep = "\t",
+    counts_f, header = TRUE, na.strings=c("","NA"), sep = "\t",
     stringsAsFactors = FALSE
 )
 meta_tab <- read.table(

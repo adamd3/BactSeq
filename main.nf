@@ -181,7 +181,7 @@ workflow {
         ch_readcounts_df,
         ch_metadata
     )
-    ch_deseq_res = DIFF_EXPRESSION.out.deseq_res
+    ch_deseq_res = DIFF_EXPRESSION.out.deseq_res.collect()
 
 
     /*

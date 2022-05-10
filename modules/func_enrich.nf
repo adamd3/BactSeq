@@ -13,11 +13,6 @@ process FUNC_ENRICHMENT {
 
     script:
     """
-    echo task path: \$PWD
-
-    for resf in ./DGE*tsv; do
-        functional_enrichment.R  \
-            -r $resf -a $ch_func_file -o ./
-    done
+    functional_enrichment.R -a $ch_func_file -o ./
     """
 }

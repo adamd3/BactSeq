@@ -74,9 +74,6 @@ Other available parameters:
     ER_1	SRX1607060_T1.fastq.gz	Erythromycin	1
     ER_2	SRX1607061_T1.fastq.gz	Erythromycin	2
     ER_3	SRX1607062_T1.fastq.gz	Erythromycin	3
-    HP_1	SRX1607063_T1.fastq.gz	Hypoxia	1
-    HP_2	SRX1607064_T1.fastq.gz	Hypoxia	2
-    HP_3	SRX1607065_T1.fastq.gz	Hypoxia	3
     KN_1	SRX1607066_T1.fastq.gz	Kanamycin	1
     KN_2	SRX1607067_T1.fastq.gz	Kanamycin	2
     KN_3	SRX1607068_T1.fastq.gz	Kanamycin	3

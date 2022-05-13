@@ -7,8 +7,8 @@ channels:
   - defaults
 dependencies:
   ## conda-forge packages
-  - conda-forge::python>=3.7
-  - conda-forge::numpy>=1.22
+  - conda-forge::numpy>=1.21
+  - conda-forge::python>=3.7, <3.9
   - conda-forge::gawk>=5.1
   - conda-forge::pigz>=2.3               ## Required for TrimGalore multi-threading
   - conda-forge::pandas>=1.4
@@ -28,12 +28,14 @@ dependencies:
   - conda-forge::r-fastmap>=1.1
   - conda-forge::r-devtools>=2.4
   - conda-forge::r-readr>=2.1
+  - conda-forge::r-scales>=1.1
+
+
   ## bioconda packages
   - bioconda::fastqc>=0.11
   - bioconda::trim-galore>=0.6
   - bioconda::bwa>=0.7
   - bioconda::samtools>=1.15
-  - bioconda::r-scales>=0.4
   - bioconda::bioconductor-edger>=3.36
   - bioconda::bioconductor-deseq2>=1.34
   - bioconda::bioconductor-fgsea>=1.10

@@ -3,8 +3,10 @@
 if (!require("optparse")){
     install.packages("optparse",repos = "http://cran.us.r-project.org")
 }
+if (!require("BiocManager", quietly = TRUE))
+    install.packages("BiocManager",repos = "http://cran.us.r-project.org")
 if (!require("edgeR")){
-    install.packages("edgeR",repos = "http://cran.us.r-project.org")
+    BiocManager::install("edgeR")
 }
 
 library(optparse)

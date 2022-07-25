@@ -13,6 +13,6 @@ process FUNC_ENRICHMENT {
 
     script:
     """
-    functional_enrichment.R -a $ch_func_file -o ./
+    functional_enrichment_topGO.R -a $ch_func_file -o ./
     """
 }

@@ -40,6 +40,7 @@ large_disc_pal <- brewer.pal.info[brewer.pal.info$category == 'qual',]
 colpal_large <- unlist(
     mapply(brewer.pal, large_disc_pal$maxcolors, rownames(large_disc_pal)))
 colpal_large[c(5:8)] <- colpal_large[c(70:73)] ## replace to avoid colour clashes
+colpal_large <- c(brewer.pal(9,"Set1"),colpal_large)
 
 
 ##------------------------------------------------------------------------------
@@ -65,6 +66,12 @@ pca_counts <- prcomp(t(norm_counts), center = TRUE, scale = FALSE)
 
 ## save pca object
 saveRDS(pca_counts, file.path(outdir,'pca.rds'))
+
+## save pca coordinates
+write.table(
+    pca_counts$x, file = file.path(outdir,'pca_coords.tsv'),
+    quote = FALSE, sep = "\t", row.names = TRUE, col.names = TRUE
+)
 
 
 p1 <- ggbiplot(

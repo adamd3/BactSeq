@@ -47,6 +47,7 @@ opt <- parse_args(opt_parser)
 
 counts_f <- "gene_counts.tsv"
 meta_f <- "sample_metadata.tsv"
+cont_tab_f <- "contrast_table.tsv"
 outdir <- opt$outdir
 
 
@@ -62,6 +63,9 @@ counts_tab <- read.csv(
 meta_tab <- read.table(
     meta_f, header = TRUE, sep = "\t", stringsAsFactors = FALSE
 )
+contrast_tab <- read.table(
+    cont_tab_f, header = TRUE, sep = "\t", stringsAsFactors = FALSE
+)
 
 ## factorise group column
 meta_tab$group <- as.factor(as.character(meta_tab$group))
@@ -74,14 +78,25 @@ meta_tab <- meta_tab[match(colnames(counts_tab),meta_tab$sample),]
 ##------------------------------------------------------------------------------
 ## Differential gene expression
 ##------------------------------------------------------------------------------
-## get all possible combinations of group column:
-comb_list <- combn(levels(meta_tab$group), 2, simplify = FALSE)
 
-comb_names <- sapply(comb_list, function(x){
-    contrast_name <- paste0(x[1],"_",x[2])
+## make list of contrasts to be performed from contrast table
+comb_list <- lapply(1:nrow(contrast_tab), function(idx){
+    c(contrast_tab[idx,1], contrast_tab[idx,2])
+})
+comb_names <- lapply(1:nrow(contrast_tab), function(idx){
+    contrast_name <- paste0(contrast_tab[idx,1],"_",contrast_tab[idx,2])
     contrast_name
 })
 names(comb_list) <- comb_names
+
+# ## previous version - get all possible combinations of group column:
+# comb_list <- combn(levels(meta_tab$group), 2, simplify = FALSE)
+#
+# comb_names <- sapply(comb_list, function(x){
+#     contrast_name <- paste0(x[1],"_",x[2])
+#     contrast_name
+# })
+# names(comb_list) <- comb_names
 
 ## make DESeq2 object
 dds <- DESeqDataSetFromMatrix(
@@ -97,7 +112,6 @@ contrast_list <- lapply(comb_list, function(x){
     res <- lfcShrink(dds, contrast = c("group", gp_1, gp_2), type = "normal")
     res
 })
-
 
 ## export tables of genes with log2FC and p-values:
 lapply(seq_along(contrast_list), function(x){
@@ -117,7 +131,7 @@ lapply(seq_along(contrast_list), function(x){
 ##------------------------------------------------------------------------------
 ## choose the limits for the x- and y-axes using the log2FoldChanges and pvalues
 lfc_list <- lapply(contrast_list, function(x){
-    subset(x, padj<0.05)$log2FoldChange
+    subset(x, padj<p_thresh)$log2FoldChange
 })
 xmin <- round_any(min(unlist(lfc_list)), 0.1, floor)
 xmax <- round_any(max(unlist(lfc_list)), 0.1, ceiling)
@@ -130,7 +144,7 @@ if(abs(xmax)>abs(xmin)){
 
 ymin <- 0
 pval_list <- lapply(contrast_list, function(x){
-    subset(x, padj<0.05)$padj
+    subset(x, padj<p_thresh)$padj
 })
 ymax <- round_any(max(unlist(pval_list)), 0.5, ceiling)
 
@@ -140,12 +154,12 @@ set1pal <- brewer.pal(9,"Set1")
 lapply(seq_along(contrast_list), function(x){
     ymin <- 0
     ymax <- max(-log10(
-        subset(contrast_list[[x]], padj<0.05 & log2FoldChange > 1)$padj))
+        subset(contrast_list[[x]], padj<p_thresh & log2FoldChange>l2fc_thresh)$padj))
     xmin <- round_any(min(unlist(subset(
-        contrast_list[[x]], padj<0.05 & log2FoldChange > 1)$log2FoldChange)),
+        contrast_list[[x]], padj<p_thresh & log2FoldChange > l2fc_thresh)$log2FoldChange)),
         0.1, floor)
     xmax <- round_any(max(unlist(subset(
-        contrast_list[[x]], padj<0.05 & log2FoldChange > 1)$log2FoldChange)),
+        contrast_list[[x]], padj<p_thresh & log2FoldChange > l2fc_thresh)$log2FoldChange)),
         0.1, ceiling)
     if(abs(xmax)>abs(xmin)){
         xmin=xmax*-1
@@ -155,17 +169,17 @@ lapply(seq_along(contrast_list), function(x){
 
     ## show gene labels where the log2FoldChange exceeds a certain threshold:
     keepLabs <- rownames(
-        subset(contrast_list[[x]], padj<0.05 & (abs(log2FoldChange) > xmax*0.9)))
+        subset(contrast_list[[x]], padj<p_thresh & (abs(log2FoldChange) > xmax*0.9)))
     keepLabs <- c(keepLabs,rownames(
-        subset(contrast_list[[x]], padj<0.05 & (abs(-log10(padj)) > ymax*0.5))
+        subset(contrast_list[[x]], padj<p_thresh & (abs(-log10(padj)) > ymax*0.5))
     ))
 
     ## Custom colour scheme
     keyvals <- ifelse(
-        contrast_list[[x]]$log2FoldChange < -1 & contrast_list[[x]]$padj<0.05,
+        contrast_list[[x]]$log2FoldChange < (l2fc_thresh*-1) & contrast_list[[x]]$padj<p_thresh,
         set1pal[3],
         ifelse(
-            contrast_list[[x]]$log2FoldChange > 1 & contrast_list[[x]]$padj<0.05,
+            contrast_list[[x]]$log2FoldChange > l2fc_thresh & contrast_list[[x]]$padj<p_thresh,
             set1pal[1], 'grey45')
     )
     keyvals[is.na(keyvals)] <- 'grey45'
@@ -183,8 +197,8 @@ lapply(seq_along(contrast_list), function(x){
           x = 'log2FoldChange', y = 'padj',
           pointSize = 3.0,
           labSize = 4.0,
-          pCutoff = 5e-2,
-          FCcutoff = 1,
+          pCutoff = p_thresh,
+          FCcutoff = l2fc_thresh,
           colCustom = keyvals,
           drawConnectors = TRUE,
           max.overlaps = 20,

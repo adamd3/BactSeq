@@ -29,7 +29,7 @@ if (!(workflow.runName ==~ /[a-z]+_[a-z]+/)) {
 ================================================================================
 */
 
-
+// required inputs
 if (params.sample_file) {
     ch_samples = file(params.sample_file, checkIfExists: true)
 } else { exit 1, 'Sample file not specified!' }
@@ -42,6 +42,10 @@ if (params.ref_ann) {
     ch_gff_file = file(params.ref_ann, checkIfExists: true)
 } else { exit 1, 'Reference genome GFF file not specified!' }
 
+// optional inputs
+if (params.cont_tabl) {
+    ch_cont_file = file(params.cont_tabl, checkIfExists: true)
+}
 if (params.func_file) {
     ch_func_file = file(params.func_file, checkIfExists: true)
 }
@@ -173,16 +177,19 @@ workflow {
     )
     ch_pca_out = PCA_SAMPLES.out.pca_out
 
-
     /*
      *  Differential gene expression (DESeq2)
      */
-    DIFF_EXPRESSION (
-        ch_readcounts_df,
-        ch_metadata
-    )
-    ch_deseq_res = DIFF_EXPRESSION.out.deseq_res.collect()
-
+    if (params.cont_tabl) {
+        DIFF_EXPRESSION (
+            ch_readcounts_df,
+            ch_metadata,
+            ch_cont_file,
+            params.p_thresh,
+            params.l2fc_thresh
+        )
+        ch_deseq_res = DIFF_EXPRESSION.out.deseq_res.collect()
+    }
 
     /*
      *  Functional enrichment of DEGs (optional)
@@ -190,7 +197,9 @@ workflow {
     if (params.func_file) {
         FUNC_ENRICHMENT (
             ch_func_file,
-            ch_deseq_res
+            ch_deseq_res,
+            params.p_thresh,
+            params.l2fc_thresh
         )
         ch_func_enrich = FUNC_ENRICHMENT.out.func_res
     }
@@ -229,7 +238,10 @@ def helpMessage() {
                                       Available: conda, docker, singularity.
 
     Other options:
+      --cont_tabl [file]              Path to tsv file containing contrasts to be performed for differential expression.
       --func_file [file]              Path to GMT-format file containing functional annotation.
+      --p_thresh [str]                Adjusted p-value threshold for identifying differentially expressed genes. Default = 0.05.
+      --l2fc_thresh [str]             Absolute log2(FoldChange) threshold for identifying differentially expressed genes. Default = 1.
       --skip_trimming [bool]          Do not trim adaptors from FastQ files.
       --outdir [file]                 The output directory where the results will be saved (Default: './results').
       -name [str]                     Name for the pipeline run. If not specified, Nextflow will automatically generate a random mnemonic.

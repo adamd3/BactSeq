@@ -5,7 +5,10 @@ process DIFF_EXPRESSION {
 
     input:
     path gene_counts
-    path ref_gene_df
+    path meta_merged
+    path cont_tabl
+    val p_thresh
+    val l2fc_thresh
 
     output:
     path '*.tsv', emit: deseq_res
@@ -13,6 +16,6 @@ process DIFF_EXPRESSION {
 
     script:
     """
-    diffexpr.R -o ./
+    diffexpr.R -p $p_thresh -l $l2fc_thresh -o ./ 
     """
 }

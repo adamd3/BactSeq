@@ -38,6 +38,12 @@ library(plyr)
 library(EnhancedVolcano)
 
 option_list <- list(
+    make_option(c("-p", "--p_threshold"), type="double", default=0.05,
+        help="adjusted p-value threshold (default = 0.05)",
+        metavar="character"),
+    make_option(c("-l", "--log2fc_threshold"), type="double", default=1,
+        help="absolute log2FoldChange threshold (default = 1)",
+        metavar="character"),
     make_option(c("-o", "--outdir"), type="character", default=NULL,
         help="output directory for files", metavar="character")
 )
@@ -48,6 +54,9 @@ opt <- parse_args(opt_parser)
 counts_f <- "gene_counts.tsv"
 meta_f <- "sample_metadata.tsv"
 cont_tab_f <- "contrast_table.tsv"
+
+p_thresh <- opt$p_threshold
+l2fc_thresh <- opt$log2fc_threshold
 outdir <- opt$outdir
 
 

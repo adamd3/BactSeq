@@ -64,7 +64,7 @@ if (params.func_file) {
     Modules
 ================================================================================
 */
-include {MAKE_META_FILE} from './modules/metadata'
+// include {MAKE_META_FILE} from './modules/metadata'
 include {TRIMGALORE} from './modules/trim_reads'
 include {MAKE_BWA_INDEX; BWA_ALIGN} from './modules/bwa_align'
 include {COUNT_READS} from './modules/count_reads'
@@ -112,31 +112,31 @@ def create_fastq_channel(LinkedHashMap row) {
 */
 workflow {
 
-    /*
-     * Make metadata file linking samples with FastQ files
-     */
-    MAKE_META_FILE (
-        ch_samples
-    )
-    ch_metadata = MAKE_META_FILE.out.sample_metadata
+    // /*
+    //  * Make metadata file linking samples with FastQ files
+    //  */
+    // MAKE_META_FILE (
+    //     ch_samples
+    // )
+    // ch_metadata = MAKE_META_FILE.out.sample_metadata
 
 
     /*
      *  Create channels for input files
      */
-    // ch_metadata
+    // ch_samples
     //     .splitCsv(header:true, sep:'\t')
     //     .map {
     //         row -> [ row.sample, [ file(row.path_to_file, checkIfExists: true) ] ]
     //     }
     //     .set { ch_raw_reads_trimgalore }
 
-    // ch_metadata
+    // ch_samples
     //     .splitCsv(header: true, sep:'\t')
     //     .map { row -> row.sample }
     //     .set { ch_sample_ids }
 
-    ch_metadata
+    ch_samples
         .splitCsv(header: true, sep:'\t')
         .map { create_fastq_channel(it) }
         .set { ch_raw_reads_trimgalore }
@@ -187,7 +187,7 @@ workflow {
         ch_bwa_out_bam,
         ch_bwa_out_bai,
         ch_bwa_out_count,
-        ch_metadata,
+        ch_samples,
         ch_gff_file
     )
     ch_readcounts_df = COUNT_READS.out.counts_df
@@ -211,7 +211,7 @@ workflow {
      */
     PCA_SAMPLES (
         ch_cpm_counts,
-        ch_metadata
+        ch_samples
     )
     ch_pca_out = PCA_SAMPLES.out.pca_out
 
@@ -221,7 +221,7 @@ workflow {
     if (params.cont_tabl) {
         DIFF_EXPRESSION (
             ch_readcounts_df,
-            ch_metadata,
+            ch_samples,
             ch_cont_file,
             params.p_thresh,
             params.l2fc_thresh

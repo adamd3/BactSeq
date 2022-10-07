@@ -59,7 +59,7 @@ outf <- opt$outf
 ## Read data
 ##------------------------------------------------------------------------------
 meta_tab <- read.table(meta_f, header = TRUE, sep = "\t")
-## columns: sample	filename	group	repeat    path_to_file
+## columns: sample	 file1   file2	group	rep_no    paired
 
 
 ## cat the counts files
@@ -148,7 +148,7 @@ ggCols <- c(brewer_pallette1[1],brewer_pallette1[3])
 counts_summary <- data.frame(
     sample = meta_tab$"sample",
     group = meta_tab$"group",
-    rep = meta_tab$"rep",
+    rep = meta_tab$"rep_no",
     # protein_coding = colSums(
     #     gene_counts$counts[ref_gene_df$biotype=="protein_coding",]),
     # tRNA = colSums(

@@ -8,7 +8,8 @@ def parse():
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "sample_file",
-        help = "tsv file containing sample metadata, with the following column headers: sample, file_name, group, rep_no"
+        help = "tsv file containing sample metadata, with the following column " +
+        "headers: sample, file1, file2, group, rep_no, paired"
     )
     parser.add_argument(
         "data_dir", help = "Directory containing RNA-seq data"

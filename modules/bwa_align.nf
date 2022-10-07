@@ -36,7 +36,7 @@ process BWA_ALIGN {
     if (meta.paired_end) {
         """
         bwa mem -t ${task.cpus} ref_idx \\
-            ${name}_1_trimmed.fq.gz ${name}_2_trimmed.fq.gz | \\
+            ${name}_1_val_1.fq.gz ${name}_2_val_2.fq.gz | \\
             samtools sort -@ ${task.cpus - 1} -O bam - > ${name}.bam
         samtools index -@ ${task.cpus} ${name}.bam
         samtools idxstats ${name}.bam | head -n 1 > ${name}.counts

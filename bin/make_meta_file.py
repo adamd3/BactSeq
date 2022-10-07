@@ -11,7 +11,7 @@ def parse():
         help = "tsv file containing sample metadata, with the following column headers: sample, file_name, group, rep_no"
     )
     parser.add_argument(
-        "data_dir", help = "Directory containing downloaded RNA-seq data"
+        "data_dir", help = "Directory containing RNA-seq data"
     )
     parser.add_argument("outf", help="File for results")
     args = parser.parse_args()

@@ -50,6 +50,8 @@ if (params.func_file) {
     ch_func_file = file(params.func_file, checkIfExists: true)
 }
 
+
+
 // optional functional enrichment step
 //ch_func_file = ( params.func_file
 //            ? Channel.empty()
@@ -75,6 +77,36 @@ include {FUNC_ENRICHMENT} from './modules/func_enrich'
 
 /*
 ================================================================================
+    Functions
+================================================================================
+*/
+// Function to get list of [ meta, [ fastq_1, file2 ] ]
+def create_fastq_channel(LinkedHashMap row) {
+    // create sample metadata
+    def meta = [:]
+    meta.sample_id    = row.sample
+    meta.paired_end   = row.paired.toBoolean()
+
+    // add path(s) of the fastq file(s) to the metadata
+    def fastq_meta = []
+    if (!file(row.file1).exists()) {
+        exit 1, "ERROR: Please check input samplesheet -> Read 1 FastQ file does not exist!\n${row.file1}"
+    }
+    if (meta.paired_end) {
+        if (!file(row.file2).exists()) {
+            exit 1, "ERROR: Please check input samplesheet -> Read 2 FastQ file does not exist!\n${row.file2}"
+        }
+        fastq_meta = [ meta, [ file(row.file1), file(row.file2) ] ]
+    } else {
+        fastq_meta = [ meta, [ file(row.file1) ] ]
+    }
+    return fastq_meta
+}
+
+
+
+/*
+================================================================================
     Main workflow
 ================================================================================
 */
@@ -92,15 +124,22 @@ workflow {
     /*
      *  Create channels for input files
      */
-    ch_metadata
-        .splitCsv(header:true, sep:'\t')
-        .map { row -> [ row.sample, [ file(row.path_to_file, checkIfExists: true) ] ] }
-        .set { ch_raw_reads_trimgalore }
+    // ch_metadata
+    //     .splitCsv(header:true, sep:'\t')
+    //     .map {
+    //         row -> [ row.sample, [ file(row.path_to_file, checkIfExists: true) ] ]
+    //     }
+    //     .set { ch_raw_reads_trimgalore }
+
+    // ch_metadata
+    //     .splitCsv(header: true, sep:'\t')
+    //     .map { row -> row.sample }
+    //     .set { ch_sample_ids }
 
     ch_metadata
         .splitCsv(header: true, sep:'\t')
-        .map { row -> row.sample }
-        .set { ch_sample_ids }
+        .map { create_fastq_channel(it) }
+        .set { ch_raw_reads_trimgalore }
 
 
     /*
@@ -134,8 +173,7 @@ workflow {
      */
     BWA_ALIGN (
         ch_trimmed_reads,
-        ch_bwa_idx,
-        ch_sample_ids
+        ch_bwa_idx
     )
     ch_bwa_out_bam = BWA_ALIGN.out.bam_files.collect()
     ch_bwa_out_bai = BWA_ALIGN.out.bai_files.collect()

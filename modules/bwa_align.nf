@@ -16,14 +16,13 @@ process MAKE_BWA_INDEX {
 }
 
 process BWA_ALIGN {
-    tag "$name"
+    tag "$meta.sample_id"
     label 'process_high'
     publishDir "${params.outdir}/bwa_aln", mode: 'copy'
 
     input:
-    path trimmed_reads
+    tuple val(meta), path(trimmed_reads)
     path idx
-    val name
 
     output:
     path '*.bam', emit: bam_files
@@ -31,9 +30,23 @@ process BWA_ALIGN {
     path '*.counts', emit: count_files
 
     script:
-    """
-    bwa mem -t ${task.cpus} ref_idx ${name}_trimmed.fq.gz | samtools sort -@ ${task.cpus - 1} -O bam - > ${name}.bam
-    samtools index -@ ${task.cpus} ${name}.bam
-    samtools idxstats ${name}.bam | head -n 1 > ${name}.counts
-    """
+
+    def name = task.ext.prefix ?: "${meta.sample_id}"
+
+    if (meta.paired_end) {
+        """
+        bwa mem -t ${task.cpus} ref_idx \\
+            ${name}_1_trimmed.fq.gz ${name}_2_trimmed.fq.gz | \\
+            samtools sort -@ ${task.cpus - 1} -O bam - > ${name}.bam
+        samtools index -@ ${task.cpus} ${name}.bam
+        samtools idxstats ${name}.bam | head -n 1 > ${name}.counts
+        """
+    } else {
+        """
+        bwa mem -t ${task.cpus} ref_idx ${name}_trimmed.fq.gz \\
+            | samtools sort -@ ${task.cpus - 1} -O bam - > ${name}.bam
+        samtools index -@ ${task.cpus} ${name}.bam
+        samtools idxstats ${name}.bam | head -n 1 > ${name}.counts
+        """
+    }
 }

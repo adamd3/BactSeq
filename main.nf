@@ -64,7 +64,7 @@ if (params.func_file) {
     Modules
 ================================================================================
 */
-include {MAKE_META_FILE} from './modules/metadata'
+// include {MAKE_META_FILE} from './modules/metadata'
 include {TRIMGALORE} from './modules/trim_reads'
 include {MAKE_BWA_INDEX; BWA_ALIGN} from './modules/bwa_align'
 include {COUNT_READS} from './modules/count_reads'
@@ -112,13 +112,13 @@ def create_fastq_channel(LinkedHashMap row) {
 */
 workflow {
 
-    /*
-     * Make metadata file linking samples with FastQ files
-     */
-    MAKE_META_FILE (
-        ch_samples
-    )
-    ch_metadata = MAKE_META_FILE.out.sample_metadata
+    // /*
+    //  * Make metadata file linking samples with FastQ files
+    //  */
+    // MAKE_META_FILE (
+    //     ch_samples
+    // )
+    // ch_metadata = MAKE_META_FILE.out.sample_metadata
 
 
     /*
@@ -136,7 +136,7 @@ workflow {
     //     .map { row -> row.sample }
     //     .set { ch_sample_ids }
 
-    ch_metadata
+    ch_samples
         .splitCsv(header: true, sep:'\t')
         .map { create_fastq_channel(it) }
         .set { ch_raw_reads_trimgalore }

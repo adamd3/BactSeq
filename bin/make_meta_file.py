@@ -20,8 +20,8 @@ def parse():
 
 def merge_meta(sample_file, data_dir, outf):
     sample_dat = pd.read_csv(sample_file, sep = "\t")
-    sample_dat['path_to_file1'] = [os.path.join(data_dir, s) for s in sample_dat['file1'].tolist()]
-    sample_dat['path_to_file2'] = [os.path.join(data_dir, s) for s in sample_dat['file2'].tolist()]
+    # sample_dat['path_to_file1'] = [os.path.join(data_dir, s) for s in sample_dat['file1'].tolist()]
+    # sample_dat['path_to_file2'] = [os.path.join(data_dir, s) for s in sample_dat['file2'].tolist()]
     sample_dat.to_csv(outf, index=False, sep='\t')
 
 if __name__ == "__main__":

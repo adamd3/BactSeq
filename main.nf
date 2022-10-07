@@ -64,7 +64,7 @@ if (params.func_file) {
     Modules
 ================================================================================
 */
-// include {MAKE_META_FILE} from './modules/metadata'
+include {MAKE_META_FILE} from './modules/metadata'
 include {TRIMGALORE} from './modules/trim_reads'
 include {MAKE_BWA_INDEX; BWA_ALIGN} from './modules/bwa_align'
 include {COUNT_READS} from './modules/count_reads'

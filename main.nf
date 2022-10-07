@@ -136,7 +136,7 @@ workflow {
     //     .map { row -> row.sample }
     //     .set { ch_sample_ids }
 
-    ch_samples
+    ch_metadata
         .splitCsv(header: true, sep:'\t')
         .map { create_fastq_channel(it) }
         .set { ch_raw_reads_trimgalore }

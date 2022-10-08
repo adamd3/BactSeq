@@ -153,7 +153,8 @@ workflow {
         TRIMGALORE (
             ch_raw_reads_trimgalore
         )
-        ch_trimmed_reads = TRIMGALORE.out.trimmed_reads.collect()
+        // ch_trimmed_reads = TRIMGALORE.out.trimmed_reads.collect()
+        ch_trimmed_reads = TRIMGALORE.out.trimmed_reads
         ch_trimgalore_results_mqc = TRIMGALORE.out.trimgalore_results_mqc
         ch_trimgalore_fastqc_reports_mqc = TRIMGALORE.out.trimgalore_fastqc_reports_mqc
     }

@@ -86,6 +86,7 @@ def create_fastq_channel(LinkedHashMap row) {
     def meta = [:]
     meta.sample_id    = row.sample
     meta.paired_end   = row.paired.toBoolean()
+   
 
     // add path(s) of the fastq file(s) to the metadata
     def fastq_meta = []
@@ -189,7 +190,8 @@ workflow {
         ch_bwa_out_bai,
         ch_bwa_out_count,
         ch_metadata,
-        ch_gff_file
+        ch_gff_file,
+        params.paired
     )
     ch_readcounts_df = COUNT_READS.out.counts_df
     ch_refgene_df = COUNT_READS.out.ref_gene_dt
@@ -273,6 +275,7 @@ def helpMessage() {
       --sample_file [file]            Path to file containing sample information.
       --ref_genome [file]             Path to FASTA file containing reference genome sequence.
       --ref_ann [file]                Path to GFF file containing reference genome annotation.
+      --paired [str]                  Is data paired-end? Default = FALSE.
       -profile [str]                  Configuration profile to use.
                                       Available: conda, docker, singularity.
 

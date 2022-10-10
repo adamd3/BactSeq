@@ -9,6 +9,7 @@ process COUNT_READS {
     path counts
     path meta
     path gff
+    val paired
 
     output:
     path 'gene_counts.tsv', emit: counts_df
@@ -16,13 +17,14 @@ process COUNT_READS {
     path 'library_composition.png', emit: libcomp_plot
 
     script:
-    if (meta.paired_end) {
+
+    if (paired) {
         """
-        count_reads.R -m $meta -g $gff -p TRUE
+        count_reads.R -m $meta -g $gff -p $pend
         """
     } else {
         """
-        count_reads.R -m $meta -g $gff -p FALSE
+        count_reads.R -m $meta -g $gff -p $pend
         """
     }
 }

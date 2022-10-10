@@ -43,7 +43,12 @@ option_list <- list(
     make_option(c("-m", "--metadata"), type="character", default=NULL,
         help="sample metadata tsv file", metavar="character"),
     make_option(c("-g", "--gff"), type="character", default=NULL,
-        help="GFF annotation file for the reference strain", metavar="character")
+        help="GFF annotation file for the reference strain", 
+        metavar="character"),
+    make_option(c("-p", "--is_paired"), type="character", default=NULL,
+        help="are the reads paired-end? default = FALSE", 
+        metavar="character"),
+
 )
 
 opt_parser <- OptionParser(option_list=option_list)
@@ -51,6 +56,7 @@ opt <- parse_args(opt_parser)
 
 meta_f <- opt$metadata
 gff_f <- opt$gff
+ispaired <- if(opt$is_paired == "TRUE") TRUE else FALSE
 outf <- opt$outf
 
 
@@ -118,7 +124,8 @@ gene_counts <- Rsubread::featureCounts(
     isGTFAnnotationFile = TRUE,
     GTF.featureType = "gene", GTF.attrType = "locus_tag",
     nthreads = 16, countMultiMappingReads = TRUE,
-    isPairedEnd = FALSE, strandSpecific = 2
+    isPairedEnd = ispaired, 
+    strandSpecific = 2
 )
 colnames(gene_counts$counts) <- gsub(".bam", "", colnames(gene_counts$counts))
 colnames(gene_counts$counts) <- gsub("\\.","_",colnames(gene_counts$counts))

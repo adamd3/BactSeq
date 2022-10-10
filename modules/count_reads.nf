@@ -17,6 +17,15 @@ process COUNT_READS {
 
     script:
     """
-    count_reads.R -m $meta -g $gff
+    if (meta.paired_end) {
+        """
+        count_reads.R -m $meta -g $gff -p TRUE
+        """
+    } else {
+        """
+        count_reads.R -m $meta -g $gff -p FALSE
+        """
+    }
+
     """
 }

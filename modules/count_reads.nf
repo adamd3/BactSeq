@@ -16,7 +16,6 @@ process COUNT_READS {
     path 'library_composition.png', emit: libcomp_plot
 
     script:
-    """
     if (meta.paired_end) {
         """
         count_reads.R -m $meta -g $gff -p TRUE
@@ -26,6 +25,4 @@ process COUNT_READS {
         count_reads.R -m $meta -g $gff -p FALSE
         """
     }
-
-    """
 }

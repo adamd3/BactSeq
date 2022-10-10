@@ -20,11 +20,11 @@ process COUNT_READS {
 
     if (paired) {
         """
-        count_reads.R -m $meta -g $gff -p $pend
+        count_reads.R -m $meta -g $gff -p TRUE
         """
     } else {
         """
-        count_reads.R -m $meta -g $gff -p $pend
+        count_reads.R -m $meta -g $gff -p FALSE
         """
     }
 }

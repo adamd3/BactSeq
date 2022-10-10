@@ -47,7 +47,7 @@ option_list <- list(
         metavar="character"),
     make_option(c("-p", "--is_paired"), type="character", default=NULL,
         help="are the reads paired-end? default = FALSE", 
-        metavar="character"),
+        metavar="character")
 
 )
 

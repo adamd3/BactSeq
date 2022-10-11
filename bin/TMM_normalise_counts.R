@@ -27,7 +27,7 @@ outdir <- opt$outdir
 
 ## Read data
 counts_tab <- read.csv(
-    "gene_counts.tsv", header = TRUE, na.strings=c("","NA"), sep = "\t",
+    "gene_counts_pc.tsv", header = TRUE, na.strings=c("","NA"), sep = "\t",
     stringsAsFactors = FALSE
 )
 ref_gene_tab <- read.csv(
@@ -35,9 +35,12 @@ ref_gene_tab <- read.csv(
     stringsAsFactors = FALSE
 )
 
-## remove rRNA genes
-ref_tab_sub <- ref_gene_tab[!ref_gene_tab$biotype=="rRNA",]
-non_rRNA_counts <- counts_tab[rownames(counts_tab) %in% ref_tab_sub$locus_tag,]
+# ## remove rRNA genes
+# ref_tab_sub <- ref_gene_tab[!ref_gene_tab$biotype=="rRNA",]
+# non_rRNA_counts <- counts_tab[rownames(counts_tab) %in% ref_tab_sub$locus_tag,]
+
+## update: now passing the protein-coding counts matrix only 
+non_rRNA_counts <- counts_tab
 
 
 ## ensure that ref gene annotations order matches counts table

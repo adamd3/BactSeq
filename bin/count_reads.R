@@ -85,8 +85,6 @@ merged_total_counts <- as.data.frame(do.call(rbind, total_counts_list))
 ref_annot <- ape::read.gff(gff_f, na.strings = c(".", "?"), GFF3 = TRUE)
 
 ref_annot <- subset(ref_annot, type=="gene")
-dim(ref_annot)
-# [1] 4970    9
 
 gene_attr <- stringr::str_split(ref_annot$attributes,";")
 locus_tags <- unlist(lapply(gene_attr, function(x){x[grepl("locus_tag", x)]}))
@@ -135,6 +133,12 @@ write.table(
     sep = "\t", quote = FALSE
 )
 
+## protein-coding genes only
+gene_counts_pc <- gene_counts$counts[ref_gene_df$biotype=="protein_coding",]
+write.table(
+    gene_counts_pc, "gene_counts_pc.tsv", col.names = TRUE, row.names = TRUE,
+    sep = "\t", quote = FALSE
+)
 
 
 ##------------------------------------------------------------------------------
@@ -149,20 +153,20 @@ gg_color_hue <- function(n) {
     hcl(h = hues, l = 65, c = 100)[1:n]
 }
 ggColsDefault <- (gg_color_hue(4))
-ggCols <- c(brewer_pallette1[1],brewer_pallette1[3])
+ggCols <- brewer_pallette1[c(1,3,4)]
 
 ## summarise counts per sample
 counts_summary <- data.frame(
     sample = meta_tab$"sample",
     group = meta_tab$"group",
     rep = meta_tab$"rep_no",
-    # protein_coding = colSums(
-    #     gene_counts$counts[ref_gene_df$biotype=="protein_coding",]),
+    protein_coding = colSums(
+        gene_counts$counts[ref_gene_df$biotype=="protein_coding",]),
     # tRNA = colSums(
-    #     gene_counts$counts[ref_gene_df$biotype=="tRNA",]),
-    other_genes = colSums(
-        gene_counts$counts[!(ref_gene_df$biotype=="rRNA"),]),
-    rRNA_genes = colSums(
+        # gene_counts$counts[ref_gene_df$biotype=="tRNA",]),
+    other_ncRNA = colSums(
+        gene_counts$counts[!(ref_gene_df$biotype %in% c("rRNA", "protein_coding")),]),
+    rRNA = colSums(
         gene_counts$counts[ref_gene_df$biotype=="rRNA",])
 )
 
@@ -173,18 +177,28 @@ counts_summary <- data.frame(
 
 ## add total mapped counts
 counts_summary <- merge(counts_summary,merged_total_counts, by = "sample")
-counts_summary$non_rRNA_genes <- counts_summary$mapped-counts_summary$rRNA_genes
+# counts_summary$non_rRNA <- counts_summary$mapped-counts_summary$rRNA
 
 counts_summary <- counts_summary[rev(order(counts_summary$sample)),]
 
 counts_melt <- reshape2::melt(
     counts_summary, id.vars = c("sample"),
-    measure.vars = c("non_rRNA_genes", "rRNA_genes")
+    measure.vars = c(
+        # "non_rRNA",
+        "protein_coding",
+        "other_ncRNA",
+        "rRNA"
+        )
 )
 counts_melt$sample <- factor(
     counts_melt$sample, levels = rev(unique(sort(counts_melt$sample)))
 )
-counts_melt$variable <- factor(counts_melt$variable, levels=c("rRNA_genes", "non_rRNA_genes"))
+counts_melt$variable <- factor(counts_melt$variable, levels=c(
+    "rRNA", 
+    # "non_rRNA"
+    "protein_coding",
+    "other_ncRNA"
+    ))
 # minUsable <- min(mergedDf$q15_dedup_reads)
 
 cc1 <- 12

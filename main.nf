@@ -194,6 +194,7 @@ workflow {
         params.paired
     )
     ch_readcounts_df = COUNT_READS.out.counts_df
+    ch_readcounts_df_pc = COUNT_READS.out.counts_df_pc
     ch_refgene_df = COUNT_READS.out.ref_gene_df
 
 
@@ -201,7 +202,7 @@ workflow {
      *  Get normalised read counts per gene
      */
     TMM_NORMALISE_COUNTS (
-        ch_readcounts_df,
+        ch_readcounts_df_pc,
         ch_refgene_df
     )
     ch_cpm_counts = TMM_NORMALISE_COUNTS.out.cpm_counts
@@ -223,7 +224,7 @@ workflow {
      */
     if (params.cont_tabl) {
         DIFF_EXPRESSION (
-            ch_readcounts_df,
+            ch_readcounts_df_pc,
             ch_metadata,
             ch_cont_file,
             params.p_thresh,

@@ -194,7 +194,7 @@ workflow {
         params.paired
     )
     ch_readcounts_df = COUNT_READS.out.counts_df
-    ch_refgene_df = COUNT_READS.out.ref_gene_dt
+    ch_refgene_df = COUNT_READS.out.ref_gene_df
 
 
     /*

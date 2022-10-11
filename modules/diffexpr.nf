@@ -16,7 +16,7 @@ process DIFF_EXPRESSION {
 
     script:
     """
-    [ ! -f contrasts.tsv ] && ln -s $cont_tabl contrasts.tsv
+    [ ! -f contrast_table.tsv ] && ln -s $cont_tabl contrast_table.tsv
     diffexpr.R -p $p_thresh -l $l2fc_thresh -o ./ 
     """
 }

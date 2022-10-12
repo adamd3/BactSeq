@@ -191,7 +191,8 @@ workflow {
         ch_bwa_out_count,
         ch_metadata,
         ch_gff_file,
-        params.paired
+        params.paired,
+        params.strandedness
     )
     ch_readcounts_df = COUNT_READS.out.counts_df
     ch_readcounts_df_pc = COUNT_READS.out.counts_df_pc
@@ -277,6 +278,7 @@ def helpMessage() {
       --ref_genome [file]             Path to FASTA file containing reference genome sequence.
       --ref_ann [file]                Path to GFF file containing reference genome annotation.
       --paired [str]                  Is data paired-end? Default = FALSE.
+      --strandedness [str]            Is data stranded? Options: `unstranded`, `forward`, `reverse`. Default = reverse.
       -profile [str]                  Configuration profile to use.
                                       Available: conda, docker, singularity.
 

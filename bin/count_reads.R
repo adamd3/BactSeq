@@ -48,7 +48,9 @@ option_list <- list(
     make_option(c("-p", "--is_paired"), type="character", default=NULL,
         help="are the reads paired-end? default = FALSE", 
         metavar="character")
-
+    make_option(c("-s", "--strandedness"), type="character", default=NULL,
+        help="read strandedness. default = reverse", 
+        metavar="character")
 )
 
 opt_parser <- OptionParser(option_list=option_list)
@@ -57,6 +59,7 @@ opt <- parse_args(opt_parser)
 meta_f <- opt$metadata
 gff_f <- opt$gff
 ispaired <- if(opt$is_paired == "TRUE") TRUE else FALSE
+strandedness <- opt$strandedness
 outf <- opt$outf
 
 
@@ -117,13 +120,21 @@ write.table(
 ##------------------------------------------------------------------------------
 bamfilesCount <- paste0(meta_tab$sample, ".bam")
 
+# 0 (unstranded), 1 (stranded) and 2 (reversely stranded)
+strand <- switch(as.character(strandedness),
+       "unstranded" = 0,
+       "forward" = 1,
+       "reverse" = 2,
+       stop("Invalid input")
+)
+
 gene_counts <- Rsubread::featureCounts(
     bamfilesCount, annot.ext = gff_f,
     isGTFAnnotationFile = TRUE,
     GTF.featureType = "gene", GTF.attrType = "locus_tag",
     nthreads = 16, countMultiMappingReads = TRUE,
     isPairedEnd = ispaired, 
-    strandSpecific = 2
+    strandSpecific = strand
 )
 colnames(gene_counts$counts) <- gsub(".bam", "", colnames(gene_counts$counts))
 colnames(gene_counts$counts) <- gsub("\\.","_",colnames(gene_counts$counts))
@@ -245,8 +256,8 @@ ggsave(
 ## get the proportions of reads per library
 # propCols <- (mergedDf[,c(3,13,14,5)] / mergedDf[,2])
 
-propCols <- (counts_summary[c(
-    "protein_coding", "other", "rRNA")] / counts_summary[c("mapped")])
+propCols <- counts_summary[c(
+    "protein_coding", "other", "rRNA")] / counts_summary$mapped
 
 propCols$sample <- counts_summary$sample
 

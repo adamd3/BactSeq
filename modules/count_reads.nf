@@ -10,6 +10,7 @@ process COUNT_READS {
     path meta
     path gff
     val paired
+    val strandedness
 
     output:
     path 'gene_counts.tsv', emit: counts_df
@@ -21,11 +22,11 @@ process COUNT_READS {
 
     if (paired) {
         """
-        count_reads.R -m $meta -g $gff -p TRUE
+        count_reads.R -s $strandedness -m $meta -g $gff -p TRUE
         """
     } else {
         """
-        count_reads.R -m $meta -g $gff -p FALSE
+        count_reads.R -s $strandedness -m $meta -g $gff -p FALSE
         """
     }
 }

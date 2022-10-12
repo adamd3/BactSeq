@@ -164,8 +164,8 @@ counts_summary <- data.frame(
         gene_counts$counts[ref_gene_df$biotype=="protein_coding",]),
     # tRNA = colSums(
         # gene_counts$counts[ref_gene_df$biotype=="tRNA",]),
-    other_ncRNA = colSums(
-        gene_counts$counts[!(ref_gene_df$biotype %in% c("rRNA", "protein_coding")),]),
+    # other = colSums(
+    #     gene_counts$counts[!(ref_gene_df$biotype %in% c("rRNA", "protein_coding")),]),
     rRNA = colSums(
         gene_counts$counts[ref_gene_df$biotype=="rRNA",])
 )
@@ -178,33 +178,35 @@ counts_summary <- data.frame(
 ## add total mapped counts
 counts_summary <- merge(counts_summary,merged_total_counts, by = "sample")
 # counts_summary$non_rRNA <- counts_summary$mapped-counts_summary$rRNA
+counts_summary$other <- counts_summary$mapped-(
+    counts_summary$rRNA + counts_summary$protein_coding)
 
 counts_summary <- counts_summary[rev(order(counts_summary$sample)),]
 
+
+cc1 <- 12
+
+
+#############################
+## raw counts plot
+#############################
 counts_melt <- reshape2::melt(
     counts_summary, id.vars = c("sample"),
-    measure.vars = c(
-        # "non_rRNA",
-        "protein_coding",
-        "other_ncRNA",
-        "rRNA"
-        )
+    measure.vars = c("protein_coding", "other", "rRNA")
 )
 counts_melt$sample <- factor(
     counts_melt$sample, levels = rev(unique(sort(counts_melt$sample)))
 )
 counts_melt$variable <- factor(counts_melt$variable, levels=c(
-    "rRNA", 
-    # "non_rRNA"
-    "protein_coding",
-    "other_ncRNA"
-    ))
+    "rRNA", "other", "protein_coding")
+)
 # minUsable <- min(mergedDf$q15_dedup_reads)
 
-cc1 <- 12
+
 p1 <- ggplot(counts_melt,
         aes(x = sample, colour = variable, fill = variable, y = value)
-    ) + geom_bar(position = "stack", stat = "identity", width = 0.7) +
+    ) + 
+    geom_bar(position = "stack", stat = "identity", width = 0.7) +
     coord_flip() +
     xlab("Sample") + ylab("Million reads") +
     scale_fill_manual(
@@ -217,7 +219,7 @@ p1 <- ggplot(counts_melt,
     scale_colour_manual(values = ggCols, guide = FALSE) +
     scale_y_continuous(labels = unit_format(unit = "", scale = 1e-6)) +
     ## add a dashed line at the min usable number of reads
-    geom_hline(yintercept = 5e6, linetype="dashed") +
+    # geom_hline(yintercept = 5e6, linetype="dashed") +
     theme_bw(base_size = cc1*1.5) +
     theme(
         legend.position = "top",
@@ -235,3 +237,54 @@ ggsave(
     width = 8, height = (nsamps/2),
     dpi = 300
 )
+
+
+#############################
+## proportions plot
+#############################
+## get the proportions of reads per library
+# propCols <- (mergedDf[,c(3,13,14,5)] / mergedDf[,2])
+
+propCols <- (counts_summary[c(
+    "protein_coding", "other", "rRNA")] / counts_summary[c("mapped")])
+
+propCols$sample <- counts_summary$sample
+
+# rowSums(propCols) ## each row should sum to 1
+colnames(propCols) <- c(
+    "protein_coding", "other", "rRNA"
+)
+prop_melt <- melt(
+    propCols, id.vars = c("sample"),
+    measure.vars = c("protein_coding", "other", "rRNA")
+)
+prop_melt$sample <- factor(
+    prop_melt$sample, levels = rev(unique(sort(prop_melt$sample)))
+)
+prop_melt$variable <- factor(prop_melt$variable, levels=c(
+    "rRNA", "other", "protein_coding")
+)
+
+p2 <- ggplot(prop_melt,
+         aes(x = sample, colour = variable, fill = variable, y = value)
+    ) + geom_bar(stat = "identity",  width = 0.7) +
+    coord_flip()  +
+    xlab(xlab) + ylab("Proportion of reads") +
+    scale_fill_manual(
+        "",
+        labels = c("Unaligned", "Low quality", "Duplicate", "Usable"),
+        values = ggCols,
+        guide = guide_legend(reverse = TRUE)
+        # values = ggColsDefault
+    ) +
+    scale_colour_manual(values = ggCols, guide = FALSE) +
+    scale_y_continuous(labels = unit_format(unit = "", scale = 1e-6)) +
+    ggStandard + theme_bw(base_size = cc1*1.5) +
+    theme(legend.position="top", legend.text=element_text(size=cc1*1.6))
+ggsave(
+    p2, file = 'library_composition_proportions.png',
+    device = "png",
+    width = 8, height = (nsamps/2),
+    dpi = 300
+)
+mergedDf

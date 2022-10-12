@@ -41,6 +41,7 @@ ref_gene_tab <- read.csv(
 
 ## update: now passing the protein-coding counts matrix only 
 non_rRNA_counts <- counts_tab
+ref_tab_sub <- ref_gene_tab[ref_gene_tab$biotype=="protein_coding",]
 
 
 ## ensure that ref gene annotations order matches counts table

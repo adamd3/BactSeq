@@ -51,7 +51,7 @@ option_list <- list(
 opt_parser <- OptionParser(option_list=option_list)
 opt <- parse_args(opt_parser)
 
-counts_f <- "gene_counts.tsv"
+counts_f <- "gene_counts_pc.tsv"
 meta_f <- "sample_metadata.tsv"
 cont_tab_f <- "contrast_table.tsv"
 

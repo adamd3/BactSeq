@@ -27,7 +27,9 @@ if (!require("devtools")){
 if (!require("EnhancedVolcano")){
     devtools::install_github("kevinblighe/EnhancedVolcano")
 }
-
+if (!require("tibble")){
+    install.packages("tibble",repos = "http://cran.us.r-project.org")
+}
 
 library(optparse)
 library(DESeq2)
@@ -36,6 +38,7 @@ library(RColorBrewer)
 library(RSQLite)
 library(plyr)
 library(EnhancedVolcano)
+library(tibble)
 
 option_list <- list(
     make_option(c("-p", "--p_threshold"), type="double", default=0.05,
@@ -125,11 +128,12 @@ contrast_list <- lapply(comb_list, function(x){
 ## export tables of genes with log2FC and p-values:
 lapply(seq_along(contrast_list), function(x){
     contrast_name <- names(contrast_list)[x]
+    res_df <- tibble::rownames_to_column(contrast_list[x], "feature_id")
     write.table(
-        contrast_list[x],
+        res_df,
         file = file.path(outdir, paste0("DGE_", contrast_name, ".tsv")),
         quote = FALSE, sep = "\t",
-        row.names = TRUE, col.names = TRUE
+        row.names = FALSE, col.names = TRUE
     )
 })
 

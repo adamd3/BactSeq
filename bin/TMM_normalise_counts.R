@@ -8,9 +8,13 @@ if (!require("BiocManager", quietly = TRUE))
 if (!require("edgeR")){
     BiocManager::install("edgeR")
 }
+if (!require("tibble")){
+    install.packages("tibble",repos = "http://cran.us.r-project.org")
+}
 
 library(optparse)
 library(edgeR)
+library(tibble)
 
 option_list <- list(
     make_option(c("-t", "--log_transform"), type="character", default=NULL,
@@ -52,12 +56,15 @@ y <- DGEList(counts = non_rRNA_counts)
 y <- calcNormFactors(y, method = "TMM")
 cpm_df <- as.data.frame(edgeR::cpm(y, log = log))
 
+
+cpm_df <- tibble::rownames_to_column(cpm_df, "feature_id")
 write.table(
     cpm_df, file.path(outdir,"cpm_counts.tsv"), col.names = TRUE,
-    row.names = TRUE, sep = "\t", quote = FALSE
+    row.names = FALSE, sep = "\t", quote = FALSE
 )
 
 ## reads per kilobase per million (rpkm) - normalised for lib size + gene length
+
 y <- DGEList(
     counts = non_rRNA_counts,
     genes = data.frame(gene.length = as.numeric(ref_tab_sub$gene_length))
@@ -65,7 +72,9 @@ y <- DGEList(
 y <- calcNormFactors(y)
 rpkm_df <- as.data.frame(edgeR::rpkm(y, log = log))
 
+rpkm_df <- tibble::rownames_to_column(rpkm_df, "feature_id")
+
 write.table(
     rpkm_df, file.path(outdir,"rpkm_counts.tsv"), col.names = TRUE,
-    row.names = TRUE, sep = "\t", quote = FALSE
+    row.names = FALSE, sep = "\t", quote = FALSE
 )

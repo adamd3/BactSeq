@@ -23,8 +23,8 @@ if (!require("scales")){
 if (!require("RColorBrewer")){
     install.packages("RColorBrewer",repos = "http://cran.us.r-project.org")
 }
-if (!require("reshape2")){
-    install.packages("reshape2",repos = "http://cran.us.r-project.org")
+if (!require("tibble")){
+    install.packages("tibble",repos = "http://cran.us.r-project.org")
 }
 
 
@@ -36,6 +36,7 @@ library(ggplot2)
 library(scales)
 library(RColorBrewer)
 library(reshape2)
+library(tibble)
 
 
 
@@ -139,15 +140,20 @@ gene_counts <- Rsubread::featureCounts(
 colnames(gene_counts$counts) <- gsub(".bam", "", colnames(gene_counts$counts))
 colnames(gene_counts$counts) <- gsub("\\.","_",colnames(gene_counts$counts))
 
+
+counts_mat <- gene_counts$counts
+counts_mat <- tibble::rownames_to_column(counts_mat, "feature_id")
+
+
 write.table(
-    gene_counts$counts, "gene_counts.tsv", col.names = TRUE, row.names = TRUE,
+    counts_mat, "gene_counts.tsv", col.names = TRUE, row.names = FALSE,
     sep = "\t", quote = FALSE
 )
 
 ## protein-coding genes only
-gene_counts_pc <- gene_counts$counts[ref_gene_df$biotype=="protein_coding",]
+gene_counts_pc <- counts_mat[ref_gene_df$biotype=="protein_coding",]
 write.table(
-    gene_counts_pc, "gene_counts_pc.tsv", col.names = TRUE, row.names = TRUE,
+    gene_counts_pc, "gene_counts_pc.tsv", col.names = TRUE, row.names = FALSE,
     sep = "\t", quote = FALSE
 )
 

@@ -53,9 +53,11 @@ meta_tab <- read.table(
     meta_f, header = TRUE, sep = "\t", stringsAsFactors = FALSE
 )
 
-rownames(norm_counts) <- norm_counts[["feature_id"]]
+
+gene_names <- norm_counts[["feature_id"]]
 norm_counts[["feature_id"]] <- NULL 
 norm_counts <- as.data.frame(sapply(norm_counts, as.numeric))
+rownames(norm_counts) <- gene_names
 
 ## factorise group
 meta_tab$group <- as.factor(as.character(meta_tab$group))

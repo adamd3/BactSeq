@@ -82,7 +82,6 @@ contrast_tab <- read.table(
 
 rownames(counts_tab) <- counts_tab[["feature_id"]]
 counts_tab[["feature_id"]] <- NULL 
-counts_tab <- as.data.frame(sapply(counts_tab, as.numeric))
 
 
 ## factorise group column

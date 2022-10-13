@@ -39,9 +39,10 @@ ref_gene_tab <- read.csv(
     stringsAsFactors = FALSE
 )
 
-rownames(counts_tab) <- counts_tab[["feature_id"]]
+gene_names <- counts_tab[["feature_id"]]
 counts_tab[["feature_id"]] <- NULL 
 counts_tab <- as.data.frame(sapply(counts_tab, as.numeric))
+rownames(counts_tab) <- gene_names
 
 # ## remove rRNA genes
 # ref_tab_sub <- ref_gene_tab[!ref_gene_tab$biotype=="rRNA",]

@@ -175,16 +175,9 @@ counts_summary <- data.frame(
         gene_counts$counts[ref_gene_df$biotype=="protein_coding",]),
     # tRNA = colSums(
         # gene_counts$counts[ref_gene_df$biotype=="tRNA",]),
-    # other = colSums(
-    #     gene_counts$counts[!(ref_gene_df$biotype %in% c("rRNA", "protein_coding")),]),
     rRNA = colSums(
         gene_counts$counts[ref_gene_df$biotype=="rRNA",])
 )
-
-
-## order rows
-# counts_summary <- counts_summary[order(
-#     counts_summary$CRISPR_sytem, counts_summary$target, counts_summary$sample),]
 
 ## add total mapped counts
 counts_summary <- merge(counts_summary,merged_total_counts, by = "sample")
@@ -222,10 +215,8 @@ p1 <- ggplot(counts_melt,
     xlab("Sample") + ylab("Million reads") +
     scale_fill_manual(
         "",
-        # labels = c("Unaligned", "Low quality", "Duplicate", "Usable"),
         values = ggCols,
         guide = guide_legend(reverse = TRUE)
-        # values = ggColsDefault
     ) +
     scale_colour_manual(values = ggCols, guide = FALSE) +
     scale_y_continuous(labels = unit_format(unit = "", scale = 1e-6)) +
@@ -283,7 +274,6 @@ p2 <- ggplot(prop_melt,
         labels = c("Unaligned", "Low quality", "Duplicate", "Usable"),
         values = ggCols,
         guide = guide_legend(reverse = TRUE)
-        # values = ggColsDefault
     ) +
     scale_colour_manual(values = ggCols, guide = FALSE) +
     scale_y_continuous(labels = comma) +
@@ -294,6 +284,7 @@ p2 <- ggplot(prop_melt,
         axis.text.x = element_text(colour = "black"),
         axis.text.y = element_text(colour = "black")
         )
+
 ggsave(
     p2, file = 'library_composition_proportions.png',
     device = "png",

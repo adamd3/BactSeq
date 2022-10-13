@@ -88,6 +88,7 @@ meta_tab <- meta_tab[match(colnames(counts_tab),meta_tab$sample),]
 
 rownames(counts_tab) <- counts_tab[["feature_id"]]
 counts_tab[["feature_id"]] <- NULL 
+counts_tab <- as.data.frame(sapply(counts_tab, as.numeric)
 
 ##------------------------------------------------------------------------------
 ## Differential gene expression

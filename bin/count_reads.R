@@ -287,8 +287,13 @@ p2 <- ggplot(prop_melt,
     ) +
     scale_colour_manual(values = ggCols, guide = FALSE) +
     scale_y_continuous(labels = comma) +
-    ggStandard + theme_bw(base_size = cc1*1.5) +
-    theme(legend.position="top", legend.text=element_text(size=cc1*1.6))
+    theme_bw(base_size = cc1*1.5) +
+    theme(
+        legend.position="top", 
+        legend.text=element_text(size=cc1*1.6),
+        axis.text.x = element_text(colour = "black"),
+        axis.text.y = element_text(colour = "black")
+        )
 ggsave(
     p2, file = 'library_composition_proportions.png',
     device = "png",

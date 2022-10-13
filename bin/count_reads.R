@@ -142,7 +142,7 @@ colnames(gene_counts$counts) <- gsub("\\.","_",colnames(gene_counts$counts))
 
 
 counts_mat <- gene_counts$counts
-counts_mat <- tibble::rownames_to_column(counts_mat, "feature_id")
+counts_mat <- tibble::rownames_to_column(as.data.frame(counts_mat), "feature_id")
 
 
 write.table(

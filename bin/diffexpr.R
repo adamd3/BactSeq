@@ -128,7 +128,7 @@ contrast_list <- lapply(comb_list, function(x){
 ## export tables of genes with log2FC and p-values:
 lapply(seq_along(contrast_list), function(x){
     contrast_name <- names(contrast_list)[x]
-    res_df <- tibble::rownames_to_column(contrast_list[x], "feature_id")
+    res_df <- tibble::rownames_to_column(as.data.frame(contrast_list[x]), "feature_id")
     write.table(
         res_df,
         file = file.path(outdir, paste0("DGE_", contrast_name, ".tsv")),

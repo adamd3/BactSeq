@@ -57,7 +57,7 @@ y <- calcNormFactors(y, method = "TMM")
 cpm_df <- as.data.frame(edgeR::cpm(y, log = log))
 
 
-cpm_df <- tibble::rownames_to_column(cpm_df, "feature_id")
+cpm_df <- tibble::rownames_to_column(as.data.frame(cpm_df), "feature_id")
 write.table(
     cpm_df, file.path(outdir,"cpm_counts.tsv"), col.names = TRUE,
     row.names = FALSE, sep = "\t", quote = FALSE
@@ -72,7 +72,7 @@ y <- DGEList(
 y <- calcNormFactors(y)
 rpkm_df <- as.data.frame(edgeR::rpkm(y, log = log))
 
-rpkm_df <- tibble::rownames_to_column(rpkm_df, "feature_id")
+rpkm_df <- tibble::rownames_to_column(as.data.frame(rpkm_df), "feature_id")
 
 write.table(
     rpkm_df, file.path(outdir,"rpkm_counts.tsv"), col.names = TRUE,

@@ -46,7 +46,9 @@ colpal_large <- c(brewer.pal(9,"Set1"),colpal_large)
 ##------------------------------------------------------------------------------
 ## Read and process data
 ##------------------------------------------------------------------------------
-norm_counts <- read.table(counts_f)
+norm_counts <- read.table(
+    counts_f, header = TRUE, sep = "\t", stringsAsFactors = FALSE
+)
 meta_tab <- read.table(
     meta_f, header = TRUE, sep = "\t", stringsAsFactors = FALSE
 )

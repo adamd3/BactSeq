@@ -79,16 +79,18 @@ contrast_tab <- read.table(
     cont_tab_f, header = TRUE, sep = "\t", stringsAsFactors = FALSE
 )
 
+
+rownames(counts_tab) <- counts_tab[["feature_id"]]
+counts_tab[["feature_id"]] <- NULL 
+counts_tab <- as.data.frame(sapply(counts_tab, as.numeric))
+
+
 ## factorise group column
 meta_tab$group <- as.factor(as.character(meta_tab$group))
 
 ## order rows to match counts columns
 meta_tab <- meta_tab[match(colnames(counts_tab),meta_tab$sample),]
 
-
-rownames(counts_tab) <- counts_tab[["feature_id"]]
-counts_tab[["feature_id"]] <- NULL 
-counts_tab <- as.data.frame(sapply(counts_tab, as.numeric))
 
 ##------------------------------------------------------------------------------
 ## Differential gene expression

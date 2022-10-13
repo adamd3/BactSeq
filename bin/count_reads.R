@@ -262,9 +262,6 @@ propCols <- counts_summary[c(
 propCols$sample <- counts_summary$sample
 
 # rowSums(propCols) ## each row should sum to 1
-colnames(propCols) <- c(
-    "protein_coding", "other", "rRNA"
-)
 prop_melt <- melt(
     propCols, id.vars = c("sample"),
     measure.vars = c("protein_coding", "other", "rRNA")
@@ -289,7 +286,7 @@ p2 <- ggplot(prop_melt,
         # values = ggColsDefault
     ) +
     scale_colour_manual(values = ggCols, guide = FALSE) +
-    scale_y_continuous(labels = unit_format(unit = "", scale = 1e-6)) +
+    scale_y_continuous(labels = comma) +
     ggStandard + theme_bw(base_size = cc1*1.5) +
     theme(legend.position="top", legend.text=element_text(size=cc1*1.6))
 ggsave(
@@ -298,4 +295,3 @@ ggsave(
     width = 8, height = (nsamps/2),
     dpi = 300
 )
-mergedDf

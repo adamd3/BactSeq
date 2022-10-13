@@ -277,7 +277,7 @@ p2 <- ggplot(prop_melt,
          aes(x = sample, colour = variable, fill = variable, y = value)
     ) + geom_bar(stat = "identity",  width = 0.7) +
     coord_flip()  +
-    xlab(xlab) + ylab("Proportion of reads") +
+    xlab("Sample") + ylab("Proportion of reads") +
     scale_fill_manual(
         "",
         labels = c("Unaligned", "Low quality", "Duplicate", "Usable"),

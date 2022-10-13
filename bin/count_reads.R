@@ -271,7 +271,6 @@ p2 <- ggplot(prop_melt,
     xlab("Sample") + ylab("Proportion of reads") +
     scale_fill_manual(
         "",
-        labels = c("Unaligned", "Low quality", "Duplicate", "Usable"),
         values = ggCols,
         guide = guide_legend(reverse = TRUE)
     ) +

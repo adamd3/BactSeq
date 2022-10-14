@@ -213,7 +213,7 @@ counts_melt$sample <- factor(
 )
 counts_melt$variable <- factor(counts_melt$variable, levels=c(
     "rRNA", 
-    "non_rRNA", 
+    "non_rRNA"#, 
     # "protein_coding"
     )
 )
@@ -282,7 +282,7 @@ prop_melt$sample <- factor(
 )
 prop_melt$variable <- factor(prop_melt$variable, levels=c(
     "rRNA", 
-    "non_rRNA", 
+    "non_rRNA"#, 
     # "protein_coding"
     )
 )

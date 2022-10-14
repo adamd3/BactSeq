@@ -40,7 +40,7 @@ process BWA_ALIGN {
             samtools sort -@ ${task.cpus - 1} -O bam - > ${name}.bam
         samtools index -@ ${task.cpus} ${name}.bam
         # samtools idxstats ${name}.bam | head -n 1 > ${name}.counts
-        samtools view -F 0x4 Not_depleted_2.bam | cut -f 1 | sort | uniq | wc -l > ${name}.counts
+        samtools view -F 0x4 ${name}.bam | cut -f 1 | sort | uniq | wc -l > ${name}.counts
         """
     } else {
         """
@@ -48,7 +48,7 @@ process BWA_ALIGN {
             | samtools sort -@ ${task.cpus - 1} -O bam - > ${name}.bam
         samtools index -@ ${task.cpus} ${name}.bam
         # samtools idxstats ${name}.bam | head -n 1 > ${name}.counts
-        samtools view -F 0x4 Not_depleted_2.bam | cut -f 1 | sort | uniq | wc -l > ${name}.counts
+        samtools view -F 0x4 ${name}.bam | cut -f 1 | sort | uniq | wc -l > ${name}.counts
         """
     }
 }

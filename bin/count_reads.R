@@ -271,7 +271,7 @@ p1 <- ggplot(counts_melt,
     theme(
         legend.position = "top",
         legend.title = element_blank(),
-        legend.text=element_text(size=cc1*1.3),
+        legend.text=element_text(size=cc1),
         axis.text.x = element_text(colour = "black"),
         axis.text.y = element_text(colour = "black")
     )
@@ -337,7 +337,7 @@ p2 <- ggplot(prop_melt,
     theme_bw(base_size = cc1*1.3) +
     theme(
         legend.position="top", 
-        legend.text=element_text(size=cc1*1.3),
+        legend.text=element_text(size=cc1),
         axis.text.x = element_text(colour = "black"),
         axis.text.y = element_text(colour = "black")
         )

@@ -80,8 +80,10 @@ contrast_tab <- read.table(
 )
 
 
-rownames(counts_tab) <- counts_tab[["feature_id"]]
+gene_names <- counts_tab[["feature_id"]]
 counts_tab[["feature_id"]] <- NULL 
+counts_tab <- as.data.frame(sapply(counts_tab, as.numeric))
+rownames(counts_tab) <- gene_names
 
 
 ## factorise group column
@@ -132,7 +134,7 @@ contrast_list <- lapply(comb_list, function(x){
 ## export tables of genes with log2FC and p-values:
 lapply(seq_along(contrast_list), function(x){
     contrast_name <- names(contrast_list)[x]
-    # res_df <- tibble::rownames_to_column(as.data.frame(contrast_list[x]), "feature_id")
+    res_df <- tibble::rownames_to_column(as.data.frame(contrast_list[x]), "feature_id")
     write.table(
         contrast_list[x],
         file = file.path(outdir, paste0("DGE_", contrast_name, ".tsv")),

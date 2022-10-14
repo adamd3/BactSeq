@@ -135,6 +135,7 @@ contrast_list <- lapply(comb_list, function(x){
 lapply(seq_along(contrast_list), function(x){
     contrast_name <- names(contrast_list)[x]
     res_df <- tibble::rownames_to_column(as.data.frame(contrast_list[x]), "feature_id")
+    colnames(res_df) <- gsub(contrast_name, "", colnames(res_df))
     write.table(
         res_df,
         file = file.path(outdir, paste0("DGE_", contrast_name, ".tsv")),

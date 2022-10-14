@@ -39,7 +39,6 @@ library(reshape2)
 library(tibble)
 
 
-
 option_list <- list(
     make_option(c("-m", "--metadata"), type="character", default=NULL,
         help="sample metadata tsv file", metavar="character"),
@@ -51,7 +50,10 @@ option_list <- list(
         metavar="character"),
     make_option(c("-s", "--strandedness"), type="character", default=NULL,
         help="read strandedness. default = reverse", 
-        metavar="character")
+        metavar="character"),
+    make_option(c("-t", "--threads"), type="numeric", default=1,
+        help="number of threads to use. default = 1.", 
+        metavar="numeric")
 )
 
 opt_parser <- OptionParser(option_list=option_list)
@@ -61,6 +63,7 @@ meta_f <- opt$metadata
 gff_f <- opt$gff
 ispaired <- if(opt$is_paired == "TRUE") TRUE else FALSE
 strandedness <- opt$strandedness
+threads <- opt$threads
 outf <- opt$outf
 
 
@@ -74,13 +77,19 @@ meta_tab <- read.table(meta_f, header = TRUE, sep = "\t")
 
 ## cat the counts files
 # system("cat *.counts > merged_counts.txt")
+
 total_counts_list <- lapply(meta_tab$sample, function(x){
-    total_counts <- read.table(paste0(x,".counts"), header = FALSE, sep = "\t")
-    total_counts$sample <- x
-    colnames(total_counts) <- c("chr","chr_size","mapped","blank","sample")
-    total_counts
+    # total_counts <- read.table(paste0(x,".counts"), header = FALSE, sep = "\t")
+    # total_counts$sample <- x
+    # colnames(total_counts) <- c("chr","chr_size","mapped","blank","sample")
+    # total_counts
+    mapped_count <- read.table(paste0(x,".counts"), header = FALSE)
+    colnames(mapped_count) <- "mapped"
+    mapped_count$sample <- x
+    mapped_count
 })
 merged_total_counts <- as.data.frame(do.call(rbind, total_counts_list))
+
 
 
 ##------------------------------------------------------------------------------
@@ -132,8 +141,11 @@ strand <- switch(as.character(strandedness),
 gene_counts <- Rsubread::featureCounts(
     bamfilesCount, annot.ext = gff_f,
     isGTFAnnotationFile = TRUE,
-    GTF.featureType = "gene", GTF.attrType = "locus_tag",
-    nthreads = 16, countMultiMappingReads = TRUE,
+    GTF.featureType = "gene", 
+    GTF.attrType = "locus_tag",
+    nthreads = threads, 
+    countMultiMappingReads = TRUE, 
+    fraction = TRUE, ## assign fractional counts to multimappers
     isPairedEnd = ispaired, 
     strandSpecific = strand
 )
@@ -170,31 +182,46 @@ gg_color_hue <- function(n) {
     hcl(h = hues, l = 65, c = 100)[1:n]
 }
 ggColsDefault <- (gg_color_hue(4))
-ggCols <- brewer_pallette1[c(1,3,4)]
+ggCols <- brewer_pallette1[c(1,3,4,5,2,7,8)]
 
 ## summarise counts per sample
+
+all_biotypes <- unique(ref_gene_df$biotype)
+
+biotype_counts <- data.frame(do.call(rbind,
+    lapply(all_biotypes, function(biotype){
+    colSums(gene_counts$counts[ref_gene_df$biotype==biotype,])
+})))
+colnames(biotype_counts) <- all_biotypes
+
 counts_summary <- data.frame(
     sample = meta_tab$"sample",
     group = meta_tab$"group",
-    rep = meta_tab$"rep_no",
+    rep = meta_tab$"rep_no"#,
     # protein_coding = colSums(
     #     gene_counts$counts[ref_gene_df$biotype=="protein_coding",]),
     # tRNA = colSums(
         # gene_counts$counts[ref_gene_df$biotype=="tRNA",]),
-    rRNA = colSums(
-        gene_counts$counts[ref_gene_df$biotype=="rRNA",])
+    # rRNA = colSums(
+    #     gene_counts$counts[ref_gene_df$biotype=="rRNA",])
 )
+
+counts_summary <- cbind(counts_summary,biotype_counts)
 
 ## add total mapped counts
 counts_summary <- merge(counts_summary,merged_total_counts, by = "sample")
 # counts_summary$non_rRNA <- counts_summary$mapped-counts_summary$rRNA
-counts_summary$non_rRNA <- counts_summary$mapped-(
-    counts_summary$rRNA) #+ counts_summary$protein_coding)
+
+
+counts_summary$non_rRNA <- counts_summary$mapped - rowSums(biotype_counts)#(
+    #counts_summary$rRNA + counts_summary$protein_coding)
 
 counts_summary <- counts_summary[rev(order(counts_summary$sample)),]
 
 
 cc1 <- 12
+
+non_rRNA_btypes <- all_biotypes[!all_biotypes=="rRNA"]
 
 
 #############################
@@ -204,8 +231,9 @@ counts_melt <- reshape2::melt(
     counts_summary, id.vars = c("sample"),
     measure.vars = c(
         # "protein_coding", 
-        "non_rRNA",
-        "rRNA"
+        # "non_rRNA",
+        # "rRNA"
+        all_biotypes
         )
 )
 counts_melt$sample <- factor(
@@ -213,7 +241,8 @@ counts_melt$sample <- factor(
 )
 counts_melt$variable <- factor(counts_melt$variable, levels=c(
     "rRNA", 
-    "non_rRNA"#, 
+    non_rRNA_btypes
+    # "non_rRNA", 
     # "protein_coding"
     )
 )
@@ -262,8 +291,9 @@ ggsave(
 
 propCols <- counts_summary[c(
     # "protein_coding", 
-    "non_rRNA", 
-    "rRNA"
+    # "non_rRNA", 
+    # "rRNA"
+    all_biotypes
     )] / counts_summary$mapped
 
 propCols$sample <- counts_summary$sample
@@ -273,8 +303,9 @@ prop_melt <- melt(
     propCols, id.vars = c("sample"),
     measure.vars = c(
         # "protein_coding", 
-        "non_rRNA", 
-        "rRNA"
+        # "non_rRNA", 
+        # "rRNA"
+        all_biotypes
         )
 )
 prop_melt$sample <- factor(
@@ -282,7 +313,8 @@ prop_melt$sample <- factor(
 )
 prop_melt$variable <- factor(prop_melt$variable, levels=c(
     "rRNA", 
-    "non_rRNA"#, 
+    non_rRNA_btypes
+    # "non_rRNA", 
     # "protein_coding"
     )
 )

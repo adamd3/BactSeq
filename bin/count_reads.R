@@ -188,11 +188,13 @@ ggCols <- brewer_pallette1[c(1,3,4,5,2,7,8)]
 
 all_biotypes <- unique(ref_gene_df$biotype)
 
-biotype_counts <- data.frame(do.call(rbind,
+biotype_counts <- data.frame(do.call(cbind,
     lapply(all_biotypes, function(biotype){
-    colSums(gene_counts$counts[ref_gene_df$biotype==biotype,])
+    colSums(gene_counts$counts[ref_gene_df$biotype==biotype,,drop=FALSE])
 })))
 colnames(biotype_counts) <- all_biotypes
+
+
 
 counts_summary <- data.frame(
     sample = meta_tab$"sample",
@@ -210,10 +212,10 @@ counts_summary <- cbind(counts_summary,biotype_counts)
 
 ## add total mapped counts
 counts_summary <- merge(counts_summary,merged_total_counts, by = "sample")
-# counts_summary$non_rRNA <- counts_summary$mapped-counts_summary$rRNA
+# counts_summary$other <- counts_summary$mapped-counts_summary$rRNA
 
 
-counts_summary$non_rRNA <- counts_summary$mapped - rowSums(biotype_counts)#(
+counts_summary$other <- counts_summary$mapped - rowSums(biotype_counts)#(
     #counts_summary$rRNA + counts_summary$protein_coding)
 
 counts_summary <- counts_summary[rev(order(counts_summary$sample)),]
@@ -221,6 +223,7 @@ counts_summary <- counts_summary[rev(order(counts_summary$sample)),]
 
 cc1 <- 12
 
+all_biotypes <- c(all_biotypes, "other")
 non_rRNA_btypes <- all_biotypes[!all_biotypes=="rRNA"]
 
 
@@ -231,7 +234,7 @@ counts_melt <- reshape2::melt(
     counts_summary, id.vars = c("sample"),
     measure.vars = c(
         # "protein_coding", 
-        # "non_rRNA",
+        # "other",
         # "rRNA"
         all_biotypes
         )
@@ -242,7 +245,7 @@ counts_melt$sample <- factor(
 counts_melt$variable <- factor(counts_melt$variable, levels=c(
     "rRNA", 
     non_rRNA_btypes
-    # "non_rRNA", 
+    # "other", 
     # "protein_coding"
     )
 )
@@ -291,7 +294,7 @@ ggsave(
 
 propCols <- counts_summary[c(
     # "protein_coding", 
-    # "non_rRNA", 
+    # "other", 
     # "rRNA"
     all_biotypes
     )] / counts_summary$mapped
@@ -303,7 +306,7 @@ prop_melt <- melt(
     propCols, id.vars = c("sample"),
     measure.vars = c(
         # "protein_coding", 
-        # "non_rRNA", 
+        # "other", 
         # "rRNA"
         all_biotypes
         )
@@ -314,7 +317,7 @@ prop_melt$sample <- factor(
 prop_melt$variable <- factor(prop_melt$variable, levels=c(
     "rRNA", 
     non_rRNA_btypes
-    # "non_rRNA", 
+    # "other", 
     # "protein_coding"
     )
 )

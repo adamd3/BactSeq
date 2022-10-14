@@ -177,8 +177,8 @@ counts_summary <- data.frame(
     sample = meta_tab$"sample",
     group = meta_tab$"group",
     rep = meta_tab$"rep_no",
-    protein_coding = colSums(
-        gene_counts$counts[ref_gene_df$biotype=="protein_coding",]),
+    # protein_coding = colSums(
+    #     gene_counts$counts[ref_gene_df$biotype=="protein_coding",]),
     # tRNA = colSums(
         # gene_counts$counts[ref_gene_df$biotype=="tRNA",]),
     rRNA = colSums(
@@ -188,8 +188,8 @@ counts_summary <- data.frame(
 ## add total mapped counts
 counts_summary <- merge(counts_summary,merged_total_counts, by = "sample")
 # counts_summary$non_rRNA <- counts_summary$mapped-counts_summary$rRNA
-counts_summary$other <- counts_summary$mapped-(
-    counts_summary$rRNA + counts_summary$protein_coding)
+counts_summary$non_rRNA <- counts_summary$mapped-(
+    counts_summary$rRNA) #+ counts_summary$protein_coding)
 
 counts_summary <- counts_summary[rev(order(counts_summary$sample)),]
 
@@ -202,13 +202,20 @@ cc1 <- 12
 #############################
 counts_melt <- reshape2::melt(
     counts_summary, id.vars = c("sample"),
-    measure.vars = c("protein_coding", "other", "rRNA")
+    measure.vars = c(
+        # "protein_coding", 
+        "non_rRNA",
+        "rRNA"
+        )
 )
 counts_melt$sample <- factor(
     counts_melt$sample, levels = rev(unique(sort(counts_melt$sample)))
 )
 counts_melt$variable <- factor(counts_melt$variable, levels=c(
-    "rRNA", "other", "protein_coding")
+    "rRNA", 
+    "non_rRNA", 
+    # "protein_coding"
+    )
 )
 # minUsable <- min(mergedDf$q15_dedup_reads)
 
@@ -254,20 +261,30 @@ ggsave(
 # propCols <- (mergedDf[,c(3,13,14,5)] / mergedDf[,2])
 
 propCols <- counts_summary[c(
-    "protein_coding", "other", "rRNA")] / counts_summary$mapped
+    # "protein_coding", 
+    "non_rRNA", 
+    "rRNA"
+    )] / counts_summary$mapped
 
 propCols$sample <- counts_summary$sample
 
 # rowSums(propCols) ## each row should sum to 1
 prop_melt <- melt(
     propCols, id.vars = c("sample"),
-    measure.vars = c("protein_coding", "other", "rRNA")
+    measure.vars = c(
+        # "protein_coding", 
+        "non_rRNA", 
+        "rRNA"
+        )
 )
 prop_melt$sample <- factor(
     prop_melt$sample, levels = rev(unique(sort(prop_melt$sample)))
 )
 prop_melt$variable <- factor(prop_melt$variable, levels=c(
-    "rRNA", "other", "protein_coding")
+    "rRNA", 
+    "non_rRNA", 
+    # "protein_coding"
+    )
 )
 
 p2 <- ggplot(prop_melt,

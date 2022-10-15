@@ -281,7 +281,7 @@ nsamps <- ncol(gene_counts$counts)
 ggsave(
     p1, file = paste0('library_composition.png'),
     device = "png",
-    width = 8, height = (nsamps/2),
+    width = 8, height = (nsamps/2.2),
     dpi = 300
 )
 
@@ -345,6 +345,6 @@ p2 <- ggplot(prop_melt,
 ggsave(
     p2, file = 'library_composition_proportions.png',
     device = "png",
-    width = 8, height = (nsamps/2),
+    width = 8, height = (nsamps/2.2),
     dpi = 300
 )

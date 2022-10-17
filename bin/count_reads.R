@@ -209,7 +209,7 @@ gg_color_hue <- function(n){
     hcl(h = hues, l = 65, c = 100)[1:n]
 }
 ggColsDefault <- (gg_color_hue(4))
-ggCols <- brewer_pallette1[c(1,3,4,5,2,7,8)]
+ggCols <- c(brewer_pallette1[c(1,3,4,5,2,7,8)],"grey",brewer_pallette3)
 
 ## summarise counts per sample
 

@@ -67,6 +67,12 @@ threads <- opt$threads
 outf <- opt$outf
 
 
+meta_f <- "/projects/pseudomonas_transcriptomics/storage/adam_out/Divya_RNASeq/results_antisense/pipeline_info/sample_metadata.tsv"
+gff_f <- "/projects/pseudomonas_transcriptomics/storage/PA01_reference.gff"
+ispaired <- TRUE
+strandedness <- "reverse"
+threads <- 32
+
 
 ##------------------------------------------------------------------------------
 ## Read data
@@ -90,10 +96,6 @@ total_counts_list <- lapply(meta_tab$sample, function(x){
 })
 merged_total_counts <- as.data.frame(do.call(rbind, total_counts_list))
 
-write.table(
-    merged_total_counts, "merged_total_counts.tsv", col.names = TRUE, row.names = TRUE,
-    sep = "\t", quote = FALSE
-)
 
 
 ##------------------------------------------------------------------------------
@@ -132,7 +134,9 @@ write.table(
 ##------------------------------------------------------------------------------
 ## Count reads mapping to genes
 ##------------------------------------------------------------------------------
-bamfilesCount <- paste0(meta_tab$sample, ".bam")
+bamfilesCount <- paste0(
+    "/projects/pseudomonas_transcriptomics/storage/adam_out/Divya_RNASeq/results_antisense/bwa_aln/",
+    meta_tab$sample, ".bam")
 
 # 0 (unstranded), 1 (stranded) and 2 (reversely stranded)
 strand <- switch(as.character(strandedness),
@@ -151,7 +155,8 @@ gene_counts <- Rsubread::featureCounts(
     countMultiMappingReads = TRUE, 
     fraction = TRUE, ## assign fractional counts to multimappers
     isPairedEnd = ispaired, 
-    strandSpecific = strand
+    strandSpecific = strand,
+    tmpDir = "/projects/pseudomonas_transcriptomics/storage/adam_out/Divya_RNASeq/"
 )
 colnames(gene_counts$counts) <- gsub(".bam", "", colnames(gene_counts$counts))
 colnames(gene_counts$counts) <- gsub("\\.","_",colnames(gene_counts$counts))

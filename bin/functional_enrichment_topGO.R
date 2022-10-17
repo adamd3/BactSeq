@@ -112,23 +112,23 @@ names(term_genes_list) <- all_terms
 ##------------------------------------------------------------------------------
 
 lapply(dge_files, function(res_f){
+    print(res_f)
 
-    res_tab <- na.omit(read.table(res_f))
+    res_tab <- na.omit(read_tsv(res_f))
 
-    all_genes <- rownames(res_tab)
+    all_genes <- res_tab[["feature_id"]]
 
 
     label <- sub(pattern = "(.*)\\..*$", replacement = "\\1", basename(file.path(res_f)))
-
 
     ## get up/down-regulated genes
     padj_col <- colnames(res_tab)[grepl("padj", colnames(res_tab))]
     l2fc_col <- colnames(res_tab)[grepl("log2FoldChange", colnames(res_tab))]
 
-    genes_up <- rownames(res_tab[(res_tab[[padj_col]] < p_threshold &
-        res_tab[[l2fc_col]] > log2fc_threshold),])
-    genes_down <- rownames(res_tab[(res_tab[[padj_col]] < p_threshold &
-        res_tab[[l2fc_col]] < (log2fc_threshold*-1)),])
+    genes_up <- (res_tab[(res_tab[[padj_col]] < p_threshold &
+        res_tab[[l2fc_col]] > log2fc_threshold),])[["feature_id"]]
+    genes_down <- (res_tab[(res_tab[[padj_col]] < p_threshold &
+        res_tab[[l2fc_col]] < (log2fc_threshold*-1)),])[["feature_id"]]
 
     ## enrichment testing is only performed if >=5 DEGs identified
     if (length(genes_up)>=5){

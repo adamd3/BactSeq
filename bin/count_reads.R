@@ -135,7 +135,7 @@ strand <- switch(as.character(strandedness),
        "unstranded" = 0,
        "forward" = 1,
        "reverse" = 2,
-       stop("Invalid input")
+       stop("Invalid strandedness")
 )
 
 gene_counts <- Rsubread::featureCounts(
@@ -170,6 +170,33 @@ write.table(
 )
 
 
+## count antisense (if libraries are stranded)
+if (!strand==0){
+    as_strand <- switch(strand,
+       1 = 2,
+       2 = 1,
+       stop("Invalid strandedness")
+    )
+    as_gene_counts <- Rsubread::featureCounts(
+        bamfilesCount, annot.ext = gff_f,
+        isGTFAnnotationFile = TRUE,
+        GTF.featureType = "gene", 
+        GTF.attrType = "locus_tag",
+        nthreads = threads, 
+        countMultiMappingReads = TRUE, 
+        fraction = TRUE, ## assign fractional counts to multimappers
+        isPairedEnd = ispaired, 
+        strandSpecific = as_strand
+    )
+    colnames(as_gene_counts$counts) <- gsub(".bam", "", colnames(as_gene_counts$counts))
+    colnames(as_gene_counts$counts) <- gsub("\\.","_",colnames(as_gene_counts$counts))
+    as_counts_mat <- as_gene_counts$counts
+} else {
+    ## set antisense counts to 0
+    as_counts_mat <- gene_counts$counts
+    as_counts_mat[!as_counts_mat==0] <- 0 
+}
+
 ##------------------------------------------------------------------------------
 ## Plot library composition
 ##------------------------------------------------------------------------------
@@ -177,7 +204,7 @@ write.table(
 brewer_pallette1 <- brewer.pal(9,"Set1")
 brewer_pallette3 <- brewer.pal(8,"Dark2")
 
-gg_color_hue <- function(n) {
+gg_color_hue <- function(n){
     hues = seq(15, 375, length = n + 1)
     hcl(h = hues, l = 65, c = 100)[1:n]
 }
@@ -194,7 +221,8 @@ biotype_counts <- data.frame(do.call(cbind,
 })))
 colnames(biotype_counts) <- all_biotypes
 
-
+## add antisense counts 
+biotype_counts[["antisense"]] <- colSums(as_counts_mat)
 
 counts_summary <- data.frame(
     sample = meta_tab$"sample",
@@ -223,7 +251,7 @@ counts_summary <- counts_summary[rev(order(counts_summary$sample)),]
 
 cc1 <- 12
 
-all_biotypes <- c(all_biotypes, "other")
+all_biotypes <- c(all_biotypes, "antisense", "other")
 non_rRNA_btypes <- all_biotypes[!all_biotypes=="rRNA"]
 
 

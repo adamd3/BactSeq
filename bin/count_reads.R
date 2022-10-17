@@ -135,7 +135,7 @@ strand <- switch(as.character(strandedness),
        "unstranded" = 0,
        "forward" = 1,
        "reverse" = 2,
-       stop("Invalid strandedness")
+       stop("Invalid input")
 )
 
 gene_counts <- Rsubread::featureCounts(
@@ -170,38 +170,6 @@ write.table(
 )
 
 
-## UPDATE: antisense can overlap the sense strand of another feature; 
-##   therefore, the total count can be more than mapped reads! hence, 
-##    no longer counting antisense but instead relabelling "other" 
-##    as "antisense/intergenic"
-
-# ## count antisense (if libraries are stranded)
-# if (!strand==0){
-#     as_strand <- switch(as.character(strand),
-#        "1" = 2,
-#        "2" = 1,
-#        stop("Invalid strandedness")
-#     )
-#     as_gene_counts <- Rsubread::featureCounts(
-#         bamfilesCount, annot.ext = gff_f,
-#         isGTFAnnotationFile = TRUE,
-#         GTF.featureType = "gene", 
-#         GTF.attrType = "locus_tag",
-#         nthreads = threads, 
-#         countMultiMappingReads = TRUE, 
-#         fraction = TRUE, ## assign fractional counts to multimappers
-#         isPairedEnd = ispaired, 
-#         strandSpecific = as_strand
-#     )
-#     colnames(as_gene_counts$counts) <- gsub(".bam", "", colnames(as_gene_counts$counts))
-#     colnames(as_gene_counts$counts) <- gsub("\\.","_",colnames(as_gene_counts$counts))
-#     as_counts_mat <- as_gene_counts$counts
-# } else {
-#     ## set antisense counts to 0
-#     as_counts_mat <- gene_counts$counts
-#     as_counts_mat[!as_counts_mat==0] <- 0 
-# }
-
 ##------------------------------------------------------------------------------
 ## Plot library composition
 ##------------------------------------------------------------------------------
@@ -209,12 +177,12 @@ write.table(
 brewer_pallette1 <- brewer.pal(9,"Set1")
 brewer_pallette3 <- brewer.pal(8,"Dark2")
 
-gg_color_hue <- function(n){
+gg_color_hue <- function(n) {
     hues = seq(15, 375, length = n + 1)
     hcl(h = hues, l = 65, c = 100)[1:n]
 }
 ggColsDefault <- (gg_color_hue(4))
-ggCols <- c(brewer_pallette1[c(1,3,4,5,2,7,8)],"grey",brewer_pallette3)
+ggCols <- brewer_pallette1[c(1,3,4,5,2,7,8)]
 
 ## summarise counts per sample
 
@@ -226,8 +194,7 @@ biotype_counts <- data.frame(do.call(cbind,
 })))
 colnames(biotype_counts) <- all_biotypes
 
-# ## add antisense counts 
-# biotype_counts[["antisense"]] <- colSums(as_counts_mat)
+
 
 counts_summary <- data.frame(
     sample = meta_tab$"sample",
@@ -267,7 +234,7 @@ counts_melt <- reshape2::melt(
     counts_summary, id.vars = c("sample"),
     measure.vars = c(
         # "protein_coding", 
-        # "other",
+        # "antisense_other",
         # "rRNA"
         all_biotypes
         )
@@ -278,7 +245,7 @@ counts_melt$sample <- factor(
 counts_melt$variable <- factor(counts_melt$variable, levels=c(
     "rRNA", 
     non_rRNA_btypes
-    # "other", 
+    # "antisense_other", 
     # "protein_coding"
     )
 )
@@ -301,8 +268,6 @@ p1 <- ggplot(counts_melt,
     ## add a dashed line at the min usable number of reads
     # geom_hline(yintercept = 5e6, linetype="dashed") +
     theme_bw(base_size = cc1*1.3) +
-    guides(fill = guide_legend(nrow = 3)) +
-    guides(colour = FALSE) +
     theme(
         legend.position = "top",
         legend.title = element_blank(),
@@ -329,7 +294,7 @@ ggsave(
 
 propCols <- counts_summary[c(
     # "protein_coding", 
-    # "other", 
+    # "antisense_other", 
     # "rRNA"
     all_biotypes
     )] / counts_summary$mapped
@@ -341,7 +306,7 @@ prop_melt <- melt(
     propCols, id.vars = c("sample"),
     measure.vars = c(
         # "protein_coding", 
-        # "other", 
+        # "antisense_other", 
         # "rRNA"
         all_biotypes
         )
@@ -352,7 +317,7 @@ prop_melt$sample <- factor(
 prop_melt$variable <- factor(prop_melt$variable, levels=c(
     "rRNA", 
     non_rRNA_btypes
-    # "other", 
+    # "antisense_other", 
     # "protein_coding"
     )
 )
@@ -370,8 +335,6 @@ p2 <- ggplot(prop_melt,
     scale_colour_manual(values = ggCols, guide = FALSE) +
     scale_y_continuous(labels = comma) +
     theme_bw(base_size = cc1*1.3) +
-    guides(fill = guide_legend(nrow = 3)) +
-    guides(colour = FALSE) +
     theme(
         legend.position="top", 
         legend.text=element_text(size=cc1),

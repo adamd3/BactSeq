@@ -172,9 +172,9 @@ write.table(
 
 ## count antisense (if libraries are stranded)
 if (!strand==0){
-    as_strand <- switch(strand,
-       1 = 2,
-       2 = 1,
+    as_strand <- switch(as.character(strand),
+       "1" = 2,
+       "2" = 1,
        stop("Invalid strandedness")
     )
     as_gene_counts <- Rsubread::featureCounts(

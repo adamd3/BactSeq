@@ -296,6 +296,8 @@ p1 <- ggplot(counts_melt,
     ## add a dashed line at the min usable number of reads
     # geom_hline(yintercept = 5e6, linetype="dashed") +
     theme_bw(base_size = cc1*1.3) +
+    guides(fill = guide_legend(nrow = 3)) +
+    guides(colour = guide_legend(nrow = 3)) +
     theme(
         legend.position = "top",
         legend.title = element_blank(),
@@ -363,6 +365,8 @@ p2 <- ggplot(prop_melt,
     scale_colour_manual(values = ggCols, guide = FALSE) +
     scale_y_continuous(labels = comma) +
     theme_bw(base_size = cc1*1.3) +
+    guides(fill = guide_legend(nrow = 3)) +
+    guides(colour = guide_legend(nrow = 3)) +
     theme(
         legend.position="top", 
         legend.text=element_text(size=cc1),

@@ -90,10 +90,6 @@ total_counts_list <- lapply(meta_tab$sample, function(x){
 })
 merged_total_counts <- as.data.frame(do.call(rbind, total_counts_list))
 
-write.table(
-    merged_total_counts, "merged_total_counts.tsv", col.names = TRUE, row.names = TRUE,
-    sep = "\t", quote = FALSE
-)
 
 
 ##------------------------------------------------------------------------------
@@ -174,32 +170,37 @@ write.table(
 )
 
 
-## count antisense (if libraries are stranded)
-if (!strand==0){
-    as_strand <- switch(as.character(strand),
-       "1" = 2,
-       "2" = 1,
-       stop("Invalid strandedness")
-    )
-    as_gene_counts <- Rsubread::featureCounts(
-        bamfilesCount, annot.ext = gff_f,
-        isGTFAnnotationFile = TRUE,
-        GTF.featureType = "gene", 
-        GTF.attrType = "locus_tag",
-        nthreads = threads, 
-        countMultiMappingReads = TRUE, 
-        fraction = TRUE, ## assign fractional counts to multimappers
-        isPairedEnd = ispaired, 
-        strandSpecific = as_strand
-    )
-    colnames(as_gene_counts$counts) <- gsub(".bam", "", colnames(as_gene_counts$counts))
-    colnames(as_gene_counts$counts) <- gsub("\\.","_",colnames(as_gene_counts$counts))
-    as_counts_mat <- as_gene_counts$counts
-} else {
-    ## set antisense counts to 0
-    as_counts_mat <- gene_counts$counts
-    as_counts_mat[!as_counts_mat==0] <- 0 
-}
+## UPDATE: antisense can overlap the sense strand of another feature; 
+##   therefore, the total count can be more than mapped reads! hence, 
+##    no longer counting antisense but instead relabelling "other" 
+##    as "antisense/intergenic"
+
+# ## count antisense (if libraries are stranded)
+# if (!strand==0){
+#     as_strand <- switch(as.character(strand),
+#        "1" = 2,
+#        "2" = 1,
+#        stop("Invalid strandedness")
+#     )
+#     as_gene_counts <- Rsubread::featureCounts(
+#         bamfilesCount, annot.ext = gff_f,
+#         isGTFAnnotationFile = TRUE,
+#         GTF.featureType = "gene", 
+#         GTF.attrType = "locus_tag",
+#         nthreads = threads, 
+#         countMultiMappingReads = TRUE, 
+#         fraction = TRUE, ## assign fractional counts to multimappers
+#         isPairedEnd = ispaired, 
+#         strandSpecific = as_strand
+#     )
+#     colnames(as_gene_counts$counts) <- gsub(".bam", "", colnames(as_gene_counts$counts))
+#     colnames(as_gene_counts$counts) <- gsub("\\.","_",colnames(as_gene_counts$counts))
+#     as_counts_mat <- as_gene_counts$counts
+# } else {
+#     ## set antisense counts to 0
+#     as_counts_mat <- gene_counts$counts
+#     as_counts_mat[!as_counts_mat==0] <- 0 
+# }
 
 ##------------------------------------------------------------------------------
 ## Plot library composition
@@ -225,8 +226,8 @@ biotype_counts <- data.frame(do.call(cbind,
 })))
 colnames(biotype_counts) <- all_biotypes
 
-## add antisense counts 
-biotype_counts[["antisense"]] <- colSums(as_counts_mat)
+# ## add antisense counts 
+# biotype_counts[["antisense"]] <- colSums(as_counts_mat)
 
 counts_summary <- data.frame(
     sample = meta_tab$"sample",
@@ -247,7 +248,7 @@ counts_summary <- merge(counts_summary,merged_total_counts, by = "sample")
 # counts_summary$other <- counts_summary$mapped-counts_summary$rRNA
 
 
-counts_summary$other <- counts_summary$mapped - rowSums(biotype_counts)#(
+counts_summary$antisense_other <- counts_summary$mapped - rowSums(biotype_counts)#(
     #counts_summary$rRNA + counts_summary$protein_coding)
 
 counts_summary <- counts_summary[rev(order(counts_summary$sample)),]
@@ -255,7 +256,7 @@ counts_summary <- counts_summary[rev(order(counts_summary$sample)),]
 
 cc1 <- 12
 
-all_biotypes <- c(all_biotypes, "antisense", "other")
+all_biotypes <- c(all_biotypes, "antisense_other")
 non_rRNA_btypes <- all_biotypes[!all_biotypes=="rRNA"]
 
 

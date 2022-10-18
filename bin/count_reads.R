@@ -218,6 +218,13 @@ counts_summary <- merge(counts_summary,merged_total_counts, by = "sample")
 counts_summary$antisense_other <- counts_summary$mapped - rowSums(biotype_counts)#(
     #counts_summary$rRNA + counts_summary$protein_coding)
 
+write.table(
+    counts_summary, "counts_summary.tsv", col.names = TRUE, row.names = FALSE,
+    sep = "\t", quote = FALSE
+)
+
+
+
 counts_summary <- counts_summary[rev(order(counts_summary$sample)),]
 
 

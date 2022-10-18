@@ -15,7 +15,6 @@ process COUNT_READS {
     output:
     path 'gene_counts.tsv', emit: counts_df
     path 'gene_counts_pc.tsv', emit: counts_df_pc
-    path 'merged_total_counts.tsv', emit: merged_total_counts
     path 'counts_summary.tsv', emit: counts_summary
     path 'ref_gene_df.tsv', emit: ref_gene_df
     path 'library_composition.png', emit: libcomp_plot

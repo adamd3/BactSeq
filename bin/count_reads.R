@@ -259,12 +259,14 @@ counts_melt$variable <- factor(counts_melt$variable, levels=c(
 # minUsable <- min(mergedDf$q15_dedup_reads)
 
 
+ylabel <- ifelse(isTRUE(ispaired), "Million read pairs", "Million reads")
+
 p1 <- ggplot(counts_melt,
         aes(x = sample, colour = variable, fill = variable, y = value)
     ) + 
     geom_bar(position = "stack", stat = "identity", width = 0.7) +
     coord_flip() +
-    xlab("Sample") + ylab("Million reads") +
+    xlab("Sample") + ylab(ylabel) +
     scale_fill_manual(
         "",
         values = ggCols,

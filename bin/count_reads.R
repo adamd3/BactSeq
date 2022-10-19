@@ -208,7 +208,8 @@ counts_summary <- data.frame(
     #     gene_counts$counts[ref_gene_df$biotype=="rRNA",])
 )
 
-counts_summary <- cbind(counts_summary,biotype_counts)
+# counts_summary <- cbind(counts_summary,biotype_counts)
+ counts_summary$rRNA <- biotype_counts$rRNA
 
 ## add total mapped counts
 counts_summary <- merge(counts_summary,merged_total_counts, by = "sample")

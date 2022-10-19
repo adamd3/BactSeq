@@ -223,6 +223,11 @@ write.table(
     sep = "\t", quote = FALSE
 )
 
+write.table(
+    biotype_counts, "biotype_counts.tsv", col.names = TRUE, row.names = FALSE,
+    sep = "\t", quote = FALSE
+)
+
 
 
 counts_summary <- counts_summary[rev(order(counts_summary$sample)),]

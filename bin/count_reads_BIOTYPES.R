@@ -212,11 +212,19 @@ counts_summary <- cbind(counts_summary,biotype_counts)
 
 ## add total mapped counts
 counts_summary <- merge(counts_summary,merged_total_counts, by = "sample")
+# counts_summary$other <- counts_summary$mapped-counts_summary$rRNA
 
-counts_summary$other <- counts_summary$mapped - counts_summary$rRNA
+
+counts_summary$antisense_other <- counts_summary$mapped - rowSums(biotype_counts)#(
+    #counts_summary$rRNA + counts_summary$protein_coding)
 
 write.table(
     counts_summary, "counts_summary.tsv", col.names = TRUE, row.names = FALSE,
+    sep = "\t", quote = FALSE
+)
+
+write.table(
+    biotype_counts, "biotype_counts.tsv", col.names = TRUE, row.names = FALSE,
     sep = "\t", quote = FALSE
 )
 
@@ -227,7 +235,7 @@ counts_summary <- counts_summary[rev(order(counts_summary$sample)),]
 
 cc1 <- 12
 
-all_biotypes <- c(all_biotypes, "other")
+all_biotypes <- c(all_biotypes, "antisense_other")
 non_rRNA_btypes <- all_biotypes[!all_biotypes=="rRNA"]
 
 
@@ -237,9 +245,10 @@ non_rRNA_btypes <- all_biotypes[!all_biotypes=="rRNA"]
 counts_melt <- reshape2::melt(
     counts_summary, id.vars = c("sample"),
     measure.vars = c(
-        "other",
-        "rRNA"
-        # all_biotypes
+        # "protein_coding", 
+        # "antisense_other",
+        # "rRNA"
+        all_biotypes
         )
 )
 counts_melt$sample <- factor(
@@ -247,8 +256,9 @@ counts_melt$sample <- factor(
 )
 counts_melt$variable <- factor(counts_melt$variable, levels=c(
     "rRNA", 
-    "other" 
-    # non_rRNA_btypes
+    non_rRNA_btypes
+    # "antisense_other", 
+    # "protein_coding"
     )
 )
 # minUsable <- min(mergedDf$q15_dedup_reads)
@@ -297,9 +307,10 @@ ggsave(
 # propCols <- (mergedDf[,c(3,13,14,5)] / mergedDf[,2])
 
 propCols <- counts_summary[c(
-    "other", 
-    "rRNA"
-    # all_biotypes
+    # "protein_coding", 
+    # "antisense_other", 
+    # "rRNA"
+    all_biotypes
     )] / counts_summary$mapped
 
 propCols$sample <- counts_summary$sample
@@ -308,9 +319,10 @@ propCols$sample <- counts_summary$sample
 prop_melt <- melt(
     propCols, id.vars = c("sample"),
     measure.vars = c(
-        "other", 
-        "rRNA"
-        # all_biotypes
+        # "protein_coding", 
+        # "antisense_other", 
+        # "rRNA"
+        all_biotypes
         )
 )
 prop_melt$sample <- factor(
@@ -318,8 +330,9 @@ prop_melt$sample <- factor(
 )
 prop_melt$variable <- factor(prop_melt$variable, levels=c(
     "rRNA", 
-    "other"#, 
-    # non_rRNA_btypes
+    non_rRNA_btypes
+    # "antisense_other", 
+    # "protein_coding"
     )
 )
 

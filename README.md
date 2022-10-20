@@ -33,6 +33,7 @@ You can run the pipeline as follows:
         --sample_file [sample_file.tsv] \
         --ref_genome [genome.fasta] --ref_ann [genome_annot.gff3] \
         --func_file [func_file.csv] \
+        --strandedness reverse \
         -profile docker -resume
 
 You can run with [`Docker`](https://www.docker.com/) or [`Singularity`](https://sylabs.io/guides/3.5/user-guide/introduction.html) by specifying ` -profile docker` or ` -profile singularity`, respectively.
@@ -45,7 +46,7 @@ Explanation of parameters:
 - `sample_file`: TSV file containing sample information (see below)
 - `data_dir`: path to directory containing FASTQ files.
 - `paired`: data are paired-end (default is to assume single-end)
-- `strandedness`: is data stranded? Options: `unstranded`, `forward`, `reverse`. Default = reverse.
+- `strandedness`: is data stranded? Options: `unstranded`, `forward`, `reverse`. Default = `reverse`.
 - `cont_tabl`: (optional) table of contrasts to be performed for differential expression.
 - `func_file`: (optional) functional annotation file - if provided, functional enrichment of DE genes will be performed.
 - `p_thresh`: adjusted p-value threshold for identifying differentially expressed genes. Default = 0.05.

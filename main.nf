@@ -218,7 +218,6 @@ workflow {
         )
         ch_readcounts_df_pc = MERGE_COUNTS.out.kallisto_merged_out
         ch_refgene_df = MERGE_COUNTS.out.ref_gene_df
-        // NOTE: only protein-coding genes are present in these counts
 
 
     } else { exit 1, 'aligner not valid: please choose one of `bwa` or `kallisto`' }

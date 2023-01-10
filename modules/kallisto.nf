@@ -31,11 +31,11 @@ process KALLISTO_QUANT {
     script:
     def name = task.ext.prefix ?: "${meta.sample_id}"
 
-    if (strandedness == 0){
+    if (strandedness == 'unstranded'){
         strand_arg = ""
-    } else if (strandedness == 1){
+    } else if (strandedness == 'forward'){
         strand_arg = "--fr-stranded"
-    } else if (strandedness==2){
+    } else if (strandedness == 'reverse'){
         strand_arg = "--rf-stranded"
     }
 

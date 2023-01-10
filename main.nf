@@ -66,8 +66,8 @@ if (params.func_file) {
 */
 include {MAKE_META_FILE} from './modules/metadata'
 include {TRIMGALORE} from './modules/trim_reads'
-include {MAKE_BWA_INDEX; BWA_ALIGN} from './modules/bwa_align'
-include {COUNT_READS} from './modules/count_reads'
+include {MAKE_BWA_INDEX; BWA_ALIGN; COUNT_READS} from './modules/bwa_align'
+include {MAKE_KALLISTO_INDEX; KALLISTO_QUANT; MERGE_COUNTS} from './modules/kallisto'
 include {TMM_NORMALISE_COUNTS} from './modules/normalisation'
 include {PCA_SAMPLES} from './modules/plots'
 include {DIFF_EXPRESSION} from './modules/diffexpr'
@@ -87,7 +87,6 @@ def create_fastq_channel(LinkedHashMap row) {
     meta.sample_id    = row.sample
     meta.paired_end   = row.paired.toBoolean()
    
-
     // add path(s) of the fastq file(s) to the metadata
     def fastq_meta = []
     if (!file(row.file1).exists()) {
@@ -154,50 +153,75 @@ workflow {
         TRIMGALORE (
             ch_raw_reads_trimgalore
         )
-        // ch_trimmed_reads = TRIMGALORE.out.trimmed_reads.collect()
         ch_trimmed_reads = TRIMGALORE.out.trimmed_reads
         ch_trimgalore_results_mqc = TRIMGALORE.out.trimgalore_results_mqc
         ch_trimgalore_fastqc_reports_mqc = TRIMGALORE.out.trimgalore_fastqc_reports_mqc
     }
 
 
-    /*
-     *  Create a bwa index for the reference genome
-     */
-    MAKE_BWA_INDEX (
-        ch_fasta_file
-    )
-    ch_bwa_idx = MAKE_BWA_INDEX.out.bwa_idx
-
 
     /*
-     *  Align reads to the genome + count total mapped reads
+     *  Align / pseudo-align reads
      */
-    BWA_ALIGN (
-        ch_trimmed_reads,
-        ch_bwa_idx
-    )
-    ch_bwa_out_bam = BWA_ALIGN.out.bam_files.collect()
-    ch_bwa_out_bai = BWA_ALIGN.out.bai_files.collect()
-    ch_bwa_out_count = BWA_ALIGN.out.count_files.collect()
+    if (params.aligner == "bwa") {
+
+        MAKE_BWA_INDEX (
+            ch_fasta_file
+        )
+        ch_bwa_idx = MAKE_BWA_INDEX.out.bwa_idx
+
+        BWA_ALIGN (
+            ch_trimmed_reads,
+            ch_bwa_idx
+        )
+        ch_bwa_out_bam = BWA_ALIGN.out.bam_files.collect()
+        ch_bwa_out_bai = BWA_ALIGN.out.bai_files.collect()
+        ch_bwa_out_count = BWA_ALIGN.out.count_files.collect()
+
+        /*
+         *  Count reads mapped per gene; summarise library composition
+         */
+        COUNT_READS (
+            ch_bwa_out_bam,
+            ch_bwa_out_bai,
+            ch_bwa_out_count,
+            ch_metadata,
+            ch_gff_file,
+            params.paired,
+            params.strandedness
+        )
+        ch_readcounts_df = COUNT_READS.out.counts_df
+        ch_readcounts_df_pc = COUNT_READS.out.counts_df_pc
+        ch_refgene_df = COUNT_READS.out.ref_gene_df
+
+ 
+    } else if (params.aligner == "kallisto") {
+
+        MAKE_KALLISTO_IDX (
+            ch_fasta_file
+        )
+        ch_kallisto_idx = MAKE_KALLISTO_IDX.out.kallisto_idx
+
+        KALLISTO_QUANT (
+            ch_trimmed_reads,
+            ch_kallisto_idx,
+            params.strandedness,
+        )
+        ch_kallisto_out_dirs = KALLISTO_QUANT.out.kallisto_out_dirs.collect()
+
+        /*
+         *  Merge counts
+         */
+        MERGE_COUNTS (
+            ch_kallisto_out_dirs,
+            ch_metadata
+        )
+        ch_readcounts_df_pc = MERGE_COUNTS.out.kallisto_merged_out
+        ch_refgene_df = MERGE_COUNTS.out.ref_gene_df
+        // NOTE: only protein-coding genes are present in these counts
 
 
-    /*
-     *  Count reads mapped per gene; summarise library composition
-     */
-    COUNT_READS (
-        ch_bwa_out_bam,
-        ch_bwa_out_bai,
-        ch_bwa_out_count,
-        ch_metadata,
-        ch_gff_file,
-        params.paired,
-        params.strandedness
-    )
-    ch_readcounts_df = COUNT_READS.out.counts_df
-    ch_readcounts_df_pc = COUNT_READS.out.counts_df_pc
-    ch_refgene_df = COUNT_READS.out.ref_gene_df
-
+    } else { exit 1, 'aligner not valid: please choose one of `bwa` or `kallisto`' }
 
     /*
      *  Get normalised read counts per gene
@@ -275,14 +299,17 @@ def helpMessage() {
     Mandatory arguments:
       --data_dir [file]               Path to directory containing FastQ files.
       --sample_file [file]            Path to file containing sample information.
-      --ref_genome [file]             Path to FASTA file containing reference genome sequence.
+      --ref_genome [file]             Path to FASTA file containing reference genome sequence (bwa) or multi-FASTA file containing coding gene sequences (kallisto).
       --ref_ann [file]                Path to GFF file containing reference genome annotation.
+      --aligner [str]                 (Pseudo-)aligner to be used. Options: `bwa`, `kallisto`. Default = bwa.
       --paired [str]                  Is data paired-end? Default = FALSE.
       --strandedness [str]            Is data stranded? Options: `unstranded`, `forward`, `reverse`. Default = reverse.
       -profile [str]                  Configuration profile to use.
                                       Available: conda, docker, singularity.
 
     Other options:
+      --fragment_len [str]            Estimated average fragment length for kallisto transcript quantification (only required for single-end reads). Default = 150.
+      --fragment_sd [str]             Estimated standard deviation of fragment length for kallisto transcript quantification (only required for single-end reads). Default = 20.
       --cont_tabl [file]              Path to tsv file containing contrasts to be performed for differential expression.
       --func_file [file]              Path to GMT-format file containing functional annotation.
       --p_thresh [str]                Adjusted p-value threshold for identifying differentially expressed genes. Default = 0.05.

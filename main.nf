@@ -67,7 +67,7 @@ if (params.func_file) {
 include {MAKE_META_FILE} from './modules/metadata'
 include {TRIMGALORE} from './modules/trim_reads'
 include {MAKE_BWA_INDEX; BWA_ALIGN; COUNT_READS} from './modules/bwa_align'
-include {MAKE_KALLISTO_INDEX; KALLISTO_QUANT; MERGE_COUNTS} from './modules/kallisto'
+include {MAKE_KALLISTO_IDX; KALLISTO_QUANT; MERGE_COUNTS} from './modules/kallisto'
 include {TMM_NORMALISE_COUNTS} from './modules/normalisation'
 include {PCA_SAMPLES} from './modules/plots'
 include {DIFF_EXPRESSION} from './modules/diffexpr'

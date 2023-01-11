@@ -78,6 +78,8 @@ meta_tab <- read.table(
 contrast_tab <- read.table(
     cont_tab_f, header = TRUE, sep = "\t", stringsAsFactors = FALSE
 )
+contrast_tab <- data.frame(
+    apply(contrast_tab,2,function(x) gsub('\\s+', '',x)))
 
 
 gene_names <- counts_tab[["feature_id"]]

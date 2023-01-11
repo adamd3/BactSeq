@@ -61,7 +61,7 @@ process KALLISTO_QUANT {
 process MERGE_COUNTS {
     tag "merge_counts"
     label 'process_high'
-    publishDir "${params.outdir}/kallisto_quant", mode: 'copy'
+    publishDir "${params.outdir}/read_counts", mode: 'copy'
 
     input:
     path kallisto_dirs

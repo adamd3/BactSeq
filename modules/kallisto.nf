@@ -65,16 +65,19 @@ process MERGE_COUNTS {
 
     input:
     path kallisto_dirs
+    path gff
     path meta
 
     output:
-    path 'kallisto_merged_counts.tsv', emit: kallisto_merged_out
+    path 'kallisto_merged_counts.tsv', emit: counts_df
+    path 'kallisto_merged_counts_pc.tsv', emit: counts_df_pc
     path 'ref_gene_df.tsv', emit: ref_gene_df
 
     script:
     """
     merge_kallisto_counts.py \
         --metadata_f=$meta \
+        --gff_f=$gff \
         --out_dir="./"
     """
 }

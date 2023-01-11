@@ -40,7 +40,7 @@ def merge_counts(metadata_f, gff_f, out_dir):
     gene_lengths = quant_merged[['feature_id', 'length']]
     quant_merged = quant_merged[['feature_id'] + metadata['sample'].tolist()]
     # export merged counts
-    outf1 = os.path.join(out_dir, 'kallisto_merged_counts.tsv')
+    outf1 = os.path.join(out_dir, 'gene_counts.tsv')
     quant_merged.to_csv(outf1, index=False, sep='\t')
     # gene annotation df for extracting protein-coding genes
     annot_dat = (gffpd.read_gff3(gff_f)).df
@@ -58,7 +58,7 @@ def merge_counts(metadata_f, gff_f, out_dir):
     quant_merged_pc = quant_merged[quant_merged['feature_id'].isin(
         cds_annot['locus_tag'].tolist()
     )]
-    outf2 = os.path.join(out_dir, 'kallisto_merged_counts_pc.tsv')
+    outf2 = os.path.join(out_dir, 'gene_counts_pc.tsv')
     quant_merged_pc.to_csv(outf2, index=False, sep='\t')
     # export ref gene df (using kallisto gene lengths instead of GFF)
     gene_lengths = gene_lengths.rename(columns={'feature_id': 'locus_tag'})

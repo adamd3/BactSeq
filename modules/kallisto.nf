@@ -69,8 +69,8 @@ process MERGE_COUNTS {
     path meta
 
     output:
-    path 'kallisto_merged_counts.tsv', emit: counts_df
-    path 'kallisto_merged_counts_pc.tsv', emit: counts_df_pc
+    path 'gene_counts.tsv', emit: counts_df
+    path 'gene_counts_pc.tsv', emit: counts_df_pc
     path 'ref_gene_df.tsv', emit: ref_gene_df
 
     script:

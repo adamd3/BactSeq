@@ -118,7 +118,7 @@ names(comb_list) <- comb_names
 
 ## make DESeq2 object
 dds <- DESeqDataSetFromMatrix(
-    countData = counts_tab, colData = meta_tab,
+    countData = round(counts_tab), colData = meta_tab,
     design = ~ group
 )
 dds <- DESeq(dds)

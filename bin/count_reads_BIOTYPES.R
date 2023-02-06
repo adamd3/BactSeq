@@ -29,6 +29,9 @@ option_list <- list(
         metavar="character"),
     make_option(c("-g", "--gene_counts_f"), type="character", default=NULL,
         help="Gene annotations in reference strain", 
+        metavar="character"),
+    make_option(c("-p", "--is_paired"), type="character", default=NULL,
+        help="are the reads paired-end? default = FALSE", 
         metavar="character")
 )
 
@@ -38,8 +41,7 @@ opt <- parse_args(opt_parser)
 meta_f <- opt$metadata
 ref_gene_f <- opt$ref_gene_f
 gene_counts_f <- opt$gene_counts_f
-outf <- opt$outf
-
+ispaired <- if(opt$is_paired == "TRUE") TRUE else FALSE
 
 
 ##------------------------------------------------------------------------------

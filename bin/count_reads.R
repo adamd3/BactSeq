@@ -64,7 +64,6 @@ gff_f <- opt$gff
 ispaired <- if(opt$is_paired == "TRUE") TRUE else FALSE
 strandedness <- opt$strandedness
 threads <- opt$threads
-outf <- opt$outf
 
 
 

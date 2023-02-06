@@ -3,67 +3,41 @@
 if (!require("optparse")){
     install.packages("optparse",repos = "http://cran.us.r-project.org")
 }
-if (!require("BiocManager", quietly = TRUE))
-    install.packages("BiocManager",repos = "http://cran.us.r-project.org")
-if (!require("Rsubread")){
-    BiocManager::install("Rsubread")
-}
-if (!require("ape")){
-    install.packages("ape",repos = "http://cran.us.r-project.org")
-}
-if (!require("stringr")){
-    install.packages("stringr",repos = "http://cran.us.r-project.org")
-}
-if (!require("ggplot2")){
-    install.packages("ggplot2",repos = "http://cran.us.r-project.org")
+if (!require("tidyverse")){
+    install.packages("tidyverse",repos = "http://cran.us.r-project.org")
 }
 if (!require("scales")){
     install.packages("scales",repos = "http://cran.us.r-project.org")
 }
 if (!require("RColorBrewer")){
     install.packages("RColorBrewer",repos = "http://cran.us.r-project.org")
-}
-if (!require("tibble")){
-    install.packages("tibble",repos = "http://cran.us.r-project.org")
-}
+} 
 
 
 library(optparse)
-library(Rsubread)
-library(ape)
-library(stringr)
-library(ggplot2)
+library(tidyverse)
 library(scales)
 library(RColorBrewer)
 library(reshape2)
-library(tibble)
 
 
 option_list <- list(
     make_option(c("-m", "--metadata"), type="character", default=NULL,
         help="sample metadata tsv file", metavar="character"),
-    make_option(c("-g", "--gff"), type="character", default=NULL,
-        help="GFF annotation file for the reference strain", 
+    make_option(c("-r", "--ref_gene_f"), type="character", default=NULL,
+        help="Gene annotations in reference strain", 
         metavar="character"),
-    make_option(c("-p", "--is_paired"), type="character", default=NULL,
-        help="are the reads paired-end? default = FALSE", 
+    make_option(c("-r", "--gene_counts_f"), type="character", default=NULL,
+        help="Gene annotations in reference strain", 
         metavar="character"),
-    make_option(c("-s", "--strandedness"), type="character", default=NULL,
-        help="read strandedness. default = reverse", 
-        metavar="character"),
-    make_option(c("-t", "--threads"), type="numeric", default=1,
-        help="number of threads to use. default = 1", 
-        metavar="numeric")
 )
 
 opt_parser <- OptionParser(option_list=option_list)
 opt <- parse_args(opt_parser)
 
 meta_f <- opt$metadata
-gff_f <- opt$gff
-ispaired <- if(opt$is_paired == "TRUE") TRUE else FALSE
-strandedness <- opt$strandedness
-threads <- opt$threads
+ref_gene_f <- opt$ref_gene_f
+gene_counts_f <- opt$gene_counts_f
 outf <- opt$outf
 
 
@@ -95,80 +69,83 @@ merged_total_counts <- as.data.frame(do.call(rbind, total_counts_list))
 ##------------------------------------------------------------------------------
 ## Read genome annotation
 ##------------------------------------------------------------------------------
-ref_annot <- ape::read.gff(gff_f, na.strings = c(".", "?"), GFF3 = TRUE)
+# ref_annot <- ape::read.gff(gff_f, na.strings = c(".", "?"), GFF3 = TRUE)
 
-ref_annot <- subset(ref_annot, type=="gene")
+# ref_annot <- subset(ref_annot, type=="gene")
 
-gene_attr <- stringr::str_split(ref_annot$attributes,";")
-locus_tags <- unlist(lapply(gene_attr, function(x){x[grepl("locus_tag", x)]}))
-gene_biotypes <- unlist(lapply(gene_attr, function(x){x[grepl("gene_biotype", x)]}))
-common_gene_names <- unlist(lapply(gene_attr, function(x){
-    x <- x[grepl("gene=", x)]
-    x[identical(x, character(0))] <- ""
-    x
-}))
-gene_lengths <- (ref_annot$end - ref_annot$start) + 1
+# gene_attr <- stringr::str_split(ref_annot$attributes,";")
+# locus_tags <- unlist(lapply(gene_attr, function(x){x[grepl("locus_tag", x)]}))
+# gene_biotypes <- unlist(lapply(gene_attr, function(x){x[grepl("gene_biotype", x)]}))
+# common_gene_names <- unlist(lapply(gene_attr, function(x){
+#     x <- x[grepl("gene=", x)]
+#     x[identical(x, character(0))] <- ""
+#     x
+# }))
+# gene_lengths <- (ref_annot$end - ref_annot$start) + 1
 
-ref_gene_df <- data.frame(
-    locus_tag = locus_tags,
-    biotype = gene_biotypes,
-    gene_name = common_gene_names,
-    gene_length = gene_lengths
-)
-ref_gene_df$locus_tag <- gsub("locus_tag=","",ref_gene_df$locus_tag)
-ref_gene_df$biotype <- gsub("gene_biotype=","",ref_gene_df$biotype)
-ref_gene_df$gene_name <- gsub("gene=","",ref_gene_df$gene_name)
+# ref_gene_df <- data.frame(
+#     locus_tag = locus_tags,
+#     biotype = gene_biotypes,
+#     gene_name = common_gene_names,
+#     gene_length = gene_lengths
+# )
+# ref_gene_df$locus_tag <- gsub("locus_tag=","",ref_gene_df$locus_tag)
+# ref_gene_df$biotype <- gsub("gene_biotype=","",ref_gene_df$biotype)
+# ref_gene_df$gene_name <- gsub("gene=","",ref_gene_df$gene_name)
 
-write.table(
-    ref_gene_df, "ref_gene_df.tsv", col.names = TRUE, row.names = FALSE,
-    sep = "\t", quote = FALSE
-)
+# write.table(
+#     ref_gene_df, "ref_gene_df.tsv", col.names = TRUE, row.names = FALSE,
+#     sep = "\t", quote = FALSE
+# )
+
+ref_gene_df <- read_tsv(ref_gene_f)
 
 
 ##------------------------------------------------------------------------------
 ## Count reads mapping to genes
 ##------------------------------------------------------------------------------
-bamfilesCount <- paste0(meta_tab$sample, ".bam")
+# bamfilesCount <- paste0(meta_tab$sample, ".bam")
 
-# 0 (unstranded), 1 (stranded) and 2 (reversely stranded)
-strand <- switch(as.character(strandedness),
-       "unstranded" = 0,
-       "forward" = 1,
-       "reverse" = 2,
-       stop("Invalid input")
-)
+# # 0 (unstranded), 1 (stranded) and 2 (reversely stranded)
+# strand <- switch(as.character(strandedness),
+#        "unstranded" = 0,
+#        "forward" = 1,
+#        "reverse" = 2,
+#        stop("Invalid input")
+# )
 
-gene_counts <- Rsubread::featureCounts(
-    bamfilesCount, annot.ext = gff_f,
-    isGTFAnnotationFile = TRUE,
-    GTF.featureType = "gene", 
-    GTF.attrType = "locus_tag",
-    nthreads = threads, 
-    countMultiMappingReads = TRUE, 
-    fraction = TRUE, ## assign fractional counts to multimappers
-    isPairedEnd = ispaired, 
-    strandSpecific = strand
-)
-colnames(gene_counts$counts) <- gsub(".bam", "", colnames(gene_counts$counts))
-colnames(gene_counts$counts) <- gsub("\\.","_",colnames(gene_counts$counts))
-
-
-counts_mat <- gene_counts$counts
-counts_mat <- tibble::rownames_to_column(as.data.frame(counts_mat), "feature_id")
+# gene_counts <- Rsubread::featureCounts(
+#     bamfilesCount, annot.ext = gff_f,
+#     isGTFAnnotationFile = TRUE,
+#     GTF.featureType = "gene", 
+#     GTF.attrType = "locus_tag",
+#     nthreads = threads, 
+#     countMultiMappingReads = TRUE, 
+#     fraction = TRUE, ## assign fractional counts to multimappers
+#     isPairedEnd = ispaired, 
+#     strandSpecific = strand
+# )
+# colnames(gene_counts$counts) <- gsub(".bam", "", colnames(gene_counts$counts))
+# colnames(gene_counts$counts) <- gsub("\\.","_",colnames(gene_counts$counts))
 
 
-write.table(
-    counts_mat, "gene_counts.tsv", col.names = TRUE, row.names = FALSE,
-    sep = "\t", quote = FALSE
-)
+# counts_mat <- gene_counts$counts
+# counts_mat <- tibble::rownames_to_column(as.data.frame(counts_mat), "feature_id")
 
-## protein-coding genes only
-gene_counts_pc <- counts_mat[ref_gene_df$biotype=="protein_coding",]
-write.table(
-    gene_counts_pc, "gene_counts_pc.tsv", col.names = TRUE, row.names = FALSE,
-    sep = "\t", quote = FALSE
-)
 
+# write.table(
+#     counts_mat, "gene_counts.tsv", col.names = TRUE, row.names = FALSE,
+#     sep = "\t", quote = FALSE
+# )
+
+# ## protein-coding genes only
+# gene_counts_pc <- counts_mat[ref_gene_df$biotype=="protein_coding",]
+# write.table(
+#     gene_counts_pc, "gene_counts_pc.tsv", col.names = TRUE, row.names = FALSE,
+#     sep = "\t", quote = FALSE
+# )
+
+gene_counts <- read_tsv(gene_counts_f)
 
 ##------------------------------------------------------------------------------
 ## Plot library composition

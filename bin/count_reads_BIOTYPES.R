@@ -27,7 +27,7 @@ option_list <- list(
     make_option(c("-r", "--ref_gene_f"), type="character", default=NULL,
         help="Gene annotations in reference strain", 
         metavar="character"),
-    make_option(c("-r", "--gene_counts_f"), type="character", default=NULL,
+    make_option(c("-g", "--gene_counts_f"), type="character", default=NULL,
         help="Gene annotations in reference strain", 
         metavar="character"),
 )

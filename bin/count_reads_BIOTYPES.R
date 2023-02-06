@@ -29,7 +29,7 @@ option_list <- list(
         metavar="character"),
     make_option(c("-g", "--gene_counts_f"), type="character", default=NULL,
         help="Gene annotations in reference strain", 
-        metavar="character"),
+        metavar="character")
 )
 
 opt_parser <- OptionParser(option_list=option_list)

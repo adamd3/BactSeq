@@ -52,7 +52,7 @@ option_list <- list(
         help="read strandedness. default = reverse", 
         metavar="character"),
     make_option(c("-t", "--threads"), type="numeric", default=1,
-        help="number of threads to use. default = 1.", 
+        help="number of threads to use. default = 1", 
         metavar="numeric")
 )
 

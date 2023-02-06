@@ -79,11 +79,11 @@ process COUNT_READS {
 
     if (paired) {
         """
-        count_reads.R -p TRUE -s $strandedness -m $meta -g $gff -p TRUE -t ${task.cpus}
+        count_reads.R -p TRUE -s $strandedness -m $meta -g $gff -t ${task.cpus}
         """
     } else {
         """
-        count_reads.R -p FALSE -s $strandedness -m $meta -g $gff -p FALSE -t ${task.cpus}
+        count_reads.R -p FALSE -s $strandedness -m $meta -g $gff -t ${task.cpus}
         """
     }
 }

@@ -125,11 +125,11 @@ ref_gene_df <- read_tsv(ref_gene_f)
 #     isPairedEnd = ispaired, 
 #     strandSpecific = strand
 # )
-# colnames(gene_counts$counts) <- gsub(".bam", "", colnames(gene_counts$counts))
-# colnames(gene_counts$counts) <- gsub("\\.","_",colnames(gene_counts$counts))
+# colnames(gene_counts) <- gsub(".bam", "", colnames(gene_counts))
+# colnames(gene_counts) <- gsub("\\.","_",colnames(gene_counts))
 
 
-# counts_mat <- gene_counts$counts
+# counts_mat <- gene_counts
 # counts_mat <- tibble::rownames_to_column(as.data.frame(counts_mat), "feature_id")
 
 
@@ -167,7 +167,7 @@ all_biotypes <- unique(ref_gene_df$biotype)
 
 biotype_counts <- data.frame(do.call(cbind,
     lapply(all_biotypes, function(biotype){
-    colSums(gene_counts$counts[ref_gene_df$biotype==biotype,,drop=FALSE])
+    colSums(gene_counts[ref_gene_df$biotype==biotype,,drop=FALSE])
 })))
 colnames(biotype_counts) <- all_biotypes
 
@@ -178,11 +178,11 @@ counts_summary <- data.frame(
     group = meta_tab$"group",
     rep = meta_tab$"rep_no"#,
     # protein_coding = colSums(
-    #     gene_counts$counts[ref_gene_df$biotype=="protein_coding",]),
+    #     gene_counts[ref_gene_df$biotype=="protein_coding",]),
     # tRNA = colSums(
-        # gene_counts$counts[ref_gene_df$biotype=="tRNA",]),
+        # gene_counts[ref_gene_df$biotype=="tRNA",]),
     # rRNA = colSums(
-    #     gene_counts$counts[ref_gene_df$biotype=="rRNA",])
+    #     gene_counts[ref_gene_df$biotype=="rRNA",])
 )
 
 counts_summary <- cbind(counts_summary,biotype_counts)
@@ -267,7 +267,7 @@ p1 <- ggplot(counts_melt,
         axis.text.y = element_text(colour = "black")
     )
 
-nsamps <- ncol(gene_counts$counts)
+nsamps <- ncol(gene_counts)
 
 ggsave(
     p1, file = paste0('library_composition.png'),

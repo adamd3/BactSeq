@@ -78,25 +78,26 @@ Explanation of parameters:
   - `file_name`: name of the FASTQ file.
   - `group`: grouping factor for differential expression and exploratory plots.
   - `rep_no`: repeat number (if more than one sample per group).
+  - `paired`: data are paired-end? (0 = single-end, 1 = paired-end).
 
   Example:
 
   If data are single-end, leave the `file2` column blank.
 
   ```console
-  sample	file1   file2	group	rep_no
-  AS_1	SRX1607051_T1.fastq.gz	    Artificial_Sputum	1
-  AS_2	SRX1607052_T1.fastq.gz	    Artificial_Sputum	2
-  AS_3	SRX1607053_T1.fastq.gz	    Artificial_Sputum	3
-  MB_1	SRX1607054_T1.fastq.gz	    Middlebrook	1
-  MB_2	SRX1607055_T1.fastq.gz	    Middlebrook	2
-  MB_3	SRX1607056_T1.fastq.gz	    Middlebrook	3
-  ER_1	SRX1607060_T1.fastq.gz	    Erythromycin	1
-  ER_2	SRX1607061_T1.fastq.gz	    Erythromycin	2
-  ER_3	SRX1607062_T1.fastq.gz	    Erythromycin	3
-  KN_1	SRX1607066_T1.fastq.gz	    Kanamycin	1
-  KN_2	SRX1607067_T1.fastq.gz	    Kanamycin	2
-  KN_3	SRX1607068_T1.fastq.gz	    Kanamycin	3
+  sample	file1   file2	group	rep_no  paired
+  AS_1	SRX1607051_T1.fastq.gz	    Artificial_Sputum	1   1
+  AS_2	SRX1607052_T1.fastq.gz	    Artificial_Sputum	2   1
+  AS_3	SRX1607053_T1.fastq.gz	    Artificial_Sputum	3   1
+  MB_1	SRX1607054_T1.fastq.gz	    Middlebrook	1   1
+  MB_2	SRX1607055_T1.fastq.gz	    Middlebrook	2   1
+  MB_3	SRX1607056_T1.fastq.gz	    Middlebrook	3   1
+  ER_1	SRX1607060_T1.fastq.gz	    Erythromycin	1   1
+  ER_2	SRX1607061_T1.fastq.gz	    Erythromycin	2   1
+  ER_3	SRX1607062_T1.fastq.gz	    Erythromycin	3   1
+  KN_1	SRX1607066_T1.fastq.gz	    Kanamycin	1   1
+  KN_2	SRX1607067_T1.fastq.gz	    Kanamycin	2   1
+  KN_3	SRX1607068_T1.fastq.gz	    Kanamycin	3   1
   ```
 
 ## Output

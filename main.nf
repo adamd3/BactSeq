@@ -294,29 +294,28 @@ workflow.onComplete {
 def helpMessage() {
     log.info"""
     Usage:
-    The typical command for running the pipeline is as follows:
-      nextflow run BactSeq --data_dir [dir] --sample_file [file] --ref_genome [file] --ref_ann [file] -profile docker
+    nextflow run BactSeq --data_dir [dir] --sample_file [file] --ref_genome [file] --ref_ann [file] -profile docker [other_options]
 
     Mandatory arguments:
       --data_dir [file]               Path to directory containing FastQ files.
-      --sample_file [file]            Path to file containing sample information.
       --ref_genome [file]             Path to FASTA file containing reference genome sequence (bwa) or multi-FASTA file containing coding gene sequences (kallisto).
       --ref_ann [file]                Path to GFF file containing reference genome annotation.
-      --aligner [str]                 (Pseudo-)aligner to be used. Options: `bwa`, `kallisto`. Default = bwa.
-      --paired [str]                  Is data paired-end? Default = FALSE.
-      --strandedness [str]            Is data stranded? Options: `unstranded`, `forward`, `reverse`. Default = reverse.
+      --sample_file [file]            Path to file containing sample information.
       -profile [str]                  Configuration profile to use.
                                       Available: conda, docker, singularity.
 
     Other options:
+      --aligner [str]                 (Pseudo-)aligner to be used. Options: `bwa`, `kallisto`. Default = bwa.
+      --cont_tabl [file]              Path to tsv file containing contrasts to be performed for differential expression.
       --fragment_len [str]            Estimated average fragment length for kallisto transcript quantification (only required for single-end reads). Default = 150.
       --fragment_sd [str]             Estimated standard deviation of fragment length for kallisto transcript quantification (only required for single-end reads). Default = 20.
-      --cont_tabl [file]              Path to tsv file containing contrasts to be performed for differential expression.
       --func_file [file]              Path to GMT-format file containing functional annotation.
-      --p_thresh [str]                Adjusted p-value threshold for identifying differentially expressed genes. Default = 0.05.
       --l2fc_thresh [str]             Absolute log2(FoldChange) threshold for identifying differentially expressed genes. Default = 1.
-      --skip_trimming [bool]          Do not trim adaptors from FastQ files.
       --outdir [file]                 The output directory where the results will be saved (Default: './results').
+      --paired [str]                  Is data paired-end? Default = FALSE.     
+      --p_thresh [str]                Adjusted p-value threshold for identifying differentially expressed genes. Default = 0.05.
+      --skip_trimming [bool]          Do not trim adaptors from FastQ files.
+      --strandedness [str]            Is data stranded? Options: `unstranded`, `forward`, `reverse`. Default = reverse.
       -name [str]                     Name for the pipeline run. If not specified, Nextflow will automatically generate a random mnemonic.
 
     """.stripIndent()

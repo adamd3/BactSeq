@@ -108,7 +108,7 @@ Explanation of parameters:
   Example:
 
   ```console
-  Condition1,Condition2
+  Condition1  Condition2
   Artificial_Sputum Middlebrook
   Artificial_Sputum Kanamycin
   Artificial_Sputum Erythromycin
@@ -118,7 +118,7 @@ Explanation of parameters:
   ```
 
 - **Functional annotation file**: CSV file containing functional categories for genes. Enrichment testing will be performed
-  on results from differential gene expression contrasts. First column contains the gene ID (must match the gene IDs in `locus_tag` of the GFF annotation file); other columns are the functional groups (e.g. GO terms, but can be any functional categories).
+  on results from differential gene expression contrasts. First column contains the gene ID (must match the gene IDs in `locus_tag` of the GFF annotation file); second column contains the functional groups (e.g. GO terms, but can be any functional categories).
 
   Example:
 

@@ -42,7 +42,7 @@ Other options:
   --cont_tabl [file]              Path to tsv file containing contrasts to be performed for differential expression.
   --fragment_len [str]            Estimated average fragment length for kallisto transcript quantification (only required for single-end reads). Default = 150.
   --fragment_sd [str]             Estimated standard deviation of fragment length for kallisto transcript quantification (only required for single-end reads). Default = 20.
-  --func_file [file]              Path to GMT-format file containing functional annotation.
+  --func_file [file]              Path to CSV-format file containing functional annotations for enrichment testing.
   --l2fc_thresh [str]             Absolute log2(FoldChange) threshold for identifying differentially expressed genes. Default = 1.
   --outdir [file]                 The output directory where the results will be saved (Default: './results').
   --paired [str]                  Is data paired-end? Default = FALSE.
@@ -68,7 +68,7 @@ Explanation of parameters:
 - `outdir`: the output directory where the results will be saved (Default: `./results`).
 - `-resume`: will re-start the pipeline if it has been previously run.
 
-## Required input
+## Required inputs
 
 - **Genome sequence**: FASTA file containing the genome sequence. Can be retrieved from NCBI.
 - **Gene annotation file**: GFF file containing the genome annotation. Can be retrieved from NCBI.
@@ -98,6 +98,34 @@ Explanation of parameters:
   KN_1	SRX1607066_T1.fastq.gz	    Kanamycin	1   1
   KN_2	SRX1607067_T1.fastq.gz	    Kanamycin	2   1
   KN_3	SRX1607068_T1.fastq.gz	    Kanamycin	3   1
+  ```
+
+## Optional inputs
+
+- **Contrasts table**: TSV file containing contrasts to be performed to identify differentially expressed genes.
+  Contains 2 columns, representing the groups (as defined in Samples file) to be contrasted.
+
+  Example:
+
+  ```console
+  Condition1,Condition2
+  Artificial_Sputum Middlebrook
+  Artificial_Sputum Kanamycin
+  Artificial_Sputum Erythromycin
+  Middlebrook Erythromycin
+  Middlebrook Kanamycin
+  Erythromycin  Kanamycin
+  ```
+
+- **Functional annotation file**: CSV file containing functional categories for genes. Enrichment testing will be performed
+  on results from differential gene expression contrasts. First column contains the gene ID (must match the gene IDs in `locus_tag` of the GFF annotation file); other columns are the functional groups (e.g. GO terms, but can be any functional categories).
+
+  Example:
+
+  ```console
+  MAB_0013c,"GO:0003674,GO:0003824,GO:0008150,GO:0008152,GO:0016407,GO:0016740,GO:0016746,GO:0016747"
+  MAB_0018c,"GO:0003674,GO:0003824,GO:0005575,GO:0008150,GO:0008152,GO:0008168,GO:0016020,GO:0016021,GO:0016740,GO:0016741,GO:0031224,GO:0032259,GO:0044425"
+
   ```
 
 ## Output

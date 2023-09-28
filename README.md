@@ -10,6 +10,10 @@
 
 **BactSeq** is a Nextflow pipeline for performing bacterial RNA-Seq analysis.
 
+## News and updates
+
+- 28/09/23: Please see example contrasts table and functional enrichment file below in README. Docker and Singularity compatibility will be re-added soon. For now, the pipeline can be run using Conda.
+
 ## Pipeline summary
 
 The pipeline will perform the following steps:

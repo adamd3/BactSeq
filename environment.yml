@@ -39,3 +39,4 @@ dependencies:
   - bioconda::bioconductor-deseq2>=1.34
   - bioconda::bioconductor-topgo>=2.00
   - bioconda::bioconductor-go.db>=3.00
+  - bioconda::bioconductor-rsubread>=2.00

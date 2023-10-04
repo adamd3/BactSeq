@@ -31,4 +31,5 @@ RUN R -e 'install.packages(c(  \
     "tidyverse", "ape", "scales", "pheatmap", "matrixstats",  \
     "plyr", "rsqlite", "umap", "xtable", "BiocManager"))'
 
-RUN R -e 'BiocManager::install(c("edgeR", "DESeq2", "GO.db", "topGO"))'
+RUN R -e 'BiocManager::install(c("edgeR", "DESeq2", "GO.db",  \
+    "Rsubread", "topGO"))'

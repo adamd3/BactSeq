@@ -1,6 +1,5 @@
 #!/usr/bin/env Rscript
 
-## load / install packages
 library(optparse)
 library(DESeq2)
 library(ggplot2)

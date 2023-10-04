@@ -1,10 +1,11 @@
 # BactSeq
 
+![BactSeq](https://github.com/adamd3/BactSeq/actions/workflows/ci.yml/badge.svg)
+
 [![Nextflow](https://img.shields.io/badge/nextflow%20DSL2-%E2%89%A521.10.3-23aa62.svg?labelColor=000000)](https://www.nextflow.io/)
 [![run with conda](http://img.shields.io/badge/run%20with-conda-3EB049?labelColor=000000&logo=anaconda)](https://docs.conda.io/en/latest/)
-
-<!-- [![run with docker](https://img.shields.io/badge/run%20with-docker-0db7ed?labelColor=000000&logo=docker)](https://www.docker.com/) -->
-<!-- [![run with singularity](https://img.shields.io/badge/run%20with-singularity-1d355c.svg?labelColor=000000)](https://sylabs.io/docs/) -->
+[![run with docker](https://img.shields.io/badge/run%20with-docker-0db7ed?labelColor=000000&logo=docker)](https://www.docker.com/)
+[![run with singularity](https://img.shields.io/badge/run%20with-singularity-1d355c.svg?labelColor=000000)](https://sylabs.io/docs/)
 
 ## Introduction
 
@@ -47,14 +48,15 @@ Other options:
   --cont_tabl [file]              Path to tsv file containing contrasts to be performed for differential expression.
   --fragment_len [str]            Estimated average fragment length for kallisto transcript quantification (only required for single-end reads). Default = 150.
   --fragment_sd [str]             Estimated standard deviation of fragment length for kallisto transcript quantification (only required for single-end reads). Default = 20.
-  --func_file [file]              Path to CSV-format file containing functional annotations for enrichment testing.
+  --func_file [file]              Path to GMT-format file containing functional annotation.
   --l2fc_thresh [str]             Absolute log2(FoldChange) threshold for identifying differentially expressed genes. Default = 1.
   --outdir [file]                 The output directory where the results will be saved (Default: './results').
-  --paired [str]                  Is data paired-end? Default = FALSE.
+  --paired [str]                  Data are paired-end.
   --p_thresh [str]                Adjusted p-value threshold for identifying differentially expressed genes. Default = 0.05.
   --skip_trimming [bool]          Do not trim adaptors from FastQ files.
   --strandedness [str]            Is data stranded? Options: `unstranded`, `forward`, `reverse`. Default = reverse.
   -name [str]                     Name for the pipeline run. If not specified, Nextflow will automatically generate a random mnemonic.
+
 ```
 
 Explanation of parameters:

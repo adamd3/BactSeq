@@ -13,7 +13,8 @@
 
 ## News and updates
 
-- 28/09/23: Please see example contrasts table and functional enrichment file below in README. Docker and Singularity compatibility will be re-added soon. For now, the pipeline can be run using Conda.
+- 05/10/23: Docker and Singularity compatibility added.
+- 28/09/23: Please see example contrasts table and functional enrichment file below in README.
 
 ## Pipeline summary
 

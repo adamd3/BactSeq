@@ -33,6 +33,3 @@ RUN R -e 'install.packages(c(  \
 
 RUN R -e 'BiocManager::install(c("edgeR", "DESeq2", "GO.db",  \
     "Rsubread", "topGO"))'
-
-RUN R -e 'if(!require("devtools")) install.packages("devtools"); \
-    devtools::install_github("vqv/ggbiplot")' 

@@ -1,2 +1,2 @@
 *.R linguist-detectable=false
-*.python linguist-detectable=false
+*.py linguist-detectable=false

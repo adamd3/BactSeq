@@ -3,8 +3,7 @@
 library(optparse)
 library(ggplot2)
 library(RColorBrewer)
-library(ggbiplot)
-
+library(reshape2)
 
 option_list <- list(
     make_option(c("-o", "--outdir"),
@@ -60,22 +59,26 @@ meta_tab <- meta_tab[match(colnames(norm_counts), meta_tab$sample), ]
 ## ------------------------------------------------------------------------------
 pca_counts <- prcomp(t(norm_counts), center = TRUE, scale = FALSE)
 
+pca_coords <- data.frame(pca_counts$x)
+pca_coords$sample <- rownames(pca_coords)
+
+# move sample to first column
+pca_coords <- pca_coords[c(
+    "sample", colnames(pca_coords)[1:ncol(pca_coords) - 1]
+)]
+rownames(pca_coords) <- NULL
+
 ## save pca object
 saveRDS(pca_counts, file.path(outdir, "pca.rds"))
 
 ## save pca coordinates
 write.table(
-    pca_counts$x,
+    pca_coords,
     file = file.path(outdir, "pca_coords.tsv"),
-    quote = FALSE, sep = "\t", row.names = TRUE, col.names = TRUE
+    quote = FALSE, sep = "\t", row.names = FALSE, col.names = TRUE
 )
 
-
-p1 <- ggbiplot(
-    pca_counts,
-    groups = meta_tab$group,
-    var.axes = FALSE, alpha = 0, scale = 0 # , ellipse = TRUE
-) +
+p1 <- ggplot(pca_coords, aes(x = PC1, y = PC2)) +
     geom_point(
         size = 4, shape = 21, colour = "black",
         aes(fill = meta_tab$group)

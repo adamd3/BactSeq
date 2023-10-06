@@ -14,7 +14,6 @@
 ## News and updates
 
 - 06/10/23: Docker and Singularity support now working again. The pipeline will automatically pull the image from Docker Hub with default settings.
-- 06/10/23: See [test data](https://github.com/adamd3/BactSeq/tree/main/test_data) folder for example mandatory inputs for a minimal run.
 - 28/09/23: Please see example contrasts table and functional enrichment file below in README.
 
 ## Pipeline summary
@@ -79,6 +78,7 @@ Explanation of parameters:
 
 ## Required inputs
 
+- **Note**: See the [test data](https://github.com/adamd3/BactSeq/tree/main/test_data) folder for example mandatory inputs for a minimal run. Also see examples below.
 - **Genome sequence**: FASTA file containing the genome sequence. Can be retrieved from NCBI.
 - **Gene annotation file**: GFF file containing the genome annotation. Can be retrieved from NCBI.
 - **Sample file**: TSV file containing sample information. Must contain the following columns:

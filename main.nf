@@ -68,7 +68,7 @@ include {MAKE_META_FILE} from './modules/metadata'
 include {TRIMGALORE} from './modules/trim_reads'
 include {MAKE_BWA_INDEX; BWA_ALIGN; COUNT_READS} from './modules/bwa_align'
 include {MAKE_KALLISTO_IDX; KALLISTO_QUANT; MERGE_COUNTS} from './modules/kallisto'
-include {TMM_NORMALISE_COUNTS} from './modules/normalisation'
+include {NORMALISE_COUNTS} from './modules/normalisation'
 include {PCA_SAMPLES} from './modules/plots'
 include {DIFF_EXPRESSION} from './modules/diffexpr'
 include {FUNC_ENRICHMENT} from './modules/func_enrich'
@@ -227,12 +227,13 @@ workflow {
     /*
      *  Get normalised read counts per gene
      */
-    TMM_NORMALISE_COUNTS (
+    NORMALISE_COUNTS (
         ch_readcounts_df_pc,
         ch_refgene_df
     )
-    ch_cpm_counts = TMM_NORMALISE_COUNTS.out.cpm_counts
-    ch_rpkm_counts = TMM_NORMALISE_COUNTS.out.rpkm_counts
+    ch_deseq_counts = NORMALISE_COUNTS.out.deseq_counts
+    ch_cpm_counts = NORMALISE_COUNTS.out.cpm_counts
+    ch_rpkm_counts = NORMALISE_COUNTS.out.rpkm_counts
     // NB the resulting counts are log-transformed by default
 
 

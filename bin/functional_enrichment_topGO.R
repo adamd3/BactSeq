@@ -1,11 +1,8 @@
 #!/usr/bin/env Rscript
 
 library(optparse)
-library(readr)
 library(topGO)
-library(ggplot2)
-library(stringr)
-library(dplyr)
+library(tidyverse)
 library(GO.db)
 
 option_list <- list(

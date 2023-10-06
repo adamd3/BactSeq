@@ -16,19 +16,16 @@ dependencies:
   - conda-forge::r-optparse>=1.7
   - conda-forge::r-rcolorbrewer>=1
   - conda-forge::r-reshape2>=1.4
-  - conda-forge::r-ggplot2>=3.3
-  - conda-forge::r-tidyr>=1.1
   - conda-forge::r-pheatmap>=1.0
   - conda-forge::r-matrixstats>=0.6
   - conda-forge::r-ape>=5.0
-  - conda-forge::r-stringr>=1.4
   - conda-forge::r-xtable>=1.8
   - conda-forge::r-rsqlite>=2.2
   - conda-forge::r-plyr>=1.8
   - conda-forge::r-fastmap>=1.1
   - conda-forge::r-devtools>=2.4
-  - conda-forge::r-readr>=2.1
   - conda-forge::r-scales>=1.1
+  - conda-forge::r-tidyverse>=1.9
 
   ## bioconda packages
   - bioconda::fastqc>=0.11

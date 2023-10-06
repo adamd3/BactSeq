@@ -2,12 +2,10 @@
 library(optparse)
 library(Rsubread)
 library(ape)
-library(stringr)
-library(ggplot2)
+library(tidyverse)
 library(scales)
 library(RColorBrewer)
 library(reshape2)
-library(tibble)
 
 
 option_list <- list(
@@ -52,17 +50,8 @@ threads <- opt$threads
 ## Read data
 ## ------------------------------------------------------------------------------
 meta_tab <- read.table(meta_f, header = TRUE, sep = "\t")
-## columns: sample	 file1   file2	group	rep_no    paired
-
-
-## cat the counts files
-# system("cat *.counts > merged_counts.txt")
 
 total_counts_list <- lapply(meta_tab$sample, function(x) {
-    # total_counts <- read.table(paste0(x,".counts"), header = FALSE, sep = "\t")
-    # total_counts$sample <- x
-    # colnames(total_counts) <- c("chr","chr_size","mapped","blank","sample")
-    # total_counts
     mapped_count <- read.table(paste0(x, ".counts"), header = FALSE)
     colnames(mapped_count) <- "mapped"
     mapped_count$sample <- x
@@ -189,16 +178,9 @@ colnames(biotype_counts) <- all_biotypes
 counts_summary <- data.frame(
     sample = meta_tab$"sample",
     group = meta_tab$"group",
-    rep = meta_tab$"rep_no" # ,
-    # protein_coding = colSums(
-    #     gene_counts$counts[ref_gene_df$biotype=="protein_coding",]),
-    # tRNA = colSums(
-    # gene_counts$counts[ref_gene_df$biotype=="tRNA",]),
-    # rRNA = colSums(
-    #     gene_counts$counts[ref_gene_df$biotype=="rRNA",])
+    rep = meta_tab$"rep_no"
 )
 
-# counts_summary <- cbind(counts_summary,biotype_counts)
 counts_summary$rRNA <- biotype_counts$rRNA
 
 ## add total mapped counts
@@ -213,12 +195,7 @@ write.table(
 )
 
 
-
 counts_summary <- counts_summary[rev(order(counts_summary$sample)), ]
-
-
-cc1 <- 12
-
 all_biotypes <- c(all_biotypes, "other")
 non_rRNA_btypes <- all_biotypes[!all_biotypes == "rRNA"]
 
@@ -266,11 +243,11 @@ p1 <- ggplot(
     scale_y_continuous(labels = unit_format(unit = "", scale = 1e-6)) +
     ## add a dashed line at the min usable number of reads
     # geom_hline(yintercept = 5e6, linetype="dashed") +
-    theme_bw(base_size = cc1 * 1.3) +
+    theme_bw(base_size = 15) +
     theme(
         legend.position = "top",
         legend.title = element_blank(),
-        legend.text = element_text(size = cc1),
+        legend.text = element_text(size = 12),
         axis.text.x = element_text(colour = "black"),
         axis.text.y = element_text(colour = "black")
     )
@@ -335,10 +312,10 @@ p2 <- ggplot(
     ) +
     scale_colour_manual(values = ggCols, guide = FALSE) +
     scale_y_continuous(labels = comma) +
-    theme_bw(base_size = cc1 * 1.3) +
+    theme_bw(base_size = 15) +
     theme(
         legend.position = "top",
-        legend.text = element_text(size = cc1),
+        legend.text = element_text(size = 12),
         axis.text.x = element_text(colour = "black"),
         axis.text.y = element_text(colour = "black")
     )

@@ -13,7 +13,8 @@
 
 ## News and updates
 
-- 05/10/23: Docker and Singularity compatibility added.
+- 06/10/23: Docker and Singularity support now working again. The pipeline will automatically pull the image from Docker Hub with default settings.
+- 06/10/23: See [test data](https://github.com/adamd3/BactSeq/tree/main/test_data) folder for example mandatory inputs for a minimal run.
 - 28/09/23: Please see example contrasts table and functional enrichment file below in README.
 
 ## Pipeline summary
@@ -23,7 +24,7 @@ The pipeline will perform the following steps:
 1. Trim adaptors from reads ([`Trim Galore!`](https://www.bioinformatics.babraham.ac.uk/projects/trim_galore/))
 2. Read QC ([`FastQC`](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/))
 3. Align reads to reference genome ([`BWA-MEM`](https://github.com/lh3/bwa/))
-4. Size-factor scaling and gene length (RPKM) scaling of counts (TMM from [`edgeR`](http://bioconductor.org/packages/release/bioc/html/edgeR.html))
+4. Size-factor scaling and gene length (RPKM) scaling of counts (Using median-of-ratios method from [`DESeq2`](https://bioconductor.org/packages/release/bioc/html/DESeq2.html) and TMM from [`edgeR`](http://bioconductor.org/packages/release/bioc/html/edgeR.html))
 5. Principal component analysis (PCA) of normalised expression values
 6. Differential gene expression ([`DESeq2`](https://bioconductor.org/packages/release/bioc/html/DESeq2.html)) (optional)
 7. Functional enrichment of differentially expressed genes ([`topGO`](https://bioconductor.org/packages/release/bioc/html/topGO.html)) (optional)
@@ -142,8 +143,9 @@ Explanation of parameters:
 2. **read_counts** directory containing:
    1. `ref_gene_df.tsv`: table of genes in the annotation.
    2. `gene_counts.tsv`: raw read counts per gene.
-   3. `cpm_counts.tsv`: size factor scaled counts per million (CPM).
-   4. `rpkm_counts.tsv`: size factor scaled and gene length-scaled counts, expressed as reads per kilobase per million mapped reads (RPKM).
+   3. `deseq_counts.tsv`: size factor-scaled, log2 counts matrix, normalised using DESeq2.
+   4. `cpm_counts.tsv`: size factor-scaled, log2 counts per million (CPM) matrix, normalised using edgeR.
+   5. `rpkm_counts.tsv`: size factor scaled and gene length-scaled counts, expressed as reads per kilobase per million mapped reads (RPKM).
 3. **PCA_samples** directory containing principal component analysis results.
 4. **diff_expr** directory containing differential expression results.
 5. **func_enrich** directory containing functional enrichment results (optional).

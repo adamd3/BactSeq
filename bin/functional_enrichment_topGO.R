@@ -2,8 +2,11 @@
 
 library(optparse)
 library(topGO)
-library(tidyverse)
 library(GO.db)
+library(readr)
+library(ggplot2)
+library(stringr)
+library(dplyr)
 
 option_list <- list(
     make_option(c("-a", "--annot_f"),

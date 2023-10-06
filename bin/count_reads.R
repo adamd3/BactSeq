@@ -2,10 +2,12 @@
 library(optparse)
 library(Rsubread)
 library(ape)
-library(tidyverse)
+library(stringr)
+library(ggplot2)
 library(scales)
 library(RColorBrewer)
 library(reshape2)
+library(tibble)
 
 
 option_list <- list(

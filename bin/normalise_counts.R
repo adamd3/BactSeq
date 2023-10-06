@@ -61,7 +61,7 @@ dds <- estimateSizeFactors(dds)
 deseq_norm <- counts(dds, normalized = TRUE)
 deseq_df <- as_tibble(as.data.frame(log2(deseq_norm + 1)))
 deseq_df$feature_id <- rownames(deseq_df)
-deseq_df <- deseq_df[c("feature_id", meta_tab1$sample_id)]
+deseq_df <- deseq_df[c("feature_id", colData$sample_name)]
 
 write.table(
     deseq_df, file.path(outdir, "deseq_counts.tsv"),

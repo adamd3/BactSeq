@@ -3,6 +3,7 @@
 library(optparse)
 library(edgeR)
 library(tibble)
+library(DESeq2)
 
 option_list <- list(
     make_option(c("-t", "--log_transform"),

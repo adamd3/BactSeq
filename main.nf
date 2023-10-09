@@ -318,7 +318,7 @@ def helpMessage() {
     --skip_trimming [bool]          Do not trim adaptors from FastQ files.
     --strandedness [str]            Is data stranded? Options: `unstranded`, `forward`, `reverse`. Default = reverse.
     -name [str]                     Name for the pipeline run. If not specified, Nextflow will automatically generate a random mnemonic.
-    -resume                        Re-start the pipeline if it has been previously run.
+    -resume                         Re-start the pipeline if it has been previously run.
 
     """.stripIndent()
 }

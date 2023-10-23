@@ -9,10 +9,10 @@ library(plyr)
 library(tibble)
 
 if (!require("EnhancedVolcano")) {
-    if (!require("devtools", quietly = TRUE)) {
-        install.packages("devtools")
+    if (!require("BiocManager", quietly = TRUE)) {
+        install.packages("BiocManager")
     }
-    devtools::install_github("kevinblighe/EnhancedVolcano")
+    BiocManager::install("EnhancedVolcano")
     library(EnhancedVolcano)
 }
 
@@ -64,7 +64,7 @@ contrast_tab <- read.table(
     header = TRUE, sep = "\t", stringsAsFactors = FALSE
 )
 contrast_tab <- data.frame(
-    apply(contrast_tab, 2, function(x) gsub("\\s+", "", x))
+    rbind(apply(contrast_tab, 2, function(x) gsub("\\s+", "", x)))
 )
 
 

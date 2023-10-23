@@ -6,8 +6,15 @@ library(ggplot2)
 library(RColorBrewer)
 library(RSQLite)
 library(plyr)
-library(EnhancedVolcano)
 library(tibble)
+
+if (!require("EnhancedVolcano")) {
+    if (!require("BiocManager", quietly = TRUE)) {
+        install.packages("BiocManager")
+    }
+    BiocManager::install("EnhancedVolcano")
+    library(EnhancedVolcano)
+}
 
 option_list <- list(
     make_option(c("-p", "--p_threshold"),

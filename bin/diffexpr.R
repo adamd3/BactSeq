@@ -9,10 +9,10 @@ library(plyr)
 library(tibble)
 
 if (!require("EnhancedVolcano")) {
-    if (!require("BiocManager", quietly = TRUE)) {
-        install.packages("BiocManager")
+    if (!require("devtools", quietly = TRUE)) {
+        install.packages("devtools")
     }
-    BiocManager::install("EnhancedVolcano")
+    devtools::install_github("kevinblighe/EnhancedVolcano")
     library(EnhancedVolcano)
 }
 

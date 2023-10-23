@@ -37,3 +37,4 @@ dependencies:
   - bioconda::bioconductor-topgo>=2.00
   - bioconda::bioconductor-go.db>=3.00
   - bioconda::bioconductor-rsubread>=2.00
+  - bioconda::bioconductor-enhancedvolcano>=1.00

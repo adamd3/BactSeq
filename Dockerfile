@@ -32,4 +32,4 @@ RUN R -e 'install.packages(c(  \
     "plyr", "rsqlite", "umap", "xtable", "BiocManager"))'
 
 RUN R -e 'BiocManager::install(c("edgeR", "DESeq2", "GO.db",  \
-    "Rsubread", "topGO"))'
+    "Rsubread", "topGO", "EnhancedVolcano"))'

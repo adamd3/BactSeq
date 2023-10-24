@@ -1,9 +1,4 @@
-############################################################
-## Dockerfile for BactSeq
-############################################################
-
-FROM ubuntu:22.04
-LABEL maintainer="Adam Dinan <ad866@cam.ac.uk>"
+FROM ubuntu:latest
 
 ARG DEBIAN_FRONTEND=noninteractive
 
@@ -15,7 +10,7 @@ COPY requirements.txt /tmp
 WORKDIR /tmp
 
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends ca-certificates \
+    apt-get install -y --no-install-recommends ca-certificates libcairo2-dev \
     curl libssl-dev libcurl4-openssl-dev libxml2-dev libfontconfig1-dev \
     python3-numpy python3-pip gawk pigz r-base-dev fastqc \
     trim-galore samtools bwa kallisto && \

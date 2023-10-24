@@ -73,6 +73,8 @@ counts_tab[["feature_id"]] <- NULL
 counts_tab <- as.data.frame(sapply(counts_tab, as.numeric))
 rownames(counts_tab) <- gene_names
 
+meta_tab$group <- gsub("\\-", ".", meta_tab$group)
+meta_tab$sample <- gsub("\\-", ".", meta_tab$sample)
 
 ## factorise group column
 meta_tab$group <- as.factor(as.character(meta_tab$group))

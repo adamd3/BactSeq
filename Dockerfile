@@ -1,4 +1,5 @@
-FROM ubuntu:latest
+FROM ubuntu:22.04
+LABEL maintainer="Adam Dinan <ad866@cam.ac.uk>"
 
 ARG DEBIAN_FRONTEND=noninteractive
 
@@ -10,7 +11,7 @@ COPY requirements.txt /tmp
 WORKDIR /tmp
 
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends ca-certificates libcairo2-dev \
+    apt-get install -y --no-install-recommends ca-certificates  \
     curl libssl-dev libcurl4-openssl-dev libxml2-dev libfontconfig1-dev \
     python3-numpy python3-pip gawk pigz r-base-dev fastqc \
     trim-galore samtools bwa kallisto && \
@@ -27,4 +28,7 @@ RUN R -e 'install.packages(c(  \
     "plyr", "rsqlite", "umap", "xtable", "BiocManager"))'
 
 RUN R -e 'BiocManager::install(c("edgeR", "DESeq2", "GO.db",  \
-    "Rsubread", "topGO", "EnhancedVolcano"))'
+    "Rsubread", "topGO"))'
+
+RUN R -e 'if(!require("devtools")) install.packages("devtools"); \
+    devtools::install_github("kevinblighe/EnhancedVolcano")' 

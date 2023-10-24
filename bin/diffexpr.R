@@ -76,6 +76,9 @@ rownames(counts_tab) <- gene_names
 meta_tab$group <- gsub("\\-", ".", meta_tab$group)
 meta_tab$sample <- gsub("\\-", ".", meta_tab$sample)
 
+contrast_tab$Condition1 <- gsub("\\-", ".", contrast_tab$Condition1)
+contrast_tab$Condition2 <- gsub("\\-", ".", contrast_tab$Condition2)
+
 ## factorise group column
 meta_tab$group <- as.factor(as.character(meta_tab$group))
 

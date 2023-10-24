@@ -12,7 +12,7 @@ WORKDIR /tmp
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends ca-certificates  \
-    build-essential libcurl4-gnutls-dev \
+    build-essential \
     curl libssl-dev libcurl4-openssl-dev libxml2-dev libfontconfig1-dev \
     python3-numpy python3-pip gawk pigz r-base-dev fastqc \
     trim-galore samtools bwa kallisto && \

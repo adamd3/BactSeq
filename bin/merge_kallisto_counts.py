@@ -41,7 +41,7 @@ def merge_counts(
     gene_lengths = gene_lengths.rename(columns={"feature_id": "locus_tag"})
     quant_merged = quant_merged[["feature_id"] + metadata["sample"].tolist()]
     # export merged counts
-    outf1 = os.path.join(out_dir, "gene_counts.tsv")
+    outf1 = os.path.join(out_dir, "gene_counts1.tsv")
     quant_merged.to_csv(outf1, index=False, sep="\t")
     # # gene annotation df for extracting protein-coding genes
     # annot_dat = (gffpd.read_gff3(gff_f)).df

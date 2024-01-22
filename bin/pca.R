@@ -57,8 +57,6 @@ meta_tab$group <- as.factor(as.character(meta_tab$group))
 ## order rows to match counts columns
 meta_tab <- meta_tab[match(colnames(norm_counts), meta_tab$sample), ]
 
-cat(colnames(norm_counts), file = stderr())
-cat(dim(norm_counts), file = stderr())
 
 
 ## ------------------------------------------------------------------------------
@@ -66,15 +64,8 @@ cat(dim(norm_counts), file = stderr())
 ## ------------------------------------------------------------------------------
 pca_counts <- prcomp(t(norm_counts), center = TRUE, scale = FALSE)
 
-cat(colnames(pca_counts), file = stderr())
-cat(dim(pca_counts), file = stderr())
-
 pca_coords <- data.frame(pca_counts$x)
 pca_coords$sample <- rownames(pca_coords)
-
-cat(colnames(pca_coords), file = stderr())
-cat(dim(pca_coords), file = stderr())
-
 
 # move sample to first column
 pca_coords <- pca_coords[c(

@@ -38,6 +38,9 @@ ref_gene_tab <- read.csv(
 gene_names <- counts_tab[["feature_id"]]
 counts_tab[["feature_id"]] <- NULL
 counts_tab <- as.data.frame(sapply(counts_tab, as.numeric))
+
+print(head(counts_tab))
+print(length(gene_names))
 rownames(counts_tab) <- gene_names
 
 # ## remove rRNA genes

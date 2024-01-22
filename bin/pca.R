@@ -69,10 +69,8 @@ pca_counts <- prcomp(t(norm_counts), center = TRUE, scale = FALSE)
 cat(colnames(pca_counts), file = stderr())
 cat(dim(pca_counts), file = stderr())
 
-
 pca_coords <- data.frame(pca_counts$x)
 pca_coords$sample <- rownames(pca_coords)
-
 
 cat(colnames(pca_coords), file = stderr())
 cat(dim(pca_coords), file = stderr())

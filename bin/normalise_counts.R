@@ -2,7 +2,7 @@
 
 library(optparse)
 library(edgeR)
-library(tibble)
+library(tidyverse)
 library(DESeq2)
 
 option_list <- list(
@@ -24,23 +24,26 @@ log <- if (opt$log_transform == "TRUE") TRUE else FALSE
 outdir <- opt$outdir
 
 ## Read data
-counts_tab <- read.csv(
-    "gene_counts_pc.tsv",
-    header = TRUE, na.strings = c("", "NA"), sep = "\t",
-    stringsAsFactors = FALSE
-)
-ref_gene_tab <- read.csv(
-    "ref_gene_df.tsv",
-    header = TRUE, na.strings = c("", "NA"), sep = "\t",
-    stringsAsFactors = FALSE
-)
+# counts_tab <- read.csv(
+#     "gene_counts_pc.tsv",
+#     header = TRUE, na.strings = c("", "NA"), sep = "\t",
+#     stringsAsFactors = FALSE
+# )
+# ref_gene_tab <- read.csv(
+#     "ref_gene_df.tsv",
+#     header = TRUE, na.strings = c("", "NA"), sep = "\t",
+#     stringsAsFactors = FALSE
+# )
+
+counts_tab <- read_tsv("gene_counts_pc.tsv")
+ref_gene_tab <- read_tsv("ref_gene_df.tsv")
 
 gene_names <- counts_tab[["feature_id"]]
 counts_tab[["feature_id"]] <- NULL
-counts_tab <- as.data.frame(sapply(counts_tab, as.numeric))
+# counts_tab <- as.data.frame(sapply(counts_tab, as.numeric))
 
-print(head(counts_tab))
-print(length(gene_names))
+counts_tab <- as.data.frame(counts_tab)
+
 rownames(counts_tab) <- gene_names
 
 # ## remove rRNA genes

@@ -44,6 +44,7 @@ rownames(counts_tab) <- gene_names
 # ref_tab_sub <- ref_gene_tab[!ref_gene_tab$biotype == "rRNA", ]
 # non_rRNA_counts <- counts_tab[rownames(counts_tab) %in% ref_tab_sub$locus_tag, ]
 ref_tab_sub <- ref_gene_tab
+non_rRNA_counts <- counts_tab
 
 ## ensure that ref gene annotations order matches counts table
 ref_tab_sub <- ref_tab_sub[match(

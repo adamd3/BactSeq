@@ -214,11 +214,12 @@ workflow {
          */
         MERGE_COUNTS (
             ch_kallisto_out_dirs,
-            ch_gff_file,
+            // ch_gff_file,
             ch_metadata
         )
-        ch_readcounts_df = MERGE_COUNTS.out.counts_df
-        ch_readcounts_df_pc = MERGE_COUNTS.out.counts_df_pc
+        // ch_readcounts_df = MERGE_COUNTS.out.counts_df
+        // ch_readcounts_df_pc = MERGE_COUNTS.out.counts_df_pc
+        ch_readcounts_df_pc = MERGE_COUNTS.out.counts_df
         ch_refgene_df = MERGE_COUNTS.out.ref_gene_df
 
 

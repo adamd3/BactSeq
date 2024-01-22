@@ -39,13 +39,13 @@ nextflow run BactSeq --data_dir [dir] --sample_file [file] --ref_genome [file] -
 Mandatory arguments:
   --data_dir [file]               Path to directory containing FastQ files.
   --ref_genome [file]             Path to FASTA file containing reference genome sequence (bwa) or multi-FASTA file containing coding gene sequences (kallisto).
-  --ref_ann [file]                Path to GFF file containing reference genome annotation.
   --sample_file [file]            Path to file containing sample information.
   -profile [str]                  Configuration profile to use.
                                   Available: conda, docker, singularity.
 
 Other options:
   --aligner [str]                 (Pseudo-)aligner to be used. Options: `bwa`, `kallisto`. Default = bwa.
+  --ref_ann [file]                Path to GFF file containing reference genome annotation. Required only if bwa aligner used.
   --cont_tabl [file]              Path to tsv file containing contrasts to be performed for differential expression.
   --fragment_len [str]            Estimated average fragment length for kallisto transcript quantification (only required for single-end reads). Default = 150.
   --fragment_sd [str]             Estimated standard deviation of fragment length for kallisto transcript quantification (only required for single-end reads). Default = 20.

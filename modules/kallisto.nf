@@ -65,7 +65,7 @@ process MERGE_COUNTS {
 
     input:
     path kallisto_dirs
-    path gff
+    // path gff
     path meta
 
     output:
@@ -77,8 +77,12 @@ process MERGE_COUNTS {
     """
     merge_kallisto_counts.py \
         --metadata_f=$meta \
-        --gff_f=$gff \
         --out_dir="./"
+
+    #merge_kallisto_counts.py \
+    #    --metadata_f=$meta \
+    #    --gff_f=$gff \
+    #    --out_dir="./"
     """
 }
 

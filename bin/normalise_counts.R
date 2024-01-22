@@ -2,7 +2,8 @@
 
 library(optparse)
 library(edgeR)
-library(tidyverse)
+library(readr)
+library(tibble)
 library(DESeq2)
 
 option_list <- list(

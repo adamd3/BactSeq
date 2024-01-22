@@ -43,6 +43,7 @@ colpal_large <- c(brewer.pal(9, "Set1"), colpal_large)
 # )
 
 norm_counts <- read_tsv(counts_f)
+meta_tab <- read_tsv(meta_f)
 
 
 gene_names <- norm_counts[["feature_id"]]

@@ -4,6 +4,8 @@ library(optparse)
 library(ggplot2)
 library(RColorBrewer)
 library(reshape2)
+library(readr)
+library(tibble)
 
 option_list <- list(
     make_option(c("-o", "--outdir"),
@@ -31,19 +33,21 @@ colpal_large <- c(brewer.pal(9, "Set1"), colpal_large)
 ## ------------------------------------------------------------------------------
 ## Read and process data
 ## ------------------------------------------------------------------------------
-norm_counts <- read.table(
-    counts_f,
-    header = TRUE, sep = "\t", stringsAsFactors = FALSE
-)
-meta_tab <- read.table(
-    meta_f,
-    header = TRUE, sep = "\t", stringsAsFactors = FALSE
-)
+# norm_counts <- read.table(
+#     counts_f,
+#     header = TRUE, sep = "\t", stringsAsFactors = FALSE
+# )
+# meta_tab <- read.table(
+#     meta_f,
+#     header = TRUE, sep = "\t", stringsAsFactors = FALSE
+# )
+
+norm_counts <- read_tsv(counts_f)
 
 
 gene_names <- norm_counts[["feature_id"]]
 norm_counts[["feature_id"]] <- NULL
-norm_counts <- as.data.frame(sapply(norm_counts, as.numeric))
+norm_counts <- as.data.frame(norm_counts)
 rownames(norm_counts) <- gene_names
 
 ## factorise group

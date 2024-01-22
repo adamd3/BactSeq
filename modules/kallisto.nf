@@ -79,10 +79,6 @@ process MERGE_COUNTS {
         --metadata_f=$meta \
         --out_dir="./"
 
-    #merge_kallisto_counts.py \
-    #    --metadata_f=$meta \
-    #    --gff_f=$gff \
-    #    --out_dir="./"
     """
 }
 

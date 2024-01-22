@@ -38,11 +38,12 @@ if (params.ref_genome) {
     ch_fasta_file = file(params.ref_genome, checkIfExists: true)
 } else { exit 1, 'Reference genome FASTA file not specified!' }
 
-if (params.ref_ann) {
-    ch_gff_file = file(params.ref_ann, checkIfExists: true)
-} else { exit 1, 'Reference genome GFF file not specified!' }
 
 // optional inputs
+if (params.ref_ann) {
+    ch_gff_file = file(params.ref_ann, checkIfExists: true)
+}
+
 if (params.cont_tabl) {
     ch_cont_file = file(params.cont_tabl, checkIfExists: true)
 }

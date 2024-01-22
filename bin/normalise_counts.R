@@ -36,7 +36,7 @@ outdir <- opt$outdir
 #     stringsAsFactors = FALSE
 # )
 
-counts_tab <- read_tsv("gene_counts_pc.tsv")
+counts_tab <- read_tsv("gene_counts_pc1.tsv")
 ref_gene_tab <- read_tsv("ref_gene_df.tsv")
 
 gene_names <- counts_tab[["feature_id"]]

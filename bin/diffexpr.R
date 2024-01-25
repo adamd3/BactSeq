@@ -61,8 +61,11 @@ meta_tab <- read.table(
 )
 contrast_tab <- read.table(
     cont_tab_f,
-    header = TRUE, sep = "\t", stringsAsFactors = FALSE
+    header = TRUE, sep = "\t", stringsAsFactors = FALSE,
+    colClasses = rep("character", 2)
 )
+
+# remove whitespace
 contrast_tab <- data.frame(
     rbind(apply(contrast_tab, 2, function(x) gsub("\\s+", "", x)))
 )

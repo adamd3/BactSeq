@@ -86,8 +86,10 @@ contrast_tab$Condition2 <- gsub("\\-", ".", contrast_tab$Condition2)
 meta_tab$group <- as.factor(as.character(meta_tab$group))
 
 ## order rows to match counts columns
-meta_tab <- meta_tab[match(colnames(counts_tab), meta_tab$sample), ]
-
+meta_tab <- meta_tab[match(
+    colnames(counts_tab), make.names(meta_tab$sample)
+), ]
+rownames(meta_tab) <- make.names(meta_tab$sample)
 
 ## ------------------------------------------------------------------------------
 ## Differential gene expression
@@ -130,7 +132,9 @@ contrast_list <- lapply(comb_list, function(x) {
 ## export tables of genes with log2FC and p-values:
 lapply(seq_along(contrast_list), function(x) {
     contrast_name <- names(contrast_list)[x]
-    res_df <- tibble::rownames_to_column(as.data.frame(contrast_list[x]), "feature_id")
+    res_df <- tibble::rownames_to_column(
+        as.data.frame(contrast_list[x]), "feature_id"
+    )
     colnames(res_df) <- gsub(contrast_name, "", colnames(res_df))
     colnames(res_df) <- gsub("\\.", "", colnames(res_df))
     write.table(
@@ -171,7 +175,10 @@ set1pal <- brewer.pal(9, "Set1")
 lapply(seq_along(contrast_list), function(x) {
     ymin <- 0
     ymax <- max(-log10(
-        subset(contrast_list[[x]], padj < p_thresh & log2FoldChange > l2fc_thresh)$padj
+        subset(
+            contrast_list[[x]],
+            padj < p_thresh & log2FoldChange > l2fc_thresh
+        )$padj
     ))
     xmin <- round_any(
         min(unlist(subset(
@@ -193,18 +200,27 @@ lapply(seq_along(contrast_list), function(x) {
 
     ## show gene labels where the log2FoldChange exceeds a certain threshold:
     keepLabs <- rownames(
-        subset(contrast_list[[x]], padj < p_thresh & (abs(log2FoldChange) > xmax * 0.9))
+        subset(
+            contrast_list[[x]],
+            padj < p_thresh & (abs(log2FoldChange) > xmax * 0.9)
+        )
     )
     keepLabs <- c(keepLabs, rownames(
-        subset(contrast_list[[x]], padj < p_thresh & (abs(-log10(padj)) > ymax * 0.5))
+        subset(
+            contrast_list[[x]],
+            padj < p_thresh & (abs(-log10(padj)) > ymax * 0.5)
+        )
     ))
 
     ## Custom colour scheme
     keyvals <- ifelse(
-        contrast_list[[x]]$log2FoldChange < (l2fc_thresh * -1) & contrast_list[[x]]$padj < p_thresh,
+        contrast_list[[x]]$log2FoldChange < (
+            l2fc_thresh * -1) & contrast_list[[x]]$padj < p_thresh,
         set1pal[3],
         ifelse(
-            contrast_list[[x]]$log2FoldChange > l2fc_thresh & contrast_list[[x]]$padj < p_thresh,
+            contrast_list[[x]]$log2FoldChange > l2fc_thresh & contrast_list[[
+                x
+            ]]$padj < p_thresh,
             set1pal[1], "grey45"
         )
     )
@@ -246,7 +262,9 @@ lapply(seq_along(contrast_list), function(x) {
 
     ggsave(
         volcano_plot,
-        file = file.path(outdir, paste0("volcano_plot_", names(contrast_list)[x], ".png")),
+        file = file.path(outdir, paste0("volcano_plot_", names(
+            contrast_list
+        )[x], ".png")),
         device = "png", units = "in",
         width = 8, height = 7, dpi = 300
     )

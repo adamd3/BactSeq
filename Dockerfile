@@ -1,35 +1,17 @@
-FROM ubuntu:22.04
+FROM continuumio/miniconda3
 LABEL maintainer="Adam Dinan <ad866@cam.ac.uk>"
 
-ARG DEBIAN_FRONTEND=noninteractive
+WORKDIR /app
 
-ENV PYTHON_VERSION=3.8.5
+COPY environment.yml .
 
-ADD https://raw.githubusercontent.com/adamd3/BactSeq/main/requirements.txt .
+RUN conda env create -f environment.yml
 
-COPY requirements.txt /tmp
-WORKDIR /tmp
+RUN echo "source activate $(grep -m 1 -E 'name: *' environment.yml | cut -d' ' -f2)" \
+    > ~/.bashrc
 
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends ca-certificates  \
-    build-essential \
-    curl libssl-dev libcurl4-openssl-dev libxml2-dev libfontconfig1-dev \
-    python3-numpy python3-pip gawk pigz r-base-dev fastqc \
-    trim-galore samtools bwa kallisto && \
-    apt-get clean autoclean
+SHELL ["conda", "run", "-n", \
+    "$(grep -m 1 -E 'name: *' environment.yml | cut -d' ' -f2)", "/bin/bash", "-c"]
 
-RUN pip install --no-cache-dir -r requirements.txt
-
-RUN echo "r <- getOption('repos'); r['CRAN'] <- 'http://cran.rstudio.com'; \
-    options(repos = r);" > ~/.Rprofile
-
-RUN R -e 'install.packages(c(  \
-    "optparse", "fastmap", "RColorBrewer", "reshape2", \
-    "tidyverse", "ape", "scales", "pheatmap", "matrixstats",  \
-    "plyr", "rsqlite", "umap", "xtable", "BiocManager"))'
-
-RUN R -e 'BiocManager::install(c("edgeR", "DESeq2", "GO.db",  \
-    "Rsubread", "topGO"))'
-
-RUN R -e 'if(!require("remotes")) install.packages("remotes"); \
-    remotes::install_github("kevinblighe/EnhancedVolcano")' 
+# Open a shell by default when the container is run interactively
+ENTRYPOINT ["bash"]

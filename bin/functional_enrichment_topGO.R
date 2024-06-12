@@ -52,7 +52,7 @@ down_col <- "#7FC97F"
 ## ------------------------------------------------------------------------------
 ## Read + process data
 ## ------------------------------------------------------------------------------
-dge_files <- dir(path = "./", pattern = "\\.tsv$")
+dge_files <- dir(path = "./", pattern = "^DGE_.*\\.tsv$")
 
 
 in_dat <- read_csv(annot_f, show_col_types = FALSE)
@@ -96,14 +96,15 @@ names(term_genes_list) <- all_terms
 ## ------------------------------------------------------------------------------
 
 lapply(dge_files, function(res_f) {
-    print(res_f)
+    # print(res_f)
 
     res_tab <- na.omit(read_tsv(res_f))
 
     all_genes <- res_tab[["feature_id"]]
 
 
-    label <- sub(pattern = "(.*)\\..*$", replacement = "\\1", basename(file.path(res_f)))
+    label <- sub(
+        pattern = "(.*)\\..*$", replacement = "\\1", basename(file.path(res_f)))
 
     ## get up/down-regulated genes
     padj_col <- colnames(res_tab)[grepl("padj", colnames(res_tab))]

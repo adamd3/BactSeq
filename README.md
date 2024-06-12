@@ -13,6 +13,7 @@
 
 ## News and updates
 
+- 12/06/24: Dockerfile updated to install environment from yml. There were issues with installing a couple of R packages in the previous version.
 - 06/10/23: Docker and Singularity support now working again. The pipeline will automatically pull the image from Docker Hub with default settings.
 - 28/09/23: Please see example contrasts table and functional enrichment file below in README.
 

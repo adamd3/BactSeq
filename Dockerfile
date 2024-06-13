@@ -7,10 +7,9 @@ COPY environment.yml .
 
 RUN conda env create -f environment.yml
 
-RUN echo "source activate $(grep -m 1 -E '^name: *' environment.yml | cut -d' ' -f2)" \
-    > ~/.bashrc
+RUN ENV_NAME=$(grep -m 1 -E '^name: *' environment.yml | cut -d' ' -f2) && \
+    echo "source activate $ENV_NAME" > ~/.bashrc
 
 SHELL ["/bin/bash", "-c"]
 
-# Open a shell by default when the container is run interactively
-ENTRYPOINT ["bash", "-l"]
+ENTRYPOINT ["bash", "-l", "-c", "source ~/.bashrc && bash"]

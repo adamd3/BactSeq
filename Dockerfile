@@ -8,7 +8,7 @@ COPY environment.yml .
 RUN conda env create -f environment.yml
 
 RUN ENV_NAME=$(grep -m 1 -E '^name: *' environment.yml | cut -d' ' -f2) && \
-    echo "source activate $ENV_NAME" > ~/.bashrc
+    echo "conda activate $ENV_NAME" > ~/.bashrc
 
 SHELL ["/bin/bash", "-c"]
 

@@ -1,15 +1,34 @@
 FROM continuumio/miniconda3
 
-ENV PATH=/opt/conda/envs/bact_seq-1.0.0/bin:$PATH
-ENV LC_ALL=C.UTF-8
-ENV LANG=C.UTF-8
+RUN conda install -c conda-forge -c bioconda -c defaults \
+    conda-forge::numpy>=1.21 \
+    conda-forge::python>=3.7,<3.9 \
+    conda-forge::gawk>=5.1 \
+    conda-forge::pigz>=2.3 \
+    conda-forge::pandas>=1.4 \
+    conda-forge::r-base>=3.6 \
+    conda-forge::r-optparse>=1.7 \
+    conda-forge::r-rcolorbrewer>=1 \
+    conda-forge::r-reshape2>=1.4 \
+    conda-forge::r-pheatmap>=1.0 \
+    conda-forge::r-matrixstats>=0.6 \
+    conda-forge::r-ape>=5.0 \
+    conda-forge::r-xtable>=1.8 \
+    conda-forge::r-rsqlite>=2.2 \
+    conda-forge::r-plyr>=1.8 \
+    conda-forge::r-fastmap>=1.1 \
+    conda-forge::r-devtools>=2.4 \
+    conda-forge::r-scales>=1.1 \
+    conda-forge::r-tidyverse>=1.9 \
+    bioconda::fastqc>=0.11 \
+    bioconda::trim-galore>=0.6 \
+    bioconda::bwa>=0.7 \
+    bioconda::samtools>=1.15 \
+    bioconda::bioconductor-edger>=3.36 \
+    bioconda::bioconductor-deseq2>=1.34 \
+    bioconda::bioconductor-topgo>=2.00 \
+    bioconda::bioconductor-go.db>=3.00 \
+    bioconda::bioconductor-rsubread>=2.00 \
+    bioconda::bioconductor-enhancedvolcano>=1.00
 
-RUN echo ". /opt/conda/etc/profile.d/conda.sh" >> ~/.bashrc && \
-    echo "source activate bact_seq-1.0.0" >> ~/.bashrc && \
-    git clone https://github.com/adamd3/BactSeq.git && \
-    /opt/conda/bin/conda env create -f BactSeq/environment.yml && \
-    rm -rf BactSeq
-
-ENTRYPOINT ["bash", "-c"]
-
-CMD ["exec \"$@\""]
+WORKDIR /data/

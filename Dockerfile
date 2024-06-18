@@ -1,15 +1,15 @@
 FROM continuumio/miniconda3
-LABEL maintainer="Adam Dinan <ad866@cam.ac.uk>"
 
-WORKDIR /app
+ENV PATH=/opt/conda/envs/bact_seq-1.0.0/bin:$PATH
+ENV LC_ALL=C.UTF-8
+ENV LANG=C.UTF-8
 
-COPY environment.yml .
+RUN echo ". /opt/conda/etc/profile.d/conda.sh" >> ~/.bashrc && \
+    echo "source activate bact_seq-1.0.0" >> ~/.bashrc && \
+    git clone https://github.com/adamd3/BactSeq.git && \
+    /opt/conda/bin/conda env create -f BactSeq/environment.yml && \
+    rm -rf BactSeq
 
-RUN conda env create -f environment.yml
+ENTRYPOINT ["bash", "-c"]
 
-RUN ENV_NAME=$(grep -m 1 -E '^name: *' environment.yml | cut -d' ' -f2) && \
-    echo "conda activate $ENV_NAME" > ~/.bashrc
-
-SHELL ["/bin/bash", "-c"]
-
-ENTRYPOINT ["bash", "-l", "-c", "source ~/.bashrc && bash"]
+CMD ["exec \"$@\""]

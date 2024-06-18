@@ -1,34 +1,38 @@
 FROM continuumio/miniconda3
 
-RUN conda install -c conda-forge -c bioconda -c defaults \
-    conda-forge::numpy>=1.21 \
-    conda-forge::python>=3.7,<3.9 \
-    conda-forge::gawk>=5.1 \
-    conda-forge::pigz>=2.3 \
-    conda-forge::pandas>=1.4 \
-    conda-forge::r-base>=3.6 \
-    conda-forge::r-optparse>=1.7 \
-    conda-forge::r-rcolorbrewer>=1 \
-    conda-forge::r-reshape2>=1.4 \
-    conda-forge::r-pheatmap>=1.0 \
-    conda-forge::r-matrixstats>=0.6 \
-    conda-forge::r-ape>=5.0 \
-    conda-forge::r-xtable>=1.8 \
-    conda-forge::r-rsqlite>=2.2 \
-    conda-forge::r-plyr>=1.8 \
-    conda-forge::r-fastmap>=1.1 \
-    conda-forge::r-devtools>=2.4 \
-    conda-forge::r-scales>=1.1 \
-    conda-forge::r-tidyverse>=1.9 \
-    bioconda::fastqc>=0.11 \
-    bioconda::trim-galore>=0.6 \
-    bioconda::bwa>=0.7 \
-    bioconda::samtools>=1.15 \
-    bioconda::bioconductor-edger>=3.36 \
-    bioconda::bioconductor-deseq2>=1.34 \
-    bioconda::bioconductor-topgo>=2.00 \
-    bioconda::bioconductor-go.db>=3.00 \
-    bioconda::bioconductor-rsubread>=2.00 \
-    bioconda::bioconductor-enhancedvolcano>=1.00
+RUN conda config --add channels conda-forge \
+    && conda config --add channels bioconda \
+    && conda config --add channels defaults
+
+RUN conda install -y \
+    numpy>=1.21 \
+    python>=3.7,<3.9 \
+    gawk>=5.1 \
+    pigz>=2.3 \
+    pandas>=1.4 \
+    r-base>=3.6 \
+    r-optparse>=1.7 \
+    r-rcolorbrewer>=1 \
+    r-reshape2>=1.4 \
+    r-pheatmap>=1.0 \
+    r-matrixstats>=0.6 \
+    r-ape>=5.0 \
+    r-xtable>=1.8 \
+    r-rsqlite>=2.2 \
+    r-plyr>=1.8 \
+    r-fastmap>=1.1 \
+    r-devtools>=2.4 \
+    r-scales>=1.1 \
+    r-tidyverse>=1.9 \
+    fastqc>=0.11 \
+    trim-galore>=0.6 \
+    bwa>=0.7 \
+    samtools>=1.15 \
+    bioconductor-edger>=3.36 \
+    bioconductor-deseq2>=1.34 \
+    bioconductor-topgo>=2.00 \
+    bioconductor-go.db>=3.00 \
+    bioconductor-rsubread>=2.00 \
+    bioconductor-enhancedvolcano>=1.00
 
 WORKDIR /data/

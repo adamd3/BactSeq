@@ -1,19 +1,16 @@
 FROM continuumio/miniconda3
 
-ENV PATH=/opt/conda/envs/bact_seq-1.0.0/bin:$PATH
-ENV LC_ALL=C.UTF-8
-ENV LANG=C.UTF-8
+WORKDIR /app
 
-RUN useradd -m -s /bin/bash nextflow_user
-USER nextflow_user
-WORKDIR /home/nextflow_user
+COPY environment.yml /app
 
-COPY environment.yml .
+RUN conda env create -f environment.yml
 
-RUN conda env create -f environment.yml && conda clean -a
+RUN echo "conda activate bact_seq-1.0.0" >> ~/.bashrc
+ENV PATH /opt/conda/envs/bact_seq-1.0.0/bin:$PATH
 
-SHELL ["conda", "run", "-n", "bact_seq-1.0.0", "/bin/bash", "-c"]
+SHELL ["/bin/bash", "-c"]
 
-ENTRYPOINT ["conda", "run", "-n", "bact_seq-1.0.0", "/bin/bash", "-c"]
+COPY . /app
 
-CMD ["bash"]
+ENTRYPOINT ["bash", "-c", "source activate bact_seq-1.0.0 && exec bash"]

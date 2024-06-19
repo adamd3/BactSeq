@@ -8,12 +8,12 @@ RUN useradd -m -s /bin/bash nextflow_user
 USER nextflow_user
 WORKDIR /home/nextflow_user
 
-RUN echo ". /opt/conda/etc/profile.d/conda.sh" >> ~/.bashrc && \
-    echo "source activate bact_seq-1.0.0" >> ~/.bashrc && \
-    git clone https://github.com/adamd3/BactSeq.git && \
-    /opt/conda/bin/conda env create -f BactSeq/environment.yml && \
-    rm -rf BactSeq
+COPY environment.yml .
 
-ENTRYPOINT ["/bin/bash", "-l", "-c"]
+RUN conda env create -f environment.yml && conda clean -a
+
+SHELL ["conda", "run", "-n", "bact_seq-1.0.0", "/bin/bash", "-c"]
+
+ENTRYPOINT ["conda", "run", "-n", "bact_seq-1.0.0", "/bin/bash", "-c"]
 
 CMD ["bash"]

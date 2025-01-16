@@ -1,17 +1,16 @@
 FROM continuumio/miniconda3
-LABEL maintainer="Adam Dinan <ad866@cam.ac.uk>"
 
 WORKDIR /app
 
-COPY environment.yml .
+COPY environment.yml /app
 
 RUN conda env create -f environment.yml
 
-RUN echo "source activate $(grep -m 1 -E 'name: *' environment.yml | cut -d' ' -f2)" \
-    > ~/.bashrc
+RUN echo "conda activate bact_seq-1.0.0" >> ~/.bashrc
+ENV PATH /opt/conda/envs/bact_seq-1.0.0/bin:$PATH
 
-SHELL ["conda", "run", "-n", \
-    "$(grep -m 1 -E 'name: *' environment.yml | cut -d' ' -f2)", "/bin/bash", "-c"]
+SHELL ["/bin/bash", "-c"]
 
-# Open a shell by default when the container is run interactively
-ENTRYPOINT ["bash"]
+COPY . /app
+
+ENTRYPOINT ["bash", "-c", "source activate bact_seq-1.0.0 && exec bash"]

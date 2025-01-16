@@ -72,13 +72,13 @@ ref_annot <- subset(ref_annot, type == "gene")
 
 gene_attr <- stringr::str_split(ref_annot$attributes, ";")
 locus_tags <- unlist(lapply(gene_attr, function(x) {
-    x[grepl("locus_tag", x)]
+    x[grepl("^locus_tag", x)]
 }))
 gene_biotypes <- unlist(lapply(gene_attr, function(x) {
-    x[grepl("gene_biotype", x)]
+    x[grepl("^gene_biotype", x)]
 }))
 common_gene_names <- unlist(lapply(gene_attr, function(x) {
-    x <- x[grepl("gene=", x)]
+    x <- x[grepl("^gene=", x)]
     x[identical(x, character(0))] <- ""
     x
 }))
@@ -90,9 +90,9 @@ ref_gene_df <- data.frame(
     gene_name = common_gene_names,
     gene_length = gene_lengths
 )
-ref_gene_df$locus_tag <- gsub("locus_tag=", "", ref_gene_df$locus_tag)
-ref_gene_df$biotype <- gsub("gene_biotype=", "", ref_gene_df$biotype)
-ref_gene_df$gene_name <- gsub("gene=", "", ref_gene_df$gene_name)
+ref_gene_df$locus_tag <- sub("^.*=", "", ref_gene_df$locus_tag)
+ref_gene_df$biotype <- sub("^.*=", "", ref_gene_df$biotype)
+ref_gene_df$gene_name <- sub("^.*=", "", ref_gene_df$gene_name)
 
 write.table(
     ref_gene_df, "ref_gene_df.tsv",

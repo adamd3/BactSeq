@@ -73,7 +73,7 @@ jobs:
       - name: Run pipeline with test data (${{ matrix.aligner }})
         run: |
           if [ "${{ matrix.aligner }}" == "kallisto" ]; then
-            nextflow run ${GITHUB_WORKSPACE} -profile test,docker --aligner ${{ matrix.aligner }} --ref_genome https://raw.githubusercontent.com/adamd3/BactSeq/main/test_data/Mabs_CDS.fasta --outdir ./results
+            nextflow run ${GITHUB_WORKSPACE} -profile test,docker --aligner ${{ matrix.aligner }} --ref_genome https://raw.githubusercontent.com/adamd3/BactSeq/develop/test_data/Mabs_CDS.fasta --outdir ./results
           else
             nextflow run ${GITHUB_WORKSPACE} -profile test,docker --aligner ${{ matrix.aligner }} --outdir ./results
           fi

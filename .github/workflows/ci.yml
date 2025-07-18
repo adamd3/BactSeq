@@ -61,7 +61,8 @@ jobs:
 
       - name: Build and publish to docker
         # Only build/push on main branch and first matrix job to avoid duplicates
-        if: github.ref == 'refs/heads/main' && matrix.aligner == 'bwa' && matrix.test_type == 'single-end' && matrix.NXF_VER == '21.10.3'
+        # if: github.ref == 'refs/heads/main' && matrix.aligner == 'bwa' && matrix.test_type == 'single-end' && matrix.NXF_VER == '21.10.3'
+        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop'
         uses: docker/build-push-action@v5
         with:
           context: .

@@ -6,7 +6,7 @@ process DIFF_EXPRESSION {
     input:
     path gene_counts
     path meta_merged
-    path cont_tabl
+    path contrast_file
     val p_thresh
     val l2fc_thresh
 
@@ -16,7 +16,7 @@ process DIFF_EXPRESSION {
 
     script:
     """
-    [ ! -f contrast_table.tsv ] && ln -s $cont_tabl contrast_table.tsv
+    [ ! -f contrast_table.tsv ] && ln -s $contrast_file contrast_table.tsv
     diffexpr.R -p $p_thresh -l $l2fc_thresh -o ./ 
     """
 }

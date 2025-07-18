@@ -9,13 +9,6 @@ nextflow.enable.dsl=2
     Github : [github.com/adamd3/BactSeq]
 */
 
-// Workflow metadata
-workflow.onComplete {
-    log.info "Pipeline completed at: ${workflow.complete}"
-    log.info "Command line: ${workflow.commandLine}"
-    log.info "Execution status: ${workflow.success ? 'OK' : 'FAILED'}"
-    log.info "Duration: ${workflow.duration}"
-}
 
 // Show help message
 if (params.help) {
@@ -52,8 +45,8 @@ if (params.ref_ann) {
     ch_gff_file = file(params.ref_ann, checkIfExists: true)
 }
 
-if (params.cont_tabl) {
-    ch_cont_file = file(params.cont_tabl, checkIfExists: true)
+if (params.contrast_file) {
+    ch_cont_file = file(params.contrast_file, checkIfExists: true)
 }
 if (params.func_file) {
     ch_func_file = file(params.func_file, checkIfExists: true)
@@ -61,10 +54,6 @@ if (params.func_file) {
 
 
 
-// optional functional enrichment step
-//ch_func_file = ( params.func_file
-//            ? Channel.empty()
-//            : file(params.func_file, checkIfExists: true) )
 
 
 
@@ -135,6 +124,9 @@ workflow {
     }
     if (!(params.strandedness in ['unstranded', 'forward', 'reverse'])) {
         exit 1, "ERROR: strandedness must be 'unstranded', 'forward', or 'reverse', got: ${params.strandedness}"
+    }
+    if (params.aligner == 'bwa' && !params.ref_ann) {
+        exit 1, "ERROR: BWA aligner requires --ref_ann parameter"
     }
 
     /*
@@ -231,7 +223,7 @@ workflow {
             // ch_gff_file,
             ch_metadata
         )
-        // ch_readcounts_df = MERGE_COUNTS.out.counts_df
+        ch_readcounts_df = MERGE_COUNTS.out.counts_df
         ch_readcounts_df_pc = MERGE_COUNTS.out.counts_df_pc
         ch_refgene_df = MERGE_COUNTS.out.ref_gene_df
 
@@ -263,7 +255,7 @@ workflow {
     /*
      *  Differential gene expression (DESeq2)
      */
-    if (params.cont_tabl) {
+    if (params.contrast_file) {
         DIFF_EXPRESSION (
             ch_readcounts_df_pc,
             ch_metadata,
@@ -277,7 +269,7 @@ workflow {
     /*
      *  Functional enrichment of DEGs (optional)
      */
-    if (params.func_file) {
+    if (params.func_file && params.contrast_file) {
         FUNC_ENRICHMENT (
             ch_func_file,
             ch_deseq_res,
@@ -321,7 +313,7 @@ def helpMessage() {
 
     Other options:
     --aligner [str]                 (Pseudo-)aligner to be used. Options: `bwa`, `kallisto`. Default = bwa.
-    --cont_tabl [file]              Path to tsv file containing contrasts to be performed for differential expression.
+    --contrast_file [file]          Path to tsv file containing contrasts to be performed for differential expression.
     --fragment_len [str]            Estimated average fragment length for kallisto transcript quantification (only required for single-end reads). Default = 150.
     --fragment_sd [str]             Estimated standard deviation of fragment length for kallisto transcript quantification (only required for single-end reads). Default = 20.
     --func_file [file]              Path to GFF3-format file containing functional annotations.

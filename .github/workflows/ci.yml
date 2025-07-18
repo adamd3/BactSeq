@@ -72,7 +72,11 @@ jobs:
           
       - name: Run pipeline with test data (${{ matrix.aligner }})
         run: |
-          nextflow run ${GITHUB_WORKSPACE} -profile test,docker --aligner ${{ matrix.aligner }} --outdir ./results
+          if [ "${{ matrix.aligner }}" == "kallisto" ]; then
+            nextflow run ${GITHUB_WORKSPACE} -profile test,docker --aligner ${{ matrix.aligner }} --ref_genome https://raw.githubusercontent.com/adamd3/BactSeq/main/test_data/Mabs_CDS.fasta --outdir ./results
+          else
+            nextflow run ${GITHUB_WORKSPACE} -profile test,docker --aligner ${{ matrix.aligner }} --outdir ./results
+          fi
 
       - name: Upload test results
         if: always()

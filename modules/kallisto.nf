@@ -10,6 +10,7 @@ process MAKE_KALLISTO_IDX {
     output:
     path '*.kidx', emit: kallisto_idx
 
+    script:
     """
     kallisto index -i ref_genome.kidx $ref_genome
     """

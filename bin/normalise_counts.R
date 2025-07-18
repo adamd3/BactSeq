@@ -4,6 +4,7 @@ library(optparse)
 library(edgeR)
 library(readr)
 library(tibble)
+library(dplyr)
 library(DESeq2)
 
 option_list <- list(

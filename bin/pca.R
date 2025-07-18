@@ -6,6 +6,7 @@ library(RColorBrewer)
 library(reshape2)
 library(readr)
 library(tibble)
+library(dplyr)
 
 option_list <- list(
     make_option(c("-o", "--outdir"),

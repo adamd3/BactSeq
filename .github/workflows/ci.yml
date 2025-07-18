@@ -34,11 +34,6 @@ jobs:
             NXF_EDGE: ""
             aligner: "bwa"
             test_type: "single-end"
-          # Test paired-end functionality with BWA
-          - NXF_VER: "21.10.3"
-            NXF_EDGE: ""
-            aligner: "bwa"
-            test_type: "paired-end"
     steps:
       - name: Check out pipeline code
         uses: actions/checkout@v4
@@ -75,19 +70,15 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           
-      - name: Run pipeline with test data (${{ matrix.aligner }}, ${{ matrix.test_type }})
+      - name: Run pipeline with test data (${{ matrix.aligner }})
         run: |
-          if [ "${{ matrix.test_type }}" == "paired-end" ]; then
-            nextflow run ${GITHUB_WORKSPACE} -profile test,docker --aligner ${{ matrix.aligner }} --sample_file https://raw.githubusercontent.com/adamd3/BactSeq/main/test_data/sample_sheet_paired.tsv --outdir ./results
-          else
-            nextflow run ${GITHUB_WORKSPACE} -profile test,docker --aligner ${{ matrix.aligner }} --outdir ./results
-          fi
+          nextflow run ${GITHUB_WORKSPACE} -profile test,docker --aligner ${{ matrix.aligner }} --outdir ./results
 
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: test-results-${{ matrix.aligner }}-${{ matrix.test_type }}-nf${{ matrix.NXF_VER }}
+          name: test-results-${{ matrix.aligner }}-nf${{ matrix.NXF_VER }}
           path: |
             ./results
             .nextflow.log

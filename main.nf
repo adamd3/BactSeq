@@ -9,6 +9,14 @@ nextflow.enable.dsl=2
     Github : [github.com/adamd3/BactSeq]
 */
 
+// Workflow metadata
+workflow.onComplete {
+    log.info "Pipeline completed at: ${workflow.complete}"
+    log.info "Command line: ${workflow.commandLine}"
+    log.info "Execution status: ${workflow.success ? 'OK' : 'FAILED'}"
+    log.info "Duration: ${workflow.duration}"
+}
+
 // Show help message
 if (params.help) {
     helpMessage()
@@ -114,6 +122,22 @@ def create_fastq_channel(LinkedHashMap row) {
 workflow {
 
     /*
+     * Parameter validation
+     */
+    if (params.p_thresh <= 0 || params.p_thresh > 1) {
+        exit 1, "ERROR: p_thresh must be between 0 and 1, got: ${params.p_thresh}"
+    }
+    if (params.l2fc_thresh < 0) {
+        exit 1, "ERROR: l2fc_thresh must be >= 0, got: ${params.l2fc_thresh}"
+    }
+    if (!(params.aligner in ['bwa', 'kallisto'])) {
+        exit 1, "ERROR: aligner must be 'bwa' or 'kallisto', got: ${params.aligner}"
+    }
+    if (!(params.strandedness in ['unstranded', 'forward', 'reverse'])) {
+        exit 1, "ERROR: strandedness must be 'unstranded', 'forward', or 'reverse', got: ${params.strandedness}"
+    }
+
+    /*
      * Make metadata file linking samples with FastQ files
      */
     MAKE_META_FILE (
@@ -125,17 +149,6 @@ workflow {
     /*
      *  Create channels for input files
      */
-    // ch_metadata
-    //     .splitCsv(header:true, sep:'\t')
-    //     .map {
-    //         row -> [ row.sample, [ file(row.path_to_file, checkIfExists: true) ] ]
-    //     }
-    //     .set { ch_raw_reads_trimgalore }
-
-    // ch_metadata
-    //     .splitCsv(header: true, sep:'\t')
-    //     .map { row -> row.sample }
-    //     .set { ch_sample_ids }
 
     ch_metadata
         .splitCsv(header: true, sep:'\t')

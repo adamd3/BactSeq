@@ -2,12 +2,9 @@
 library(optparse)
 library(Rsubread)
 library(ape)
-library(stringr)
-library(ggplot2)
+library(tidyverse)
 library(scales)
 library(RColorBrewer)
-library(reshape2)
-library(tibble)
 
 
 option_list <- list(
@@ -51,15 +48,14 @@ threads <- opt$threads
 ## ------------------------------------------------------------------------------
 ## Read data
 ## ------------------------------------------------------------------------------
-meta_tab <- read.table(meta_f, header = TRUE, sep = "\t")
+meta_tab <- read_tsv(meta_f)
 
-total_counts_list <- lapply(meta_tab$sample, function(x) {
-    mapped_count <- read.table(paste0(x, ".counts"), header = FALSE)
-    colnames(mapped_count) <- "mapped"
+total_counts_list <- map(meta_tab$sample, function(x) {
+    mapped_count <- read_tsv(paste0(x, ".counts"), col_names = "mapped")
     mapped_count$sample <- x
     mapped_count
 })
-merged_total_counts <- as.data.frame(do.call(rbind, total_counts_list))
+merged_total_counts <- bind_rows(total_counts_list)
 
 
 
@@ -94,11 +90,7 @@ ref_gene_df$locus_tag <- sub("^.*=", "", ref_gene_df$locus_tag)
 ref_gene_df$biotype <- sub("^.*=", "", ref_gene_df$biotype)
 ref_gene_df$gene_name <- sub("^.*=", "", ref_gene_df$gene_name)
 
-write.table(
-    ref_gene_df, "ref_gene_df.tsv",
-    col.names = TRUE, row.names = FALSE,
-    sep = "\t", quote = FALSE
-)
+write_tsv(ref_gene_df, "ref_gene_df.tsv")
 
 
 ## ------------------------------------------------------------------------------
@@ -130,23 +122,14 @@ colnames(gene_counts$counts) <- gsub(".bam", "", colnames(gene_counts$counts))
 colnames(gene_counts$counts) <- gsub("\\.", "_", colnames(gene_counts$counts))
 
 
-counts_mat <- gene_counts$counts
-counts_mat <- tibble::rownames_to_column(as.data.frame(counts_mat), "feature_id")
+counts_mat <- gene_counts$counts %>%
+    as_tibble(rownames = "feature_id")
 
-
-write.table(
-    counts_mat, "gene_counts.tsv",
-    col.names = TRUE, row.names = FALSE,
-    sep = "\t", quote = FALSE
-)
+write_tsv(counts_mat, "gene_counts.tsv")
 
 ## protein-coding genes only
 gene_counts_pc <- counts_mat[ref_gene_df$biotype == "protein_coding", ]
-write.table(
-    gene_counts_pc, "gene_counts_pc.tsv",
-    col.names = TRUE, row.names = FALSE,
-    sep = "\t", quote = FALSE
-)
+write_tsv(gene_counts_pc, "gene_counts_pc.tsv")
 
 
 ## ------------------------------------------------------------------------------
@@ -190,11 +173,7 @@ counts_summary <- merge(counts_summary, merged_total_counts, by = "sample")
 
 counts_summary$other <- counts_summary$mapped - counts_summary$rRNA
 
-write.table(
-    counts_summary, "counts_summary.tsv",
-    col.names = TRUE, row.names = FALSE,
-    sep = "\t", quote = FALSE
-)
+write_tsv(counts_summary, "counts_summary.tsv")
 
 
 counts_summary <- counts_summary[rev(order(counts_summary$sample)), ]
@@ -205,24 +184,16 @@ non_rRNA_btypes <- all_biotypes[!all_biotypes == "rRNA"]
 #############################
 ## raw counts plot
 #############################
-counts_melt <- reshape2::melt(
-    counts_summary,
-    id.vars = c("sample"),
-    measure.vars = c(
-        "other",
-        "rRNA"
-        # all_biotypes
+counts_melt <- counts_summary %>%
+    pivot_longer(
+        cols = c("other", "rRNA"),
+        names_to = "variable",
+        values_to = "value"
+    ) %>%
+    mutate(
+        sample = factor(sample, levels = rev(unique(sort(sample)))),
+        variable = factor(variable, levels = c("rRNA", "other"))
     )
-)
-counts_melt$sample <- factor(
-    counts_melt$sample,
-    levels = rev(unique(sort(counts_melt$sample)))
-)
-counts_melt$variable <- factor(counts_melt$variable, levels = c(
-    "rRNA",
-    "other"
-    # non_rRNA_btypes
-))
 # minUsable <- min(mergedDf$q15_dedup_reads)
 
 
@@ -271,33 +242,23 @@ ggsave(
 ## get the proportions of reads per library
 # propCols <- (mergedDf[,c(3,13,14,5)] / mergedDf[,2])
 
-propCols <- counts_summary[c(
-    "other",
-    "rRNA"
-    # all_biotypes
-)] / counts_summary$mapped
+propCols <- counts_summary %>%
+    mutate(
+        other = other / mapped,
+        rRNA = rRNA / mapped
+    ) %>%
+    select(sample, other, rRNA)
 
-propCols$sample <- counts_summary$sample
-
-# rowSums(propCols) ## each row should sum to 1
-prop_melt <- melt(
-    propCols,
-    id.vars = c("sample"),
-    measure.vars = c(
-        "other",
-        "rRNA"
-        # all_biotypes
+prop_melt <- propCols %>%
+    pivot_longer(
+        cols = c("other", "rRNA"),
+        names_to = "variable",
+        values_to = "value"
+    ) %>%
+    mutate(
+        sample = factor(sample, levels = rev(unique(sort(sample)))),
+        variable = factor(variable, levels = c("rRNA", "other"))
     )
-)
-prop_melt$sample <- factor(
-    prop_melt$sample,
-    levels = rev(unique(sort(prop_melt$sample)))
-)
-prop_melt$variable <- factor(prop_melt$variable, levels = c(
-    "rRNA",
-    "other" # ,
-    # non_rRNA_btypes
-))
 
 p2 <- ggplot(
     prop_melt,

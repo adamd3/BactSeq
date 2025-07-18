@@ -33,29 +33,19 @@ colpal_large <- c(brewer.pal(9, "Set1"), colpal_large)
 ## ------------------------------------------------------------------------------
 ## Read and process data
 ## ------------------------------------------------------------------------------
-# norm_counts <- read.table(
-#     counts_f,
-#     header = TRUE, sep = "\t", stringsAsFactors = FALSE
-# )
-# meta_tab <- read.table(
-#     meta_f,
-#     header = TRUE, sep = "\t", stringsAsFactors = FALSE
-# )
-
 norm_counts <- read_tsv(counts_f)
 meta_tab <- read_tsv(meta_f)
 
 
 gene_names <- norm_counts[["feature_id"]]
-norm_counts[["feature_id"]] <- NULL
-norm_counts <- as.data.frame(norm_counts)
+norm_counts <- norm_counts %>%
+    select(-feature_id) %>%
+    as.data.frame()
 rownames(norm_counts) <- gene_names
 
-## factorise group
-meta_tab$group <- as.factor(as.character(meta_tab$group))
-
-## order rows to match counts columns
-meta_tab <- meta_tab[match(colnames(norm_counts), meta_tab$sample), ]
+meta_tab <- meta_tab %>%
+    mutate(group = as.factor(as.character(group))) %>%
+    arrange(match(sample, colnames(norm_counts)))
 
 
 
@@ -64,24 +54,15 @@ meta_tab <- meta_tab[match(colnames(norm_counts), meta_tab$sample), ]
 ## ------------------------------------------------------------------------------
 pca_counts <- prcomp(t(norm_counts), center = TRUE, scale = FALSE)
 
-pca_coords <- data.frame(pca_counts$x)
-pca_coords$sample <- rownames(pca_coords)
-
-# move sample to first column
-pca_coords <- pca_coords[c(
-    "sample", colnames(pca_coords)[1:ncol(pca_coords) - 1]
-)]
-rownames(pca_coords) <- NULL
+pca_coords <- pca_counts$x %>%
+    as_tibble(rownames = "sample") %>%
+    select(sample, everything())
 
 ## save pca object
 saveRDS(pca_counts, file.path(outdir, "pca.rds"))
 
 ## save pca coordinates
-write.table(
-    pca_coords,
-    file = file.path(outdir, "pca_coords.tsv"),
-    quote = FALSE, sep = "\t", row.names = FALSE, col.names = TRUE
-)
+write_tsv(pca_coords, file.path(outdir, "pca_coords.tsv"))
 
 p1 <- ggplot(pca_coords, aes(x = PC1, y = PC2)) +
     geom_point(

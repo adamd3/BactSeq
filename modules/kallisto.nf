@@ -32,9 +32,8 @@ process KALLISTO_QUANT {
     script:
     def name = task.ext.prefix ?: "${meta.sample_id}"
 
-    if (strandedness == 'unstranded'){
-        strand_arg = ""
-    } else if (strandedness == 'forward'){
+    def strand_arg = ""
+    if (strandedness == 'forward'){
         strand_arg = "--fr-stranded"
     } else if (strandedness == 'reverse'){
         strand_arg = "--rf-stranded"
@@ -46,13 +45,13 @@ process KALLISTO_QUANT {
         """
         [ ! -f  ${name}_1_val_1.fq.gz ] && ln -s ${reads[0]} ${name}_1_val_1.fq.gz
         [ ! -f  ${name}_2_val_2.fq.gz ] && ln -s ${reads[1]} ${name}_2_val_2.fq.gz
-        kallisto quant -t $task.cpus -i ref_genome.kidx \
+        kallisto quant -t $task.cpus -i $idx \
             ${strand_arg} -o kallisto_${name} ${name}_1_val_1.fq.gz ${name}_2_val_2.fq.gz
         """
     } else {
         """
         [ ! -f  ${name}_trimmed.fq.gz ] && ln -s $reads ${name}_trimmed.fq.gz
-        kallisto quant -t $task.cpus -i ref_genome.kidx \
+        kallisto quant -t $task.cpus -i $idx \
             ${strand_arg} --single -l ${params.fragment_len} -s ${params.fragment_sd} \
             -o kallisto_${name} ${name}_trimmed.fq.gz
         """

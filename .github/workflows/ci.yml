@@ -17,11 +17,28 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        # Nextflow versions
+        # Test both aligners and multiple Nextflow versions
         include:
-          # Test pipeline minimum Nextflow version
+          # Test pipeline minimum Nextflow version with BWA
           - NXF_VER: "21.10.3"
             NXF_EDGE: ""
+            aligner: "bwa"
+            test_type: "single-end"
+          # Test pipeline minimum Nextflow version with Kallisto
+          - NXF_VER: "21.10.3"
+            NXF_EDGE: ""
+            aligner: "kallisto"
+            test_type: "single-end"
+          # Test with latest Nextflow version
+          - NXF_VER: "23.10.1"
+            NXF_EDGE: ""
+            aligner: "bwa"
+            test_type: "single-end"
+          # Test paired-end functionality with BWA
+          - NXF_VER: "21.10.3"
+            NXF_EDGE: ""
+            aligner: "bwa"
+            test_type: "paired-end"
     steps:
       - name: Check out pipeline code
         uses: actions/checkout@v2
@@ -48,6 +65,10 @@ jobs:
           docker build  --platform linux/amd64 -t adamd3/bactseq:latest .
           docker push adamd3/bactseq:latest
           
-      - name: Run pipeline with test data
+      - name: Run pipeline with test data (${{ matrix.aligner }}, ${{ matrix.test_type }})
         run: |
-          nextflow run ${GITHUB_WORKSPACE} -profile test,docker --outdir ./results
+          if [ "${{ matrix.test_type }}" == "paired-end" ]; then
+            nextflow run ${GITHUB_WORKSPACE} -profile test,docker --aligner ${{ matrix.aligner }} --sample_file https://raw.githubusercontent.com/adamd3/BactSeq/main/test_data/sample_sheet_paired.tsv --outdir ./results
+          else
+            nextflow run ${GITHUB_WORKSPACE} -profile test,docker --aligner ${{ matrix.aligner }} --outdir ./results
+          fi

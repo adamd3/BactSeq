@@ -95,7 +95,12 @@ names(term_genes_list) <- all_terms
 ## Perform enrichment testing
 ## ------------------------------------------------------------------------------
 
-lapply(dge_files, function(res_f) {
+## Create a placeholder file if no DGE files or no significant results
+if (length(dge_files) == 0) {
+    writeLines("No DGE files found", file.path(out_dir, "no_dge_results.tsv"))
+}
+
+results <- lapply(dge_files, function(res_f) {
     # print(res_f)
 
     res_tab <- na.omit(read_tsv(res_f))
@@ -298,4 +303,16 @@ lapply(dge_files, function(res_f) {
             dpi = 400
         )
     }
+    
+    ## Create placeholder files if no significant results found
+    if (length(genes_up) < 5 && length(genes_down) < 5) {
+        writeLines("No significant enrichment results found", 
+                  file.path(out_dir, paste0(label, "_no_enrichment.tsv")))
+    }
 })
+
+## Ensure at least one TSV file exists for Nextflow
+if (length(list.files(out_dir, pattern = "\\.tsv$")) == 0) {
+    writeLines("No enrichment analysis performed", 
+              file.path(out_dir, "no_analysis_performed.tsv"))
+}

@@ -43,13 +43,19 @@ if (params.ref_genome) {
 // optional inputs
 if (params.ref_ann) {
     ch_gff_file = file(params.ref_ann, checkIfExists: true)
+} else {
+    ch_gff_file = Channel.empty()
 }
 
 if (params.contrast_file) {
     ch_cont_file = file(params.contrast_file, checkIfExists: true)
+} else {
+    ch_cont_file = Channel.empty()
 }
 if (params.func_file) {
     ch_func_file = file(params.func_file, checkIfExists: true)
+} else {
+    ch_func_file = Channel.empty()
 }
 
 

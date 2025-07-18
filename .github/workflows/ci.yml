@@ -41,7 +41,7 @@ jobs:
             test_type: "paired-end"
     steps:
       - name: Check out pipeline code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Install Nextflow
         env:
@@ -54,16 +54,26 @@ jobs:
           chmod +x nextflow
           sudo mv nextflow /usr/local/bin/
 
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        
       - name: Login to Docker Hub
-        uses: docker/login-action@v1
+        uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build and publish to docker
-        run: |
-          docker build  --platform linux/amd64 -t adamd3/bactseq:latest .
-          docker push adamd3/bactseq:latest
+        # Only build/push on main branch and first matrix job to avoid duplicates
+        if: github.ref == 'refs/heads/main' && matrix.aligner == 'bwa' && matrix.test_type == 'single-end' && matrix.NXF_VER == '21.10.3'
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          platforms: linux/amd64
+          push: true
+          tags: adamd3/bactseq:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
           
       - name: Run pipeline with test data (${{ matrix.aligner }}, ${{ matrix.test_type }})
         run: |
@@ -72,3 +82,13 @@ jobs:
           else
             nextflow run ${GITHUB_WORKSPACE} -profile test,docker --aligner ${{ matrix.aligner }} --outdir ./results
           fi
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-${{ matrix.aligner }}-${{ matrix.test_type }}-nf${{ matrix.NXF_VER }}
+          path: |
+            ./results
+            .nextflow.log
+          retention-days: 7

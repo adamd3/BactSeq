@@ -7,7 +7,7 @@ COPY environment.yml /app
 RUN conda env create -f environment.yml
 
 RUN echo "conda activate bact_seq-1.0.0" >> ~/.bashrc
-ENV PATH /opt/conda/envs/bact_seq-1.0.0/bin:$PATH
+ENV PATH=/opt/conda/envs/bact_seq-1.0.0/bin:$PATH
 
 SHELL ["/bin/bash", "-c"]
 

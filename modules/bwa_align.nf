@@ -7,7 +7,7 @@ process MAKE_BWA_INDEX {
     path ref_genome
 
     output:
-    path '*', emit: bwa_idx
+    path 'ref_idx*', emit: bwa_idx
 
     script:
     """

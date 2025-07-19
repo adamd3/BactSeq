@@ -11,6 +11,6 @@ process MAKE_META_FILE {
 
     script:
     """
-    make_meta_file.py $sample_file ${params.data_dir} sample_metadata.tsv
+    python ${projectDir}/bin/make_meta_file.py $sample_file ${params.data_dir} sample_metadata.tsv
     """
 }

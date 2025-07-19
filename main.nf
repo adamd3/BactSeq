@@ -181,10 +181,12 @@ workflow {
             ch_fasta_file
         )
         ch_bwa_idx = MAKE_BWA_INDEX.out.bwa_idx
+        ch_ref_fasta = MAKE_BWA_INDEX.out.ref_fasta
 
         BWA_ALIGN (
             ch_trimmed_reads,
-            ch_bwa_idx
+            ch_bwa_idx,
+            ch_ref_fasta
         )
         ch_bwa_out_bam = BWA_ALIGN.out.bam_files.collect()
         ch_bwa_out_bai = BWA_ALIGN.out.bai_files.collect()

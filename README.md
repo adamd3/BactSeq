@@ -234,6 +234,6 @@ If you use BactSeq in your research, please cite:
 
 ### Recent Updates
 
-- **2024-12-06**: Updated Dockerfile to install environment from yml
+- **2025-07-19**: Docker image is now compatible with nextflow 25.04.0+
 - **2023-10-06**: Docker and Singularity support restored
 - **2023-09-28**: Added example contrasts table and functional enrichment file

@@ -31,7 +31,7 @@ jobs:
             aligner: "kallisto"
             test_type: "single-end"
           # Test with latest Nextflow version
-          - NXF_VER: "23.10.1"
+          - NXF_VER: "25.04.0"
             NXF_EDGE: ""
             aligner: "bwa"
             test_type: "single-end"

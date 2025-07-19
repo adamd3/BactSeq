@@ -11,7 +11,7 @@ process FUNC_ENRICHMENT {
 
     output:
     path '*.tsv', emit: func_res
-    path '*.png', emit: func_plots
+    path '*.png', emit: func_plots, optional: true
 
     script:
     """

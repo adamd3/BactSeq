@@ -45,9 +45,33 @@ threads <- opt$threads
 
 
 
-## ------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
+## Functions
+## -----------------------------------------------------------------------------
+parse_gff_attributes <- function(
+    attributes_string, attribute_name, start_pos, end_pos, default_val = NULL) { 
+  attr_pairs_raw <- stringr::str_split(attributes_string, ";")[[1]]
+  attr_pairs <- stringr::str_trim(
+    stringr::str_replace_all(attr_pairs_raw, "[\\s\\p{Zs}\\p{C}]", " "))
+  search_pattern_regex <- paste0("^", attribute_name, "=")
+  target_attr <- attr_pairs[grepl(search_pattern_regex, attr_pairs)] 
+  if (length(target_attr) > 0) {
+    value <- stringr::str_remove(target_attr[1], search_pattern_regex)
+    return(value)
+  } else {
+    if (!is.null(default_val)) {
+      return(default_val)
+    } else {
+      default_value_generated <- paste0("unknown_", start_pos, "_", end_pos)
+      return(default_value_generated)
+    }
+  }
+}
+
+
+## -----------------------------------------------------------------------------
 ## Read data
-## ------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 meta_tab <- read_tsv(meta_f)
 
 total_counts_list <- map(meta_tab$sample, function(x) {
@@ -59,25 +83,36 @@ merged_total_counts <- bind_rows(total_counts_list)
 
 
 
-## ------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ## Read genome annotation
-## ------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ref_annot <- ape::read.gff(gff_f, na.strings = c(".", "?"), GFF3 = TRUE)
 
 ref_annot <- subset(ref_annot, type == "gene")
 
 gene_attr <- stringr::str_split(ref_annot$attributes, ";")
-locus_tags <- unlist(lapply(gene_attr, function(x) {
-    x[grepl("^locus_tag", x)]
-}))
-gene_biotypes <- unlist(lapply(gene_attr, function(x) {
-    x[grepl("^gene_biotype", x)]
-}))
-common_gene_names <- unlist(lapply(gene_attr, function(x) {
-    x <- x[grepl("^gene=", x)]
-    x[identical(x, character(0))] <- ""
-    x
-}))
+
+locus_tags <- unname(mapply(parse_gff_attributes,
+                     ref_annot$attributes,
+                     attribute_name = "locus_tag",
+                     start_pos = ref_annot$start,
+                     end_pos = ref_annot$end))
+
+gene_biotypes <- unname(mapply(parse_gff_attributes,
+                    ref_annot$attributes,
+                    attribute_name = "gene_biotype",
+                    start_pos = ref_annot$start,
+                    end_pos = ref_annot$end,
+                    "unknown"))
+
+common_gene_names <- unname(mapply(parse_gff_attributes,
+                    ref_annot$attributes,
+                    attribute_name = "gene",
+                    start_pos = ref_annot$start,
+                    end_pos = ref_annot$end,
+                    "unknown"))
+
+
 gene_lengths <- (ref_annot$end - ref_annot$start) + 1
 
 ref_gene_df <- data.frame(
@@ -93,9 +128,9 @@ ref_gene_df$gene_name <- sub("^.*=", "", ref_gene_df$gene_name)
 write_tsv(ref_gene_df, "ref_gene_df.tsv")
 
 
-## ------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ## Count reads mapping to genes
-## ------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 bamfilesCount <- paste0(meta_tab$sample, ".bam")
 
 # 0 (unstranded), 1 (stranded) and 2 (reversely stranded)
@@ -132,9 +167,9 @@ gene_counts_pc <- counts_mat[ref_gene_df$biotype == "protein_coding", ]
 write_tsv(gene_counts_pc, "gene_counts_pc.tsv")
 
 
-## ------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ## Plot library composition
-## ------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ## set up plots
 brewer_pallette1 <- brewer.pal(9, "Set1")
 brewer_pallette3 <- brewer.pal(8, "Dark2")

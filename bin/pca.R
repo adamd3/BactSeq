@@ -65,24 +65,32 @@ saveRDS(pca_counts, file.path(outdir, "pca.rds"))
 ## save pca coordinates
 write_tsv(pca_coords, file.path(outdir, "pca_coords.tsv"))
 
-p1 <- ggplot(pca_coords, aes(x = PC1, y = PC2)) +
-    geom_point(
-        size = 4, shape = 21, colour = "black",
-        aes(fill = meta_tab$group)
-    ) +
-    theme_bw(base_size = 12) +
-    scale_colour_manual(values = colpal_large, guide = "none") +
-    scale_fill_manual("Group", values = colpal_large) +
-    guides(fill = guide_legend(override.aes = list(shape = 21))) +
-    theme(
-        legend.position = "right",
-        axis.text.x = element_text(colour = "black", size = 12),
-        axis.text.y = element_text(colour = "black", size = 12)
+# only make plot if there are >2 samples and <50 samples
+
+nsamps <- nrow(pca_coords)
+
+if (nsamps > 2 && nsamps < 50) {
+
+    p1 <- ggplot(pca_coords, aes(x = PC1, y = PC2)) +
+        geom_point(
+            size = 4, shape = 21, colour = "black",
+            aes(fill = meta_tab$group)
+        ) +
+        theme_bw(base_size = 12) +
+        scale_colour_manual(values = colpal_large, guide = "none") +
+        scale_fill_manual("Group", values = colpal_large) +
+        guides(fill = guide_legend(override.aes = list(shape = 21))) +
+        theme(
+            legend.position = "right",
+            axis.text.x = element_text(colour = "black", size = 12),
+            axis.text.y = element_text(colour = "black", size = 12)
+        )
+
+    ggsave(
+        p1,
+        file = file.path(outdir, "pca_grouped.png"),
+        device = "png", units = "in",
+        width = 9, height = 7, dpi = 300
     )
 
-ggsave(
-    p1,
-    file = file.path(outdir, "pca_grouped.png"),
-    device = "png", units = "in",
-    width = 9, height = 7, dpi = 300
-)
+}

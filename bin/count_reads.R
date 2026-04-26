@@ -215,113 +215,117 @@ counts_summary <- counts_summary[rev(order(counts_summary$sample)), ]
 all_biotypes <- c(all_biotypes, "other")
 non_rRNA_btypes <- all_biotypes[!all_biotypes == "rRNA"]
 
-
-#############################
-## raw counts plot
-#############################
-counts_melt <- counts_summary %>%
-    pivot_longer(
-        cols = c("other", "rRNA"),
-        names_to = "variable",
-        values_to = "value"
-    ) %>%
-    mutate(
-        sample = factor(sample, levels = rev(unique(sort(sample)))),
-        variable = factor(variable, levels = c("rRNA", "other"))
-    )
-# minUsable <- min(mergedDf$q15_dedup_reads)
-
-
-ylabel <- ifelse(isTRUE(ispaired), "Million read pairs", "Million reads")
-
-p1 <- ggplot(
-    counts_melt,
-    aes(x = sample, colour = variable, fill = variable, y = value)
-) +
-    geom_bar(position = "stack", stat = "identity", width = 0.7) +
-    coord_flip() +
-    xlab("Sample") +
-    ylab(ylabel) +
-    scale_fill_manual(
-        "",
-        values = ggCols,
-        guide = guide_legend(reverse = TRUE)
-    ) +
-    scale_colour_manual(values = ggCols, guide = FALSE) +
-    scale_y_continuous(labels = unit_format(unit = "", scale = 1e-6)) +
-    ## add a dashed line at the min usable number of reads
-    # geom_hline(yintercept = 5e6, linetype="dashed") +
-    theme_bw(base_size = 15) +
-    theme(
-        legend.position = "top",
-        legend.title = element_blank(),
-        legend.text = element_text(size = 12),
-        axis.text.x = element_text(colour = "black"),
-        axis.text.y = element_text(colour = "black")
-    )
-
 nsamps <- ncol(gene_counts$counts)
 
-ggsave(
-    p1,
-    file = paste0("library_composition.png"),
-    device = "png",
-    width = 8, height = (nsamps / 2.2),
-    dpi = 300
-)
+
+if (nsamps > 2 & nsamps < 50) {
+
+    #############################
+    ## raw counts plot
+    #############################
+    counts_melt <- counts_summary %>%
+        pivot_longer(
+            cols = c("other", "rRNA"),
+            names_to = "variable",
+            values_to = "value"
+        ) %>%
+        mutate(
+            sample = factor(sample, levels = rev(unique(sort(sample)))),
+            variable = factor(variable, levels = c("rRNA", "other"))
+        )
+    # minUsable <- min(mergedDf$q15_dedup_reads)
 
 
-#############################
-## proportions plot
-#############################
-## get the proportions of reads per library
-# propCols <- (mergedDf[,c(3,13,14,5)] / mergedDf[,2])
+    ylabel <- ifelse(isTRUE(ispaired), "Million read pairs", "Million reads")
 
-propCols <- counts_summary %>%
-    mutate(
-        other = other / mapped,
-        rRNA = rRNA / mapped
-    ) %>%
-    select(sample, other, rRNA)
-
-prop_melt <- propCols %>%
-    pivot_longer(
-        cols = c("other", "rRNA"),
-        names_to = "variable",
-        values_to = "value"
-    ) %>%
-    mutate(
-        sample = factor(sample, levels = rev(unique(sort(sample)))),
-        variable = factor(variable, levels = c("rRNA", "other"))
-    )
-
-p2 <- ggplot(
-    prop_melt,
-    aes(x = sample, colour = variable, fill = variable, y = value)
-) +
-    geom_bar(stat = "identity", width = 0.7) +
-    coord_flip() +
-    xlab("Sample") +
-    ylab("Proportion of reads") +
-    scale_fill_manual(
-        "",
-        values = ggCols,
-        guide = guide_legend(reverse = TRUE)
+    p1 <- ggplot(
+        counts_melt,
+        aes(x = sample, colour = variable, fill = variable, y = value)
     ) +
-    scale_colour_manual(values = ggCols, guide = FALSE) +
-    scale_y_continuous(labels = comma) +
-    theme_bw(base_size = 15) +
-    theme(
-        legend.position = "top",
-        legend.text = element_text(size = 12),
-        axis.text.x = element_text(colour = "black"),
-        axis.text.y = element_text(colour = "black")
+        geom_bar(position = "stack", stat = "identity", width = 0.7) +
+        coord_flip() +
+        xlab("Sample") +
+        ylab(ylabel) +
+        scale_fill_manual(
+            "",
+            values = ggCols,
+            guide = guide_legend(reverse = TRUE)
+        ) +
+        scale_colour_manual(values = ggCols, guide = FALSE) +
+        scale_y_continuous(labels = unit_format(unit = "", scale = 1e-6)) +
+        ## add a dashed line at the min usable number of reads
+        # geom_hline(yintercept = 5e6, linetype="dashed") +
+        theme_bw(base_size = 15) +
+        theme(
+            legend.position = "top",
+            legend.title = element_blank(),
+            legend.text = element_text(size = 12),
+            axis.text.x = element_text(colour = "black"),
+            axis.text.y = element_text(colour = "black")
+        )
+
+
+    ggsave(
+        p1,
+        file = paste0("library_composition.png"),
+        device = "png",
+        width = 8, height = (nsamps / 2.2),
+        dpi = 300
     )
 
-ggsave(
-    p2,
-    file = "library_composition_proportions.png",
-    device = "png",
-    width = 8, height = (nsamps / 2.2),
-    dpi = 300
-)
+
+    #############################
+    ## proportions plot
+    #############################
+    ## get the proportions of reads per library
+    # propCols <- (mergedDf[,c(3,13,14,5)] / mergedDf[,2])
+
+    propCols <- counts_summary %>%
+        mutate(
+            other = other / mapped,
+            rRNA = rRNA / mapped
+        ) %>%
+        select(sample, other, rRNA)
+
+    prop_melt <- propCols %>%
+        pivot_longer(
+            cols = c("other", "rRNA"),
+            names_to = "variable",
+            values_to = "value"
+        ) %>%
+        mutate(
+            sample = factor(sample, levels = rev(unique(sort(sample)))),
+            variable = factor(variable, levels = c("rRNA", "other"))
+        )
+
+    p2 <- ggplot(
+        prop_melt,
+        aes(x = sample, colour = variable, fill = variable, y = value)
+    ) +
+        geom_bar(stat = "identity", width = 0.7) +
+        coord_flip() +
+        xlab("Sample") +
+        ylab("Proportion of reads") +
+        scale_fill_manual(
+            "",
+            values = ggCols,
+            guide = guide_legend(reverse = TRUE)
+        ) +
+        scale_colour_manual(values = ggCols, guide = FALSE) +
+        scale_y_continuous(labels = comma) +
+        theme_bw(base_size = 15) +
+        theme(
+            legend.position = "top",
+            legend.text = element_text(size = 12),
+            axis.text.x = element_text(colour = "black"),
+            axis.text.y = element_text(colour = "black")
+        )
+
+    ggsave(
+        p2,
+        file = "library_composition_proportions.png",
+        device = "png",
+        width = 8, height = (nsamps / 2.2),
+        dpi = 300
+    )
+}

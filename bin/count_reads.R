@@ -101,7 +101,9 @@ ref_annot <- ref_annot %>%
 ref_annot <- ref_annot %>%
     select(locus_tag, gene_biotype, gene_name, gene_length) %>%
     mutate(
-        locus
+        locus_tag = str_remove(locus_tag, "^.*="),
+        biotype = str_remove(gene_biotype, "^.*="),
+        gene_name = str_remove(gene_name, "^.*=")
     )
 
 write_tsv(ref_annot, "ref_gene_df.tsv")

@@ -70,6 +70,21 @@ meta_tab <- meta_tab %>%
     slice(match(colnames(counts_tab), sample)) %>%
     column_to_rownames(var = "sample")
 
+colnames(counts_tab) <- make.names(colnames(counts_tab))
+
+meta_tab <- meta_tab %>%
+    mutate(
+        sample = make.names(str_replace_all(sample, "-", ".")),
+        group = factor(str_replace_all(group, "-", "."))
+    )
+
+meta_tab <- meta_tab %>%
+    filter(sample %in% colnames(counts_tab)) %>%
+    arrange(match(sample, colnames(counts_tab))) %>%
+    column_to_rownames(var = "sample")
+
+stopifnot(all(colnames(counts_tab) == rownames(meta_tab)))
+
 
 ## -----------------------------------------------------------------------------
 ## Differential gene expression
@@ -84,7 +99,8 @@ comb_names <- lapply(1:nrow(contrast_tab), function(idx) {
 names(comb_list) <- comb_names
 
 dds <- DESeqDataSetFromMatrix(
-    countData = round(counts_tab), colData = meta_tab,
+    countData = round(counts_tab),
+    colData = meta_tab,
     design = ~group
 )
 dds <- DESeq(dds)

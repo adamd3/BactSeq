@@ -49,24 +49,13 @@ up_col <- "#E41A1C"
 down_col <- "#7FC97F"
 
 
-## ------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ## Read + process data
-## ------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 dge_files <- dir(path = "./", pattern = "^DGE_.*\\.tsv$")
-
 
 in_dat <- read_csv(annot_f, show_col_types = FALSE)
 colnames(in_dat) <- c("Gene", "GO_terms")
-
-
-# ## Df of GO term annotations
-# term_list <- lapply(in_dat[["GO_terms"]], function(terms){
-#     str_split(terms,",")
-# })
-#
-# go_df <- data.frame(GO.ID = unique(unlist(term_list)))
-# go_df[["Term"]] <- as.character(sapply(go_df[["GO.ID"]], Term))
-
 
 ## make a list of gene -> go terms
 gene_terms_list <- lapply(1:nrow(in_dat), function(idx) {
@@ -89,11 +78,9 @@ term_genes_list <- lapply(all_terms, function(term) {
 names(term_genes_list) <- all_terms
 
 
-
-
-## ------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ## Perform enrichment testing
-## ------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 
 ## Create a placeholder file if no DGE files or no significant results
 if (length(dge_files) == 0) {
@@ -109,7 +96,8 @@ results <- lapply(dge_files, function(res_f) {
 
 
     label <- sub(
-        pattern = "(.*)\\..*$", replacement = "\\1", basename(file.path(res_f)))
+        pattern = "(.*)\\..*$", replacement = "\\1", basename(file.path(res_f))
+    )
 
     ## get up/down-regulated genes
     padj_col <- colnames(res_tab)[grepl("padj", colnames(res_tab))]
@@ -303,16 +291,20 @@ results <- lapply(dge_files, function(res_f) {
             dpi = 400
         )
     }
-    
+
     ## Create placeholder files if no significant results found
     if (length(genes_up) < 5 && length(genes_down) < 5) {
-        writeLines("No significant enrichment results found", 
-                  file.path(out_dir, paste0(label, "_no_enrichment.tsv")))
+        writeLines(
+            "No significant enrichment results found",
+            file.path(out_dir, paste0(label, "_no_enrichment.tsv"))
+        )
     }
 })
 
 ## Ensure at least one TSV file exists for Nextflow
 if (length(list.files(out_dir, pattern = "\\.tsv$")) == 0) {
-    writeLines("No enrichment analysis performed", 
-              file.path(out_dir, "no_analysis_performed.tsv"))
+    writeLines(
+        "No enrichment analysis performed",
+        file.path(out_dir, "no_analysis_performed.tsv")
+    )
 }

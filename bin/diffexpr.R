@@ -56,34 +56,33 @@ contrast_tab <- read_tsv(cont_tab_f, col_types = cols(.default = "c"))
 contrast_tab <- contrast_tab %>%
     mutate(across(everything(), ~ str_replace_all(str_remove_all(.x, "\\s+"), "-", ".")))
 
-meta_tab <- meta_tab %>%
-    mutate(
-        sample = make.names(str_replace_all(sample, "-", ".")),
-        group = factor(str_replace_all(group, "-", "."))
-    )
-
 counts_tab <- counts_tab %>%
     mutate(across(-feature_id, as.numeric)) %>%
     column_to_rownames(var = "feature_id")
-
-meta_tab <- meta_tab %>%
-    slice(match(colnames(counts_tab), sample)) %>%
-    column_to_rownames(var = "sample")
 
 colnames(counts_tab) <- make.names(colnames(counts_tab))
 
 meta_tab <- meta_tab %>%
     mutate(
         sample = make.names(str_replace_all(sample, "-", ".")),
-        group = factor(str_replace_all(group, "-", "."))
+        group  = factor(str_replace_all(group, "-", "."))
     )
 
+common_samples <- intersect(colnames(counts_tab), meta_tab$sample)
+
+if (length(common_samples) == 0) {
+    stop("No matching samples found between counts_tab and meta_tab! Check your sample naming.")
+}
+
+counts_tab <- counts_tab[, common_samples, drop = FALSE]
+
 meta_tab <- meta_tab %>%
-    filter(sample %in% colnames(counts_tab)) %>%
-    arrange(match(sample, colnames(counts_tab))) %>%
+    filter(sample %in% common_samples) %>%
+    arrange(match(sample, common_samples)) %>%
     column_to_rownames(var = "sample")
 
-stopifnot(all(colnames(counts_tab) == rownames(meta_tab)))
+stopifnot(identical(colnames(counts_tab), rownames(meta_tab)))
+
 
 
 ## -----------------------------------------------------------------------------

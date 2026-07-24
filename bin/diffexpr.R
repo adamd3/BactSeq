@@ -2,11 +2,10 @@
 
 library(optparse)
 library(DESeq2)
-library(ggplot2)
 library(RColorBrewer)
 library(RSQLite)
 library(plyr)
-library(tibble)
+library(tidyverse)
 
 if (!require("EnhancedVolcano")) {
     if (!require("BiocManager", quietly = TRUE)) {

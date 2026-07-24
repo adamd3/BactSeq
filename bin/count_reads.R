@@ -49,23 +49,25 @@ threads <- opt$threads
 ## Functions
 ## -----------------------------------------------------------------------------
 parse_gff_attributes <- function(
-    attributes_string, attribute_name, start_pos, end_pos, default_val = NULL) { 
-  attr_pairs_raw <- stringr::str_split(attributes_string, ";")[[1]]
-  attr_pairs <- stringr::str_trim(
-    stringr::str_replace_all(attr_pairs_raw, "[\\s\\p{Zs}\\p{C}]", " "))
-  search_pattern_regex <- paste0("^", attribute_name, "=")
-  target_attr <- attr_pairs[grepl(search_pattern_regex, attr_pairs)] 
-  if (length(target_attr) > 0) {
-    value <- stringr::str_remove(target_attr[1], search_pattern_regex)
-    return(value)
-  } else {
-    if (!is.null(default_val)) {
-      return(default_val)
+  attributes_string, attribute_name, start_pos, end_pos, default_val = NULL
+) {
+    attr_pairs_raw <- stringr::str_split(attributes_string, ";")[[1]]
+    attr_pairs <- stringr::str_trim(
+        stringr::str_replace_all(attr_pairs_raw, "[\\s\\p{Zs}\\p{C}]", " ")
+    )
+    search_pattern_regex <- paste0("^", attribute_name, "=")
+    target_attr <- attr_pairs[grepl(search_pattern_regex, attr_pairs)]
+    if (length(target_attr) > 0) {
+        value <- stringr::str_remove(target_attr[1], search_pattern_regex)
+        return(value)
     } else {
-      default_value_generated <- paste0("unknown_", start_pos, "_", end_pos)
-      return(default_value_generated)
+        if (!is.null(default_val)) {
+            return(default_val)
+        } else {
+            default_value_generated <- paste0("unknown_", start_pos, "_", end_pos)
+            return(default_value_generated)
+        }
     }
-  }
 }
 
 
@@ -74,58 +76,35 @@ parse_gff_attributes <- function(
 ## -----------------------------------------------------------------------------
 meta_tab <- read_tsv(meta_f)
 
-total_counts_list <- map(meta_tab$sample, function(x) {
-    mapped_count <- read_tsv(paste0(x, ".counts"), col_names = "mapped")
-    mapped_count$sample <- x
-    mapped_count
-})
-merged_total_counts <- bind_rows(total_counts_list)
-
+merged_total_counts <- meta_tab$sample %>%
+    set_names() %>%
+    paste0(".counts") %>%
+    read_tsv(col_names = "mapped", id = "sample") %>%
+    mutate(sample = str_remove(sample, "\\.counts$"))
 
 
 ## -----------------------------------------------------------------------------
 ## Read genome annotation
 ## -----------------------------------------------------------------------------
-ref_annot <- ape::read.gff(gff_f, na.strings = c(".", "?"), GFF3 = TRUE)
-
-ref_annot <- subset(ref_annot, type == "gene")
-
-gene_attr <- stringr::str_split(ref_annot$attributes, ";")
-
-locus_tags <- unname(mapply(parse_gff_attributes,
-                     ref_annot$attributes,
-                     attribute_name = "locus_tag",
-                     start_pos = ref_annot$start,
-                     end_pos = ref_annot$end))
-
-gene_biotypes <- unname(mapply(parse_gff_attributes,
-                    ref_annot$attributes,
-                    attribute_name = "gene_biotype",
-                    start_pos = ref_annot$start,
-                    end_pos = ref_annot$end,
-                    "unknown"))
-
-common_gene_names <- unname(mapply(parse_gff_attributes,
-                    ref_annot$attributes,
-                    attribute_name = "gene",
-                    start_pos = ref_annot$start,
-                    end_pos = ref_annot$end,
-                    "unknown"))
+ref_annot <- ape::read.gff(gff_f, na.strings = c(".", "?"), GFF3 = TRUE) %>%
+    filter(type == "gene")
 
 
-gene_lengths <- (ref_annot$end - ref_annot$start) + 1
+ref_annot <- ref_annot %>%
+    mutate(
+        locus_tag = pmap_chr(list(attributes, start, end), \(a, s, e) parse_gff_attributes(a, "locus_tag", s, e)),
+        gene_biotype = pmap_chr(list(attributes, start, end), \(a, s, e) parse_gff_attributes(a, "gene_biotype", s, e)),
+        gene_name = pmap_chr(list(attributes, start, end), \(a, s, e) parse_gff_attributes(a, "gene", s, e)),
+        gene_length = (end - start) + 1
+    )
 
-ref_gene_df <- data.frame(
-    locus_tag = locus_tags,
-    biotype = gene_biotypes,
-    gene_name = common_gene_names,
-    gene_length = gene_lengths
-)
-ref_gene_df$locus_tag <- sub("^.*=", "", ref_gene_df$locus_tag)
-ref_gene_df$biotype <- sub("^.*=", "", ref_gene_df$biotype)
-ref_gene_df$gene_name <- sub("^.*=", "", ref_gene_df$gene_name)
+ref_annot <- ref_annot %>%
+    select(locus_tag, gene_biotype, gene_name, gene_length) %>%
+    mutate(
+        locus
+    )
 
-write_tsv(ref_gene_df, "ref_gene_df.tsv")
+write_tsv(ref_annot, "ref_gene_df.tsv")
 
 
 ## -----------------------------------------------------------------------------
@@ -163,7 +142,7 @@ counts_mat <- gene_counts$counts %>%
 write_tsv(counts_mat, "gene_counts.tsv")
 
 ## protein-coding genes only
-gene_counts_pc <- counts_mat[ref_gene_df$biotype == "protein_coding", ]
+gene_counts_pc <- counts_mat[ref_annot$biotype == "protein_coding", ]
 write_tsv(gene_counts_pc, "gene_counts_pc.tsv")
 
 
@@ -171,24 +150,16 @@ write_tsv(gene_counts_pc, "gene_counts_pc.tsv")
 ## Plot library composition
 ## -----------------------------------------------------------------------------
 ## set up plots
-brewer_pallette1 <- brewer.pal(9, "Set1")
-brewer_pallette3 <- brewer.pal(8, "Dark2")
-
-gg_color_hue <- function(n) {
-    hues <- seq(15, 375, length = n + 1)
-    hcl(h = hues, l = 65, c = 100)[1:n]
-}
-ggColsDefault <- (gg_color_hue(4))
-ggCols <- brewer_pallette1[c(1, 3, 4, 5, 2, 7, 8)]
+col_pal <- brewer.pal(9, "Set1")[c(1, 3, 4, 5, 2, 7, 8)]
 
 ## summarise counts per sample
 
-all_biotypes <- unique(ref_gene_df$biotype)
+all_biotypes <- unique(ref_annot$biotype)
 
 biotype_counts <- data.frame(do.call(
     cbind,
     lapply(all_biotypes, function(biotype) {
-        colSums(gene_counts$counts[ref_gene_df$biotype == biotype, , drop = FALSE])
+        colSums(gene_counts$counts[ref_annot$biotype == biotype, , drop = FALSE])
     })
 ))
 colnames(biotype_counts) <- all_biotypes
@@ -219,7 +190,6 @@ nsamps <- ncol(gene_counts$counts)
 
 
 if (nsamps > 2 & nsamps < 50) {
-
     #############################
     ## raw counts plot
     #############################
@@ -248,10 +218,10 @@ if (nsamps > 2 & nsamps < 50) {
         ylab(ylabel) +
         scale_fill_manual(
             "",
-            values = ggCols,
+            values = col_pal,
             guide = guide_legend(reverse = TRUE)
         ) +
-        scale_colour_manual(values = ggCols, guide = FALSE) +
+        scale_colour_manual(values = col_pal, guide = FALSE) +
         scale_y_continuous(labels = unit_format(unit = "", scale = 1e-6)) +
         ## add a dashed line at the min usable number of reads
         # geom_hline(yintercept = 5e6, linetype="dashed") +
@@ -278,7 +248,6 @@ if (nsamps > 2 & nsamps < 50) {
     ## proportions plot
     #############################
     ## get the proportions of reads per library
-    # propCols <- (mergedDf[,c(3,13,14,5)] / mergedDf[,2])
 
     propCols <- counts_summary %>%
         mutate(
@@ -308,10 +277,10 @@ if (nsamps > 2 & nsamps < 50) {
         ylab("Proportion of reads") +
         scale_fill_manual(
             "",
-            values = ggCols,
+            values = col_pal,
             guide = guide_legend(reverse = TRUE)
         ) +
-        scale_colour_manual(values = ggCols, guide = FALSE) +
+        scale_colour_manual(values = col_pal, guide = FALSE) +
         scale_y_continuous(labels = comma) +
         theme_bw(base_size = 15) +
         theme(

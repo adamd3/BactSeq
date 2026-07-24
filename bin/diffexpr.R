@@ -47,55 +47,34 @@ outdir <- opt$outdir
 
 
 
-## ------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ## Read and process data
-## ------------------------------------------------------------------------------
-counts_tab <- read.csv(
-    counts_f,
-    header = TRUE, na.strings = c("", "NA"), sep = "\t",
-    stringsAsFactors = FALSE
-)
-meta_tab <- read.table(
-    meta_f,
-    header = TRUE, sep = "\t", stringsAsFactors = FALSE
-)
-contrast_tab <- read.table(
-    cont_tab_f,
-    header = TRUE, sep = "\t", stringsAsFactors = FALSE,
-    colClasses = rep("character", 2)
-)
+## -----------------------------------------------------------------------------
+counts_tab <- read_tsv(counts_f, na = c("", "NA"))
+meta_tab <- read_tsv(meta_f)
+contrast_tab <- read_tsv(cont_tab_f, col_types = cols(.default = "c"))
 
-# remove whitespace
-contrast_tab <- data.frame(
-    rbind(apply(contrast_tab, 2, function(x) gsub("\\s+", "", x)))
-)
+contrast_tab <- contrast_tab %>%
+    mutate(across(everything(), ~ str_replace_all(str_remove_all(.x, "\\s+"), "-", ".")))
+
+meta_tab <- meta_tab %>%
+    mutate(
+        sample = make.names(str_replace_all(sample, "-", ".")),
+        group = factor(str_replace_all(group, "-", "."))
+    )
+
+counts_tab <- counts_tab %>%
+    mutate(across(-feature_id, as.numeric)) %>%
+    column_to_rownames(var = "feature_id")
+
+meta_tab <- meta_tab %>%
+    slice(match(colnames(counts_tab), sample)) %>%
+    column_to_rownames(var = "sample")
 
 
-gene_names <- counts_tab[["feature_id"]]
-counts_tab[["feature_id"]] <- NULL
-counts_tab <- as.data.frame(sapply(counts_tab, as.numeric))
-rownames(counts_tab) <- gene_names
-
-meta_tab$group <- gsub("\\-", ".", meta_tab$group)
-meta_tab$sample <- gsub("\\-", ".", meta_tab$sample)
-
-contrast_tab$Condition1 <- gsub("\\-", ".", contrast_tab$Condition1)
-contrast_tab$Condition2 <- gsub("\\-", ".", contrast_tab$Condition2)
-
-## factorise group column
-meta_tab$group <- as.factor(as.character(meta_tab$group))
-
-## order rows to match counts columns
-meta_tab <- meta_tab[match(
-    colnames(counts_tab), make.names(meta_tab$sample)
-), ]
-rownames(meta_tab) <- make.names(meta_tab$sample)
-
-## ------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ## Differential gene expression
-## ------------------------------------------------------------------------------
-
-## make list of contrasts to be performed from contrast table
+## -----------------------------------------------------------------------------
 comb_list <- lapply(1:nrow(contrast_tab), function(idx) {
     c(contrast_tab[idx, 1], contrast_tab[idx, 2])
 })
@@ -105,16 +84,6 @@ comb_names <- lapply(1:nrow(contrast_tab), function(idx) {
 })
 names(comb_list) <- comb_names
 
-# ## previous version - get all possible combinations of group column:
-# comb_list <- combn(levels(meta_tab$group), 2, simplify = FALSE)
-#
-# comb_names <- sapply(comb_list, function(x){
-#     contrast_name <- paste0(x[1],"_",x[2])
-#     contrast_name
-# })
-# names(comb_list) <- comb_names
-
-## make DESeq2 object
 dds <- DESeqDataSetFromMatrix(
     countData = round(counts_tab), colData = meta_tab,
     design = ~group
@@ -147,10 +116,9 @@ lapply(seq_along(contrast_list), function(x) {
 
 
 
-## ------------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ## Volcano plots
-## ------------------------------------------------------------------------------
-## choose the limits for the x- and y-axes using the log2FoldChanges and pvalues
+## -----------------------------------------------------------------------------
 lfc_list <- lapply(contrast_list, function(x) {
     subset(x, padj < p_thresh)$log2FoldChange
 })

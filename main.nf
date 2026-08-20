@@ -201,7 +201,6 @@ workflow {
             ch_bwa_out_count,
             ch_metadata,
             ch_gff_file,
-            params.paired,
             params.strandedness
         )
         ch_readcounts_df = COUNT_READS.out.counts_df
@@ -327,7 +326,6 @@ def helpMessage() {
     --func_file [file]              Path to GFF3-format file containing functional annotations.
     --l2fc_thresh [str]             Absolute log2(FoldChange) threshold for identifying differentially expressed genes. Default = 1.
     --outdir [file]                 The output directory where the results will be saved (Default: './results').
-    --paired [str]                  Data are paired-end.
     --p_thresh [str]                Adjusted p-value threshold for identifying differentially expressed genes. Default = 0.05.
     --skip_trimming [bool]          Do not trim adaptors from FastQ files.
     --strandedness [str]            Is data stranded? Options: `unstranded`, `forward`, `reverse`. Default = reverse.

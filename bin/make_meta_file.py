@@ -43,15 +43,19 @@ def make_meta(sample_file, data_dir, outf):
         print(f"ERROR: Could not read sample file: {e}", file=sys.stdout)
         sys.exit(1)
 
-    sample_dat = pd.read_csv(sample_file, sep="\t")
-
     # Remove empty rows
     sample_dat.replace("", float("NaN"), inplace=True)
     sample_dat.dropna(subset=["sample"], inplace=True)
 
-    if len(sample_dat.file2.value_counts()) > 0:
-        f2_bnames = [os.path.basename(f) for f in sample_dat["file2"].to_list()]
-        f2_full_paths = [join_path_or_url(data_dir, b) for b in f2_bnames]
+    if "file2" in sample_dat.columns and len(sample_dat["file2"].dropna()) > 0:
+        f2_bnames = [
+            os.path.basename(f) if pd.notna(f) else ""
+            for f in sample_dat["file2"].to_list()
+        ]
+        f2_full_paths = [
+            join_path_or_url(data_dir, b) if b != "" else ""
+            for b in f2_bnames
+        ]
         sample_dat["file2"] = f2_full_paths
         sample_dat["paired"] = "1"
     else:

@@ -20,21 +20,42 @@ jobs:
       matrix:
         # Test both aligners and multiple Nextflow versions
         include:
-          # Test pipeline minimum Nextflow version with BWA
+          # Test pipeline minimum Nextflow version with BWA (single-end)
           - NXF_VER: "21.10.3"
             NXF_EDGE: ""
             aligner: "bwa"
+            test_profile: "test"
             test_type: "single-end"
-          # Test pipeline minimum Nextflow version with Kallisto
+          # Test pipeline minimum Nextflow version with Kallisto (single-end)
           - NXF_VER: "21.10.3"
             NXF_EDGE: ""
             aligner: "kallisto"
+            test_profile: "test"
             test_type: "single-end"
-          # Test with latest Nextflow version
+          # Test pipeline minimum Nextflow version with BWA (paired-end)
+          - NXF_VER: "21.10.3"
+            NXF_EDGE: ""
+            aligner: "bwa"
+            test_profile: "test_pe"
+            test_type: "paired-end"
+          # Test pipeline minimum Nextflow version with Kallisto (paired-end)
+          - NXF_VER: "21.10.3"
+            NXF_EDGE: ""
+            aligner: "kallisto"
+            test_profile: "test_pe"
+            test_type: "paired-end"
+          # Test with latest Nextflow version (single-end)
           - NXF_VER: "25.04.0"
             NXF_EDGE: ""
             aligner: "bwa"
+            test_profile: "test"
             test_type: "single-end"
+          # Test with latest Nextflow version (paired-end)
+          - NXF_VER: "25.04.0"
+            NXF_EDGE: ""
+            aligner: "bwa"
+            test_profile: "test_pe"
+            test_type: "paired-end"
     steps:
       - name: Check out pipeline code
         uses: actions/checkout@v4
@@ -72,19 +93,19 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           
-      - name: Run pipeline with test data (${{ matrix.aligner }})
+      - name: Run pipeline with test data (${{ matrix.aligner }} - ${{ matrix.test_type }})
         run: |
           if [ "${{ matrix.aligner }}" == "kallisto" ]; then
-            nextflow run ${GITHUB_WORKSPACE} -profile test,docker --aligner ${{ matrix.aligner }} --ref_genome https://raw.githubusercontent.com/adamd3/BactSeq/develop/test_data/Mabs_CDS.fasta --outdir ./results
+            nextflow run ${GITHUB_WORKSPACE} -profile ${{ matrix.test_profile }},docker --aligner ${{ matrix.aligner }} --ref_genome https://raw.githubusercontent.com/adamd3/BactSeq/develop/test_data/Mabs_CDS.fasta --outdir ./results
           else
-            nextflow run ${GITHUB_WORKSPACE} -profile test,docker --aligner ${{ matrix.aligner }} --ref_genome https://raw.githubusercontent.com/adamd3/BactSeq/develop/test_data/Mabs.fasta --outdir ./results
+            nextflow run ${GITHUB_WORKSPACE} -profile ${{ matrix.test_profile }},docker --aligner ${{ matrix.aligner }} --ref_genome https://raw.githubusercontent.com/adamd3/BactSeq/develop/test_data/Mabs.fasta --outdir ./results
           fi
 
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: test-results-${{ matrix.aligner }}-nf${{ matrix.NXF_VER }}
+          name: test-results-${{ matrix.aligner }}-${{ matrix.test_type }}-nf${{ matrix.NXF_VER }}
           path: |
             ./results
             .nextflow.log

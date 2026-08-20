@@ -39,7 +39,6 @@ opt <- parse_args(opt_parser)
 
 meta_f <- opt$metadata
 gff_f <- opt$gff
-ispaired <- if (opt$is_paired == "TRUE") TRUE else FALSE
 strandedness <- opt$strandedness
 threads <- opt$threads
 
@@ -75,6 +74,14 @@ parse_gff_attributes <- function(
 ## Read data
 ## -----------------------------------------------------------------------------
 meta_tab <- read_tsv(meta_f)
+
+if (!is.null(opt$is_paired)) {
+    ispaired <- if (opt$is_paired == "TRUE") TRUE else FALSE
+} else if ("paired" %in% colnames(meta_tab)) {
+    ispaired <- any(meta_tab$paired %in% c("1", 1, "TRUE", "true", TRUE))
+} else {
+    ispaired <- FALSE
+}
 
 merged_total_counts <- meta_tab$sample %>%
     set_names() %>%

@@ -72,6 +72,10 @@ gene_lengths_kb <- as.numeric(ref_tab_sub$gene_length) / 1000
 
 rpk <- non_rRNA_counts / gene_lengths_kb
 tpm_mat <- t(t(rpk) / colSums(rpk)) * 1e6
+if (isTRUE(log)) {
+    tpm_mat <- log2(tpm_mat + 1)
+}
+
 tpm_df <- as_tibble(tpm_mat, rownames = "feature_id")
 
 write_tsv(tpm_df, file.path(outdir, "tpm_counts.tsv"))

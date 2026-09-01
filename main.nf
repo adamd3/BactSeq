@@ -246,7 +246,7 @@ workflow {
     )
     ch_deseq_counts = NORMALISE_COUNTS.out.deseq_counts
     ch_cpm_counts = NORMALISE_COUNTS.out.cpm_counts
-    ch_rpkm_counts = NORMALISE_COUNTS.out.rpkm_counts
+    ch_tpm_counts = NORMALISE_COUNTS.out.tpm_counts
     // NB the resulting counts are log-transformed by default
 
 

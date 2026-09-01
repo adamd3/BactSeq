@@ -67,13 +67,11 @@ cpm_df <- edgeR::cpm(y, log = log) %>%
 
 write_tsv(cpm_df, file.path(outdir, "cpm_counts.tsv"))
 
-## reads per kilobase per million (rpkm) - normalised for lib size + gene length
-y <- DGEList(
-    counts = non_rRNA_counts,
-    genes = tibble(gene.length = as.numeric(ref_tab_sub$gene_length))
-)
-y <- calcNormFactors(y)
-rpkm_df <- edgeR::rpkm(y, log = log) %>%
-    as_tibble(rownames = "feature_id")
+# tpm - normalised for lib size + gene length
+gene_lengths_kb <- as.numeric(ref_tab_sub$gene_length) / 1000
 
-write_tsv(rpkm_df, file.path(outdir, "rpkm_counts.tsv"))
+rpk <- non_rRNA_counts / gene_lengths_kb
+tpm_mat <- t(t(rpk) / colSums(rpk)) * 1e6
+tpm_df <- as_tibble(tpm_mat, rownames = "feature_id")
+
+write_tsv(tpm_df, file.path(outdir, "tpm_counts.tsv"))

@@ -10,7 +10,7 @@ process NORMALISE_COUNTS {
     output:
     path 'deseq_counts.tsv', emit: deseq_counts
     path 'cpm_counts.tsv', emit: cpm_counts
-    path 'rpkm_counts.tsv', emit: rpkm_counts
+    path 'tpm_counts.tsv', emit: rpkm_counts
 
     script:
     """

@@ -33,20 +33,17 @@ The pipeline performs the following steps:
 ### Core Analysis
 
 1. **Quality Control & Trimming**
-
    - Trim adaptors from reads ([`Trim Galore!`](https://www.bioinformatics.babraham.ac.uk/projects/trim_galore/))
    - Read QC ([`FastQC`](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/))
 
 2. **Read Alignment** (choose one)
-
    - **BWA**: Align reads to reference genome ([`BWA-MEM`](https://github.com/lh3/bwa/))
    - **Kallisto**: Pseudo-align reads to coding sequences ([`Kallisto`](https://pachterlab.github.io/kallisto/))
 
 3. **Expression Quantification & Normalization**
-
    - Size-factor scaling using [`DESeq2`](https://bioconductor.org/packages/release/bioc/html/DESeq2.html)
    - TMM normalization using [`edgeR`](http://bioconductor.org/packages/release/bioc/html/edgeR.html)
-   - RPKM scaling for gene length normalization
+   - TPM scaling for gene length normalization
 
 4. **Exploratory Analysis**
    - Principal component analysis (PCA) of normalized expression values
@@ -55,7 +52,6 @@ The pipeline performs the following steps:
 ### Optional Analysis
 
 5. **Differential Expression** ([`DESeq2`](https://bioconductor.org/packages/release/bioc/html/DESeq2.html))
-
    - Pairwise comparisons based on provided contrasts
    - Volcano plots and summary statistics
 
@@ -130,7 +126,6 @@ nextflow run BactSeq \
 ### Required Files
 
 1. **Sample Sheet** (`samples.tsv`)
-
    - TSV file containing sample information with the following columns:
      - `sample`: Sample ID
      - `file1`: Name of R1 FastQ file
@@ -149,7 +144,6 @@ nextflow run BactSeq \
    ```
 
 2. **Reference Genome** (`genome.fasta`)
-
    - FASTA file containing the reference genome sequence
    - Can be downloaded from NCBI RefSeq
 
@@ -160,7 +154,6 @@ nextflow run BactSeq \
 ### Optional Files
 
 1. **Contrasts Table** (`contrasts.tsv`) - _For differential expression_
-
    - TSV file with 2 columns defining comparisons to perform
    - Column names: `Condition1`, `Condition2`
 
@@ -174,7 +167,6 @@ nextflow run BactSeq \
    ```
 
 2. **Functional Annotation File** (`functional_annotation.csv`) - _For enrichment analysis_
-
    - CSV file containing GO terms for genes
    - Column 1: Gene ID (must match `locus_tag` in GFF)
    - Column 2: GO terms (comma-separated)
@@ -206,8 +198,8 @@ The pipeline generates the following output directories:
 
 - `gene_counts.tsv`: Raw read counts per gene
 - `deseq_counts.tsv`: DESeq2 normalized counts (log2 transformed)
-- `cpm_counts.tsv`: Counts per million (CPM) normalized
-- `rpkm_counts.tsv`: RPKM normalized counts
+- `cpm_counts.tsv`: Counts per million (CPM): normalized for library size
+- `tpm_counts.tsv`: Transcripts per million (TPM): normalized for both library size and gene length
 
 **Analysis Results:**
 

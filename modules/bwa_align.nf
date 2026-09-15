@@ -34,12 +34,13 @@ process BWA_ALIGN {
     script:
 
     def name = task.ext.prefix ?: "${meta.sample_id}"
+    def sort_cpus = task.cpus > 1 ? task.cpus - 1 : 1
 
     if (meta.paired_end) {
         """
         bwa mem -t ${task.cpus} ${ref_fasta} \\
             ${name}_1_val_1.fq.gz ${name}_2_val_2.fq.gz | \\
-            samtools sort -@ ${task.cpus - 1} -O bam - > ${name}.bam
+            samtools sort -@ ${sort_cpus} -O bam - > ${name}.bam
         samtools index -@ ${task.cpus} ${name}.bam
         MAPPED_FRAGMENTS=\$(( \
             \$(samtools view -@ ${task.cpus} -c -F 0x904 -f 0x40 ${name}.bam) + \
@@ -49,8 +50,8 @@ process BWA_ALIGN {
         """
     } else {
         """
-        bwa mem -t ${task.cpus} ${ref_fasta} ${name}_trimmed.fq.gz \\
-            | samtools sort -@ ${task.cpus - 1} -O bam - > ${name}.bam
+        bwa mem -t ${task.cpus} ${ref_fasta} ${name}_trimmed.fq.gz | \\
+            samtools sort -@ ${sort_cpus} -O bam - > ${name}.bam
         samtools index -@ ${task.cpus} ${name}.bam
         MAPPED_FRAGMENTS=\$(samtools view -@ ${task.cpus} -c -F 0x904 ${name}.bam)
         echo "\$MAPPED_FRAGMENTS" > ${name}.counts

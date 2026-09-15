@@ -41,16 +41,19 @@ process BWA_ALIGN {
             ${name}_1_val_1.fq.gz ${name}_2_val_2.fq.gz | \\
             samtools sort -@ ${task.cpus - 1} -O bam - > ${name}.bam
         samtools index -@ ${task.cpus} ${name}.bam
-        # samtools idxstats ${name}.bam | head -n 1 > ${name}.counts
-        samtools view -F 0x4 ${name}.bam | cut -f 1 | sort | uniq | wc -l > ${name}.counts
+        MAPPED_FRAGMENTS=\$(( \
+            \$(samtools view -@ ${task.cpus} -c -F 0x904 -f 0x40 ${name}.bam) + \
+            \$(samtools view -@ ${task.cpus} -c -F 0x904 -f 0x88 ${name}.bam) \
+        ))
+        echo "\$MAPPED_FRAGMENTS" > ${name}.counts
         """
     } else {
         """
         bwa mem -t ${task.cpus} ${ref_fasta} ${name}_trimmed.fq.gz \\
             | samtools sort -@ ${task.cpus - 1} -O bam - > ${name}.bam
         samtools index -@ ${task.cpus} ${name}.bam
-        # samtools idxstats ${name}.bam | head -n 1 > ${name}.counts
-        samtools view -F 0x4 ${name}.bam | cut -f 1 | sort | uniq | wc -l > ${name}.counts
+        MAPPED_FRAGMENTS=\$(samtools view -@ ${task.cpus} -c -F 0x904 ${name}.bam)
+        echo "\$MAPPED_FRAGMENTS" > ${name}.counts
         """
     }
 }

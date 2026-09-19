@@ -33,8 +33,7 @@ The pipeline performs the following steps:
 ### Core Analysis
 
 1. **Quality Control & Trimming**
-   - Trim adaptors from reads ([`Trim Galore!`](https://www.bioinformatics.babraham.ac.uk/projects/trim_galore/))
-   - Read QC ([`FastQC`](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/))
+   - Trim adapters and filter reads with quality control reports ([`fastp`](https://github.com/OpenGene/fastp))
 
 2. **Read Alignment** (choose one)
    - **BWA**: Align reads to reference genome ([`BWA-MEM`](https://github.com/lh3/bwa/))
@@ -108,7 +107,9 @@ nextflow run BactSeq \
 | `--l2fc_thresh`   | `1`         | Absolute log2(FoldChange) threshold for differential expression            |
 | `--fragment_len`  | `150`       | Average fragment length for Kallisto (single-end only)                     |
 | `--fragment_sd`   | `20`        | Fragment length standard deviation for Kallisto (single-end only)          |
-| `--skip_trimming` | `false`     | Skip adapter trimming                                                      |
+| `--min_read_len`  | `20`        | Minimum read length required by fastp                                      |
+| `--fastp_args`    | `""`        | Additional arguments to pass to fastp                                      |
+| `--skip_trimming` | `false`     | Skip adapter trimming and QC with fastp                                    |
 | `--outdir`        | `./results` | Output directory for results                                               |
 
 #### Standard Nextflow Parameters
@@ -185,7 +186,7 @@ The pipeline generates the following output directories:
 
 | Directory        | Contents                                           |
 | ---------------- | -------------------------------------------------- |
-| `trim_galore/`   | Adapter-trimmed FastQ files and FastQC reports     |
+| `fastp/`         | Adapter-trimmed FastQ files, HTML and JSON QC reports |
 | `read_counts/`   | Raw and normalized gene count matrices             |
 | `PCA_samples/`   | Principal component analysis plots and coordinates |
 | `diff_expr/`     | Differential expression results and volcano plots  |

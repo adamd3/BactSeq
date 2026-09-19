@@ -40,20 +40,16 @@ process KALLISTO_QUANT {
     }
 
     if (meta.paired_end) {
-        // if trimming has not been performed, must symlink to match expected file names
         // kallisto params -l, -s are estimated from paired end data, but are required when using --single
         """
-        [ ! -f  ${name}_1_val_1.fq.gz ] && ln -s ${reads[0]} ${name}_1_val_1.fq.gz
-        [ ! -f  ${name}_2_val_2.fq.gz ] && ln -s ${reads[1]} ${name}_2_val_2.fq.gz
-        kallisto quant -t $task.cpus -i $idx \
-            ${strand_arg} -o kallisto_${name} ${name}_1_val_1.fq.gz ${name}_2_val_2.fq.gz
+        kallisto quant -t $task.cpus -i $idx \\
+            ${strand_arg} -o kallisto_${name} ${reads[0]} ${reads[1]}
         """
     } else {
         """
-        [ ! -f  ${name}_trimmed.fq.gz ] && ln -s $reads ${name}_trimmed.fq.gz
-        kallisto quant -t $task.cpus -i $idx \
-            ${strand_arg} --single -l ${params.fragment_len} -s ${params.fragment_sd} \
-            -o kallisto_${name} ${name}_trimmed.fq.gz
+        kallisto quant -t $task.cpus -i $idx \\
+            ${strand_arg} --single -l ${params.fragment_len} -s ${params.fragment_sd} \\
+            -o kallisto_${name} ${reads}
         """
     }
 }

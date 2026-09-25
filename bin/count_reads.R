@@ -94,13 +94,15 @@ merged_total_counts <- meta_tab$sample %>%
 ## Read genome annotation
 ## -----------------------------------------------------------------------------
 ref_annot <- ape::read.gff(gff_f, na.strings = c(".", "?"), GFF3 = TRUE) %>%
-    filter(type == "gene")
+    filter(type %in% c("gene", "pseudogene"))
 
 
 ref_annot <- ref_annot %>%
     mutate(
         locus_tag = pmap_chr(list(attributes, start, end), \(a, s, e) parse_gff_attributes(a, "locus_tag", s, e)),
-        gene_biotype = pmap_chr(list(attributes, start, end), \(a, s, e) parse_gff_attributes(a, "gene_biotype", s, e)),
+        gene_biotype = pmap_chr(list(attributes, start, end, type), \(a, s, e, t) {
+            parse_gff_attributes(a, "gene_biotype", s, e, default_val = if (t == "pseudogene") "pseudogene" else NULL)
+        }),
         gene_name = pmap_chr(list(attributes, start, end), \(a, s, e) parse_gff_attributes(a, "gene", s, e)),
         gene_length = (end - start) + 1
     )
@@ -133,7 +135,7 @@ gene_counts <- Rsubread::featureCounts(
     bamfilesCount,
     annot.ext = gff_f,
     isGTFAnnotationFile = TRUE,
-    GTF.featureType = "gene",
+    GTF.featureType = c("gene", "pseudogene"),
     GTF.attrType = "locus_tag",
     nthreads = threads,
     countMultiMappingReads = TRUE,
@@ -151,7 +153,13 @@ counts_mat <- gene_counts$counts %>%
 write_tsv(counts_mat, "gene_counts.tsv")
 
 ## protein-coding genes only
-gene_counts_pc <- counts_mat[ref_annot$biotype == "protein_coding", ]
+pc_genes <- ref_annot %>%
+    filter(biotype == "protein_coding") %>%
+    pull(locus_tag)
+
+gene_counts_pc <- counts_mat %>%
+    filter(feature_id %in% pc_genes)
+
 write_tsv(gene_counts_pc, "gene_counts_pc.tsv")
 
 
@@ -165,10 +173,18 @@ col_pal <- brewer.pal(9, "Set1")[c(1, 3, 4, 5, 2, 7, 8)]
 
 all_biotypes <- unique(ref_annot$biotype)
 
+locus_to_biotype <- setNames(ref_annot$biotype, ref_annot$locus_tag)
+feature_biotypes <- locus_to_biotype[rownames(gene_counts$counts)]
+
 biotype_counts <- data.frame(do.call(
     cbind,
     lapply(all_biotypes, function(biotype) {
-        colSums(gene_counts$counts[ref_annot$biotype == biotype, , drop = FALSE])
+        matching_rows <- which(feature_biotypes == biotype)
+        if (length(matching_rows) > 0) {
+            colSums(gene_counts$counts[matching_rows, , drop = FALSE])
+        } else {
+            setNames(rep(0, ncol(gene_counts$counts)), colnames(gene_counts$counts))
+        }
     })
 ))
 colnames(biotype_counts) <- all_biotypes

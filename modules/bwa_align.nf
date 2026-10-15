@@ -39,7 +39,7 @@ process BWA_ALIGN {
     if (meta.paired_end) {
         """
         bwa mem -t ${task.cpus} ${ref_fasta} \\
-            ${name}_1_val_1.fq.gz ${name}_2_val_2.fq.gz | \\
+            ${trimmed_reads[0]} ${trimmed_reads[1]} | \\
             samtools sort -@ ${sort_cpus} -O bam - > ${name}.bam
         samtools index -@ ${task.cpus} ${name}.bam
         MAPPED_FRAGMENTS=\$(( \
@@ -50,7 +50,7 @@ process BWA_ALIGN {
         """
     } else {
         """
-        bwa mem -t ${task.cpus} ${ref_fasta} ${name}_trimmed.fq.gz | \\
+        bwa mem -t ${task.cpus} ${ref_fasta} ${trimmed_reads} | \\
             samtools sort -@ ${sort_cpus} -O bam - > ${name}.bam
         samtools index -@ ${task.cpus} ${name}.bam
         MAPPED_FRAGMENTS=\$(samtools view -@ ${task.cpus} -c -F 0x904 ${name}.bam)

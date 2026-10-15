@@ -69,6 +69,7 @@ if (params.func_file) {
 ================================================================================
 */
 include {MAKE_META_FILE} from './modules/metadata'
+include {FASTP} from './modules/fastp'
 include {TRIMGALORE} from './modules/trim_reads'
 include {MAKE_BWA_INDEX; BWA_ALIGN; COUNT_READS} from './modules/bwa_align'
 include {MAKE_KALLISTO_IDX; KALLISTO_QUANT; MERGE_COUNTS} from './modules/kallisto'
@@ -128,6 +129,9 @@ workflow {
     if (!(params.aligner in ['bwa', 'kallisto'])) {
         exit 1, "ERROR: aligner must be 'bwa' or 'kallisto', got: ${params.aligner}"
     }
+    if (!(params.trimmer in ['fastp', 'trimgalore'])) {
+        exit 1, "ERROR: trimmer must be 'fastp' or 'trimgalore', got: ${params.trimmer}"
+    }
     if (!(params.strandedness in ['unstranded', 'forward', 'reverse'])) {
         exit 1, "ERROR: strandedness must be 'unstranded', 'forward', or 'reverse', got: ${params.strandedness}"
     }
@@ -151,21 +155,34 @@ workflow {
     ch_metadata
         .splitCsv(header: true, sep:'\t')
         .map { create_fastq_channel(it) }
-        .set { ch_raw_reads_trimgalore }
+        .set { ch_raw_reads }
 
 
     /*
-     *  Trim reads
+     *  Trim reads & QC
      */
     if (params.skip_trimming) {
-        ch_trimmed_reads = ch_raw_reads_trimgalore
+        ch_trimmed_reads = ch_raw_reads
+        ch_fastp_json    = Channel.empty()
+        ch_fastp_html    = Channel.empty()
         ch_trimgalore_results_mqc = Channel.empty()
         ch_trimgalore_fastqc_reports_mqc = Channel.empty()
-    } else {
-        TRIMGALORE (
-            ch_raw_reads_trimgalore
+    } else if (params.trimmer == 'fastp') {
+        FASTP (
+            ch_raw_reads
         )
-        ch_trimmed_reads = TRIMGALORE.out.trimmed_reads
+        ch_trimmed_reads = FASTP.out.reads
+        ch_fastp_json    = FASTP.out.json
+        ch_fastp_html    = FASTP.out.html
+        ch_trimgalore_results_mqc = Channel.empty()
+        ch_trimgalore_fastqc_reports_mqc = Channel.empty()
+    } else if (params.trimmer == 'trimgalore') {
+        TRIMGALORE (
+            ch_raw_reads
+        )
+        ch_trimmed_reads = TRIMGALORE.out.reads
+        ch_fastp_json    = Channel.empty()
+        ch_fastp_html    = Channel.empty()
         ch_trimgalore_results_mqc = TRIMGALORE.out.trimgalore_results_mqc
         ch_trimgalore_fastqc_reports_mqc = TRIMGALORE.out.trimgalore_fastqc_reports_mqc
     }
@@ -320,14 +337,17 @@ def helpMessage() {
 
     Other options:
     --aligner [str]                 (Pseudo-)aligner to be used. Options: `bwa`, `kallisto`. Default = bwa.
+    --trimmer [str]                 Adapter trimmer and QC tool to be used. Options: `fastp`, `trimgalore`. Default = fastp.
     --contrast_file [file]          Path to tsv file containing contrasts to be performed for differential expression.
     --fragment_len [str]            Estimated average fragment length for kallisto transcript quantification (only required for single-end reads). Default = 150.
     --fragment_sd [str]             Estimated standard deviation of fragment length for kallisto transcript quantification (only required for single-end reads). Default = 20.
     --func_file [file]              Path to GFF3-format file containing functional annotations.
     --l2fc_thresh [str]             Absolute log2(FoldChange) threshold for identifying differentially expressed genes. Default = 1.
+    --min_read_len [int]            Minimum read length required by fastp. Default = 20.
+    --fastp_args [str]              Additional arguments to pass to fastp. Default = ''.
     --outdir [file]                 The output directory where the results will be saved (Default: './results').
     --p_thresh [str]                Adjusted p-value threshold for identifying differentially expressed genes. Default = 0.05.
-    --skip_trimming [bool]          Do not trim adaptors from FastQ files.
+    --skip_trimming [bool]          Do not run adapter trimming and quality filtering.
     --strandedness [str]            Is data stranded? Options: `unstranded`, `forward`, `reverse`. Default = reverse.
     -name [str]                     Name for the pipeline run. If not specified, Nextflow will automatically generate a random mnemonic.
     -resume                         Re-start the pipeline if it has been previously run.

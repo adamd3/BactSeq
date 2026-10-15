@@ -32,8 +32,9 @@ The pipeline performs the following steps:
 
 ### Core Analysis
 
-1. **Quality Control & Trimming**
-   - Trim adapters and filter reads with quality control reports ([`fastp`](https://github.com/OpenGene/fastp))
+1. **Quality Control & Trimming** (choose one)
+   - **fastp** (default): Ultra-fast all-in-one FASTQ preprocessor for adapter trimming, quality filtering, and QC reporting ([`fastp`](https://github.com/OpenGene/fastp))
+   - **Trim Galore!**: Adapter and quality trimming ([`Trim Galore!`](https://www.bioinformatics.babraham.ac.uk/projects/trim_galore/)) with read QC ([`FastQC`](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/))
 
 2. **Read Alignment** (choose one)
    - **BWA**: Align reads to reference genome ([`BWA-MEM`](https://github.com/lh3/bwa/))
@@ -99,6 +100,7 @@ nextflow run BactSeq \
 | Parameter         | Default     | Description                                                                |
 | ----------------- | ----------- | -------------------------------------------------------------------------- |
 | `--aligner`       | `bwa`       | Aligner to use: `bwa`, `kallisto`                                          |
+| `--trimmer`       | `fastp`     | Trimmer to use: `fastp`, `trimgalore`                                      |
 | `--ref_ann`       | -           | Path to GFF file containing reference genome annotation (required for BWA) |
 | `--contrast_file` | -           | Path to TSV file containing contrasts for differential expression          |
 | `--func_file`     | -           | Path to functional annotation file for enrichment analysis                 |
@@ -109,7 +111,7 @@ nextflow run BactSeq \
 | `--fragment_sd`   | `20`        | Fragment length standard deviation for Kallisto (single-end only)          |
 | `--min_read_len`  | `20`        | Minimum read length required by fastp                                      |
 | `--fastp_args`    | `""`        | Additional arguments to pass to fastp                                      |
-| `--skip_trimming` | `false`     | Skip adapter trimming and QC with fastp                                    |
+| `--skip_trimming` | `false`     | Skip adapter trimming and QC                                               |
 | `--outdir`        | `./results` | Output directory for results                                               |
 
 #### Standard Nextflow Parameters
@@ -186,7 +188,8 @@ The pipeline generates the following output directories:
 
 | Directory        | Contents                                           |
 | ---------------- | -------------------------------------------------- |
-| `fastp/`         | Adapter-trimmed FastQ files, HTML and JSON QC reports |
+| `fastp/`         | Adapter-trimmed FastQ files, HTML and JSON QC reports (when using fastp)      |
+| `trim_galore/`   | Adapter-trimmed FastQ files and FastQC reports (when using Trim Galore!)      |
 | `read_counts/`   | Raw and normalized gene count matrices             |
 | `PCA_samples/`   | Principal component analysis plots and coordinates |
 | `diff_expr/`     | Differential expression results and volcano plots  |
